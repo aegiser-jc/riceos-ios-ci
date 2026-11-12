@@ -22,10 +22,13 @@ env:
   BUNDLE_ID: com.donaus.riceos
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Select newest Xcode (App Store needs iOS 26 SDK)
+        run: |
+          ls /Applications | grep -i '^Xcode' ; X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1); [ -n "$X" ] && sudo xcode-select -s "$X"; xcodebuild -version
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Copy app/ into the iOS bundle (always current)
