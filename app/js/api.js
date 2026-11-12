@@ -17,11 +17,13 @@
   MSG.bad_national_id = 'เลขบัตรประชาชนไม่ถูกต้อง กรุณาตรวจสอบเลข 13 หลัก'; MSG.national_id_taken = 'เลขบัตรนี้ถูกใช้กับบัญชีอื่นแล้ว กรุณาติดต่อเจ้าหน้าที่'; MSG.already_verified = 'เลขบัตรของท่านผ่านการยืนยันแล้ว';
   MSG.national_id_disabled = 'ขณะนี้ยังไม่เปิดให้ยืนยันด้วยเลขบัตรประชาชน'; MSG.confirm_required = 'กรุณากดยืนยันการลบบัญชี';
   var base = ''; try { base = window.RICEOS_API_BASE || localStorage.getItem('riceos.api') || ''; } catch (e) { base = window.RICEOS_API_BASE || ''; }
-  base = String(base).replace(/\/+$/, '');
   var cap = window.Capacitor, native = !!(cap && cap.isNativePlatform && cap.isNativePlatform());
+  if (!base && native) base = 'https://riceos.donaus.com'; /* bundled app (https://localhost origin) has no same-origin backend */
+  base = String(base).replace(/\/+$/, '');
   var prefs = native && cap.Plugins ? cap.Plugins.Preferences : null, token = null;
-  function getToken() { if (token || !prefs) return Promise.resolve(token); return prefs.get({ key: 'riceos.token' }).then(function (r) { token = r && r.value || null; return token; }).catch(function () { return null; }); }
-  function setToken(t) { token = t || null; if (prefs) { try { t ? prefs.set({ key: 'riceos.token', value: t }) : prefs.remove({ key: 'riceos.token' }); } catch (e) {} } }
+  function lsTok(v) { try { if (v === undefined) return localStorage.getItem('riceos.token'); v ? localStorage.setItem('riceos.token', v) : localStorage.removeItem('riceos.token'); } catch (e) {} return null; }
+  function getToken() { if (token) return Promise.resolve(token); if (!prefs) { token = native ? lsTok() : null; return Promise.resolve(token); } return prefs.get({ key: 'riceos.token' }).then(function (r) { token = r && r.value || null; return token; }).catch(function () { return null; }); }
+  function setToken(t) { token = t || null; if (native && !prefs) lsTok(token); if (prefs) { try { t ? prefs.set({ key: 'riceos.token', value: t }) : prefs.remove({ key: 'riceos.token' }); } catch (e) {} } }
 
   function fail(status, j, network) {
     var code = network ? (typeof navigator !== 'undefined' && navigator.onLine === false ? 'network' : 'unreachable') : (j && j.error) || (status >= 500 ? 'server' : 'http_' + status);

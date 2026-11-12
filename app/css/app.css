@@ -1011,3 +1011,19 @@ details.idd .idl{margin-top:0}
  .seg button{font-size:13px;padding:5px 2px;white-space:normal;line-height:1.15;min-width:0}
  .credit{white-space:normal!important;min-width:0;overflow-wrap:anywhere;font-size:13px!important}
 }
+
+/* age / guardian required row */
+.auth .chk.req{min-height:56px;padding:10px 12px;border:2px solid #9bbf9b;border-radius:14px;background:#fff;align-items:center;flex-wrap:nowrap;margin:10px 0 6px;overflow-wrap:anywhere}
+.auth .chk.req span{flex:1 1 auto;min-width:0;line-height:1.4}
+.auth .chk.req .rq{color:#b3261e;font-weight:700;white-space:nowrap}
+.auth .chk.req:has(input:checked){border-color:#2e8b2e;background:#f1faee}
+.auth .chk.req:has(input:focus-visible){outline:3px solid #1f7a1f;outline-offset:2px}
+.agehint{margin:0 4px 8px;color:#b3261e;font:600 16px/1.4 Sarabun,sans-serif}
+.agehint[hidden]{display:none}
+.plotsw{display:flex;gap:8px;overflow-x:auto;margin:10px 0 4px;padding-bottom:4px}
+.plotsw button{flex:0 0 auto;min-width:96px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:6px 12px;border-radius:14px;border:1.5px solid #cfe0cf;background:#fff;color:#0d2a10;font:inherit}
+.plotsw button b{font:700 15px/1.2 Prompt;white-space:nowrap}.plotsw button small{font:500 12.5px Sarabun;color:var(--muted)}
+.plotsw button.on{background:#1f7a3a;border-color:#1f7a3a;color:#fff}.plotsw button.on small{color:#e3f4e3}
+.invalid{border-color:#c62828!important;box-shadow:0 0 0 3px rgba(198,40,40,.15)}
+.fielderr{margin:4px 0 0;color:#8c1d18;font:600 15.5px/1.4 Sarabun}
+.titlerow h1{max-width:60vw;overflow:hidden;text-overflow:ellipsis}

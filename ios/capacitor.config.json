@@ -1,1 +1,1 @@
-{"appId":"com.donaus.riceos","appName":"RiceOS","webDir":"www","ios":{"backgroundColor":"#1f7a3a","contentInset":"always"}}
+{"appId":"com.donaus.riceos","appName":"RiceOS","webDir":"www","ios":{"backgroundColor":"#1f7a3a","contentInset":"always"},"plugins":{"CapacitorHttp":{"enabled":true}}}

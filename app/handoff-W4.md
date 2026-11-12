@@ -50,3 +50,8 @@ Status: done (not deployed), sw riceos-v9. Sol overall 5 -> 6 -> 6 (ref itself 8
 - QR capture modal + camera: closed on route change/Back (capClose in route()), late getUserMedia stream stopped. Toast replaces previous. Points preview rounded + "ประมาณ".
 - Not done: LOW 6 (desktop nav inconsistency), preview vs actual points rule mismatch (needs rules owner).
 - Tests: smoke, e2e (new consent + modal/camera checks), e2e-real all green. Deployed: riceos-web main 81a63bb, sw d41ca38dc5af, app.js ad1d55bdc144, css f1fe12241683.
+
+## 12 Nov 2026 -- age/guardian required checkbox (sw riceos-v13)
+- Row `label.chk.req #ag` "ฉันอายุ 20 ปีขึ้นไป หรือผู้ปกครองยินยอมให้ใช้งานแล้ว" on consent screen (#agree) and LINE register (#go): button disabled + red hint #agh until ticked. consent.age_guardian=true in API.register / lineRegister and S.consent.age_guardian (local). css/app.css end block; stub stores purpose age_guardian (4 rows).
+- Tests: smoke/e2e/e2e-real tick #ag; asserts blocked-until-ticked, >=52px, clip @360/390/1440, stub row stored, real /api/me consents.age_guardian===true (warn-only if backend lacks it).
+- Not done: settings screen has no age_guardian toggle (not requested). Clip audit script needs ai4; replaced by Playwright bounds check.

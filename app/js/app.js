@@ -66,7 +66,7 @@
     return '<div class="titlerow"><button class="back" aria-label="กลับ" onclick="history.length>1?history.back():location.hash=\'#/home\'">←</button>' + (pre || '') +
       '<div><h1>' + title + '</h1>' + (sub ? '<div class="sub">' + sub + '</div>' : '') + '</div>' + (extra || '') + '</div>';
   }
-  function P() { return S.plots && S.plots[0]; }
+  function P() { var a = S.plots || []; for (var i = 0; i < a.length; i++) if (a[i].id === S.activePlot) return a[i]; return a[0]; }
   function age(p) { return p && p.sowDate ? Math.max(0, daysSince(p.sowDate)) : null; }
   function profileCard(rows, thumb) {
     var pr = S.profile || {};
@@ -238,8 +238,9 @@
         '<a class="lnk" href="#/privacy">อ่านประกาศความเป็นส่วนตัวฉบับเต็ม</a>' +
         '<label class="chk"><input type="checkbox" id="c1" checked onclick="return false" aria-readonly="true"> ใช้งานหลักของแอป: บัญชี แปลง รูปหลักฐานและพิกัด (จำเป็น)</label>' +
         '<label class="chk"><input type="checkbox" id="c2"> แสดงชื่อแสดงตนในอันดับลีก (เลือกได้)</label>' +
-        '<label class="chk"><input type="checkbox" id="c3"> ส่งข้อมูลให้ ธ.ก.ส. (เลือกได้)</label>' +
-        '<button class="btn" id="agree" style="margin-top:14px">ยินยอมและเริ่มลงทะเบียน</button>' +
+        '<label class="chk"><input type="checkbox" id="c3"> บันทึกความสนใจเรื่อง ธ.ก.ส. (ยังไม่ส่งข้อมูล)</label>' +
+        '<label class="chk req" for="ag"><input type="checkbox" id="ag" aria-required="true"> <span>ฉันอายุ 20 ปีขึ้นไป หรือผู้ปกครองยินยอมให้ใช้งานแล้ว <b class="rq">(จำเป็น)</b></span></label><p class="agehint" id="agh">ต้องติ๊กช่องนี้ก่อน จึงจะไปต่อได้</p>' +
+        '<button class="btn" id="agree" style="margin-top:14px" disabled>ยินยอมและเริ่มลงทะเบียน</button>' +
         '<a class="lnk" href="#/login" style="margin-top:10px">มีบัญชีแล้ว เข้าสู่ระบบ</a></div>';
     } else if (step === 1) {
       body = '<div class="stepcard auth"><h2 class="sth"><span class="sr">ขั้นตอนที่ 1 / 3 </span>สร้างบัญชีและ PIN</h2>' +
@@ -269,7 +270,8 @@
     var el = function (id) { return document.getElementById(id); };
     wireForm(app); wireDate(app);
     if (!consent) {
-      el('agree').onclick = function () { S.consent = { core: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() }; S.ledger = S.ledger || []; save(); route(); };
+      el('ag').onchange = function () { el('agree').disabled = !el('ag').checked; el('agh').hidden = el('ag').checked; };
+      el('agree').onclick = function () { if (!el('ag').checked) return; S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() }; S.ledger = S.ledger || []; save(); route(); };
       return;
     }
     if (step === 1) {
@@ -284,7 +286,7 @@
         if ((bad = pinProblem(pin, el('pin2').value))) return showErr(bad);
         if (noApi()) return showErr('ระบบยังไม่พร้อม กรุณาลองใหม่');
         var b = el('next'), c = S.consent; busy(b, true);
-        API.register({ name: name, phone: phone, pin: pin, shared_device: el('sh').checked, consent: { version: 'c2', core: true, public_rank: !!c.public_rank, baac: !!c.baac } }).then(function (j) {
+        API.register({ name: name, phone: phone, pin: pin, shared_device: el('sh').checked, consent: { version: 'c2', core: true, age_guardian: c.age_guardian === true, public_rank: !!c.public_rank, baac: !!c.baac } }).then(function (j) {
           ME = { user: j.user || {}, plots: [], consents: {} }; S.account = { phone: phone, id: (j.user || {}).public_id }; S.shared = el('sh').checked;
           S.profile = S.profile || {}; S.profile.name = name; delete S.profile.idHash; S.profile.avatar = S.profile.avatar || 'img/avatar.png'; go(2);
         }, function (e) {
@@ -364,7 +366,7 @@
   };
 
   /* ---------- LINE return: #/line?r=login|register|linked&ticket=...  or  ?error=... ---------- */
-  var PURPOSE_TXT = ['เก็บและใช้ข้อมูลของท่านเพื่อบริการในโครงการเท่านั้น', 'ส่งต่อให้ ธ.ก.ส. เฉพาะเมื่อท่านเลือกให้ใช้'];
+  var PURPOSE_TXT = ['เก็บและใช้ข้อมูลของท่านเพื่อบริการในโครงการเท่านั้น', 'บันทึกความสนใจเรื่อง ธ.ก.ส. ไว้สำหรับอนาคต ขณะนี้ยังไม่ส่งข้อมูลให้ ธ.ก.ส.'];
   function lineMsg(html, back) { authPage('LINE', '<p class="big">' + html + '</p>' + (back === false ? '' : '<a class="btn" href="#/login" style="display:flex;align-items:center;justify-content:center;text-decoration:none">กลับไปหน้าเข้าสู่ระบบ</a>')); }
   R.line = function () {
     var q = new URLSearchParams(location.hash.split('?')[1] || ''), r = q.get('r'), ticket = q.get('ticket'), er = q.get('error');
@@ -390,16 +392,19 @@
       '<a class="lnk" href="#/privacy">อ่านประกาศความเป็นส่วนตัวฉบับเต็ม</a>' +
       '<label class="chk"><input type="checkbox" id="c1" checked onclick="return false" aria-readonly="true"> ใช้งานหลักของแอป: บัญชี แปลง รูปหลักฐานและพิกัด (จำเป็น)</label>' +
       '<label class="chk"><input type="checkbox" id="c2"' + (c.public_rank ? ' checked' : '') + '> แสดงชื่อแสดงตนในอันดับลีก (เลือกได้)</label>' +
-      '<label class="chk"><input type="checkbox" id="c3"' + (c.baac ? ' checked' : '') + '> ส่งข้อมูลให้ ธ.ก.ส. (เลือกได้)</label>' +
+      '<label class="chk"><input type="checkbox" id="c3"' + (c.baac ? ' checked' : '') + '> บันทึกความสนใจเรื่อง ธ.ก.ส. (ยังไม่ส่งข้อมูล)</label>' +
+      '<label class="chk req" for="ag"><input type="checkbox" id="ag" aria-required="true"> <span>ฉันอายุ 20 ปีขึ้นไป หรือผู้ปกครองยินยอมให้ใช้งานแล้ว <b class="rq">(จำเป็น)</b></span></label><p class="agehint" id="agh">ต้องติ๊กช่องนี้ก่อน จึงจะไปต่อได้</p>' +
       '<label class="chk"><input type="checkbox" id="sh"' + (S.shared ? ' checked' : '') + '> เครื่องนี้ใช้ร่วมกับคนอื่น</label>' +
-      '<p class="err" id="err" role="alert" hidden></p><button class="btn" id="go" style="margin-top:8px">ยินยอมและสร้างบัญชี</button>');
+      '<p class="err" id="err" role="alert" hidden></p><button class="btn" id="go" style="margin-top:8px" disabled>ยินยอมและสร้างบัญชี</button>');
     var el = function (id) { return document.getElementById(id); };
+    el('ag').onchange = function () { el('go').disabled = !el('ag').checked; el('agh').hidden = el('ag').checked; };
     el('go').onclick = function () {
+      if (!el('ag').checked) return;
       var name = el('nm').value.trim(); if (!name) return showErr('กรุณากรอกชื่อ');
       var b = el('go'); busy(b, true);
-      API.lineRegister({ ticket: ticket, name: name, shared_device: el('sh').checked, consent: { version: 'c2', core: true, public_rank: el('c2').checked, baac: el('c3').checked } }).then(function (j) {
+      API.lineRegister({ ticket: ticket, name: name, shared_device: el('sh').checked, consent: { version: 'c2', core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked } }).then(function (j) {
         ME = { user: j.user || {}, plots: [], consents: {} }; S.shared = el('sh').checked;
-        S.consent = { core: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() };
+        S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() };
         S.account = { phone: (j.user || {}).phone || null, id: (j.user || {}).public_id }; S.profile = S.profile || {}; S.profile.name = name; S.profile.avatar = S.profile.avatar || 'img/avatar.png';
         S.ledger = S.ledger || []; S.regStep = 2; save(); location.hash = '#/register';
       }, function (e) { busy(b, false); showErr(e.message); });
@@ -459,7 +464,7 @@
       '<div class="card auth" id="acct" style="padding:14px;margin-top:10px"><h3 class="ph3">วิธีเข้าสู่ระบบ</h3><p class="big" id="acctb">กำลังเปิด...</p></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><h3 class="ph3">ความยินยอม</h3>' +
       '<label class="chk"><input type="checkbox" id="k2"' + (c.public_rank ? ' checked' : '') + '> แสดงชื่อแสดงตนในอันดับลีก</label>' +
-      '<label class="chk"><input type="checkbox" id="k3"' + (c.baac ? ' checked' : '') + '> ส่งข้อมูลให้ ธ.ก.ส.</label>' +
+      '<label class="chk"><input type="checkbox" id="k3"' + (c.baac ? ' checked' : '') + '> บันทึกความสนใจเรื่อง ธ.ก.ส. (ยังไม่ส่งข้อมูล)</label>' +
       '<a class="lnk" href="#/privacy">ประกาศความเป็นส่วนตัว</a></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><div id="obx" class="obx" hidden></div>' +
       '<button class="btn" id="chpin">เปลี่ยน PIN</button><button class="btn ghost" id="lo" style="margin-top:10px">ออกจากระบบ</button></div>' +
@@ -559,9 +564,16 @@
   function savePlotForm(p) {
     var g = function (id) { return document.getElementById(id).value.trim(); };
     var rai = Number(g('pr')), n = Math.round(Number(g('pk')));
-    if (!(rai > 0) || !(n >= 1 && n <= 30) || !g('pd')) { toast('กรุณากรอกพื้นที่ วันปลูก และจำนวนกระทง 1-30'); return false; }
+    var bad = !(rai > 0) ? 'pr' : !g('pd') ? 'pd' : !(n >= 1 && n <= 30) ? 'pk' : null;
+    document.querySelectorAll('.fielderr').forEach(function (x) { x.remove(); });
+    document.querySelectorAll('.invalid').forEach(function (x) { x.classList.remove('invalid'); });
+    if (bad) {
+      var MS = { pr: 'กรุณากรอกพื้นที่เป็นตัวเลข มากกว่า 0 ไร่', pd: 'กรุณาเลือกวันปลูก', pk: 'จำนวนกระทงต้องอยู่ระหว่าง 1-30' }, f = document.getElementById(bad), host = bad === 'pd' ? f.parentNode : f;
+      host.classList.add('invalid'); host.insertAdjacentHTML('afterend', '<p class="fielderr" role="alert">⚠️ ' + MS[bad] + '</p>');
+      try { host.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (bad !== 'pd') f.focus(); } catch (e) {} toast(MS[bad]); return false;
+    }
     S.plots = S.plots || [];
-    if (!p) { p = { id: 'p' + (S.plots.length + 1), code: String.fromCharCode(65 + S.plots.length), kratongs: [], area_source: 'self_declared' }; S.plots.push(p); }
+    if (!p) { p = { id: 'p' + (S.plots.length + 1) + '_' + Date.now().toString(36).slice(-4), code: String.fromCharCode(65 + S.plots.length), kratongs: [], area_source: 'self_declared' }; S.plots.push(p); }
     p.name = g('pn') || ('แปลง ' + p.code); p.rai = rai; p.variety = g('pv'); p.sowDate = g('pd');
     while (p.kratongs.length < n) { var s = p.kratongs.length + 1; p.kratongs.push({ seq: s, label: 'กระทง ' + s, qr: 'RICE-TUBE-' + p.code + '-' + s, lastRead: null }); }
     if (p.kratongs.length > n) p.kratongs = p.kratongs.slice(0, n);
@@ -576,7 +588,7 @@
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
       '<div><span class="green">📍</span> ' + esc(pr.district || '') + '</div>' +
       '<a class="setlink" href="#/settings" aria-label="ข้อมูลของฉันและตั้งค่า">⚙️</a><div id="obx" class="obx" hidden></div>' +
-      (p ? '<div>🌾 ' + fmt(p.rai) + ' ไร่ · ' + esc(p.variety) + ' · <span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
+      (p ? '<div>🌾 ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + esc(p.variety) + ' · <span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
       '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? '🌧️ <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + '</span>' : '🌤️ <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
       '<a class="ptspill" href="#/points" style="text-decoration:none">⭐ <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
       '<div class="row"><a class="wallet" href="#/wallet" style="flex:0 0 58%;color:inherit;text-decoration:none"><span style="color:#0c8208;font-size:20px">👛</span><span style="font:600 15px Prompt">ยอด Wallet</span> <b>' + (pr.wallet ? esc(pr.wallet) + ' บ.' : 'รอเชื่อมต่อ') + '</b><span style="margin-left:auto">›</span></a>' +
@@ -586,10 +598,10 @@
       (m && m.detail ? '<p class="note">' + esc(m.detail) + '</p>' : '') + '</div><div class="hc2"><div class="grid4">' + tiles.map(function (x) { return '<a class="tile" href="' + x[3] + '"><img alt="" src="img/ic-' + x[0] + '.jpg">' + x[1] + (x[2] ? '<small>' + x[2] + '</small>' : '') + '</a>'; }).join('') + '</div>' +
       (w.rain ? '<a class="alert" href="#/mentor" style="text-decoration:none"><span style="font-size:34px">🌧️</span><span style="flex:1"><b>' + esc(w.rain) + '</b>แนะนำ: เลื่อนใส่ปุ๋ยออกไปก่อน</span><span style="font-size:26px">›</span></a>' : '<a class="alert calm" href="#/mentor" style="text-decoration:none"><span style="font-size:30px">💧</span><span style="flex:1"><b>ตรวจระดับน้ำก่อนใส่ปุ๋ย</b>เมื่อเชื่อมข้อมูลอากาศแล้ว จะแจ้งเตือนฝนที่นี่</span><span style="font-size:26px">›</span></a>') +
       '<div style="position:relative"><a class="status" href="#/plot" style="display:block;color:inherit;text-decoration:none"><h3>สภาพแปลงล่าสุด</h3>' +
-      '<div class="row"><img alt="" src="img/ears-thumb.jpg" style="width:44px;height:58px;border-radius:8px;object-fit:cover"><div class="cols" style="flex:1">' +
+      (S.seeded ? '<div class="row"><img alt="" src="img/ears-thumb.jpg" style="width:44px;height:58px;border-radius:8px;object-fit:cover"><div class="cols" style="flex:1">' +
       '<div><span class="dot" style="background:#2e9a2e">✓</span><br>น้ำ<br><span style="color:#0e6e0c">เหมาะสม</span></div>' +
       '<div><span class="dot" style="background:#f5b800;color:#2b1d00">!</span><br>ธาตุอาหาร<br><span style="color:#d71013">ต่ำ</span></div>' +
-      '<div><span class="dot" style="background:#e53935">!</span><br>เสี่ยงโรค<br><span style="font-weight:500">(ไหม้คอรวง)</span></div></div></div></a>' +
+      '<div><span class="dot" style="background:#e53935">!</span><br>เสี่ยงโรค<br><span style="font-weight:500">(ไหม้คอรวง)</span></div></div></div>' : '<p class="note" style="margin:6px 0 0">ยังไม่มีข้อมูล · จะแสดงหลังท่านส่งรูปภารกิจและเจ้าหน้าที่ตรวจแล้ว</p>') + '</a>' +
       '</div><a class="askai" href="#/mentor"><img alt="" src="img/mascot.jpg"><span><b>พี่เลี้ยง AI</b>' + esc(F('typos_as_shown', 'ask2')) + ' ได้ทุกเรื่อง</span><span class="chev" aria-hidden="true">›</span></a>' +
       '</div></div></div>';
     var b = document.getElementById('shoot'); if (b) b.onclick = function () { capture(m.type); };
@@ -610,7 +622,8 @@
         : '<p class="note">ประวัติผลผลิตของแปลงนี้: ไม่มีข้อมูลยืนยัน</p>') +
         '<a class="btn" href="#/analysis" style="width:82%;margin-top:6px;font-size:21px">🤖 ดูตารางวิเคราะห์ AI <span>→</span></a><a class="btn ghost" href="#/options" style="margin-top:10px">ทางเลือกก่อนปลูก</a>';
     } else body = kratongList(p);
-    app.innerHTML = header() + '<div class="sheet">' + titleRow('แปลงของฉัน', '', '<div class="ico"><span>🔗</span><a href="#/plotedit" style="color:inherit;text-decoration:none">✏️</a></div>') +
+    var sw = (S.plots || []).length > 1 ? '<div class="plotsw" role="tablist" aria-label="เลือกแปลง">' + S.plots.map(function (x) { return '<button data-pl="' + esc(x.id) + '" class="' + (x === p ? 'on' : '') + '"><b>' + esc(x.name || ('แปลง ' + x.code)) + '</b><small>' + fmt(x.rai) + ' ไร่</small></button>'; }).join('') + '</div>' : '';
+    app.innerHTML = header() + '<div class="sheet">' + titleRow(esc(p.name || 'แปลงของฉัน'), fmt(p.rai) + ' ไร่' + ((S.plots || []).length > 1 ? ' · แปลงที่ ' + ((S.plots || []).indexOf(p) + 1) + ' จาก ' + S.plots.length : ''), '<div class="ico"><span>🔗</span><a href="#/plotedit" aria-label="แก้ไขแปลง" style="color:inherit;text-decoration:none">✏️</a></div>') + sw +
       (p.map ? '<div class="mapcard"><img alt="แผนที่แปลง" src="img/map.jpg" style="width:100%"></div>' : '<div class="card" style="padding:20px;text-align:center">แนวเขตแปลงจากโฉนด: ยังไม่มีข้อมูล</div>') +
       '<div class="chips"><span>🌾 ' + esc(p.variety) + '</span><span><span style="color:#17881c">📅</span> อายุข้าว ' + age(p) + ' วัน</span>' + (p.map ? '<span>🏛️ ' + esc(F('typos_as_shown', 'canal')) + '</span>' : '') + '</div>' +
       (p.map ? '<div class="metrics"><div style="background:linear-gradient(#fdf6da,#fcebb3);border:1px solid #f0e2b8">pH ดิน<div class="v" style="color:#3b1e05">' + esc(soil.ph) + '</div><span class="pill" style="background:#fcc012;font-size:12.5px;padding:0 6px">● ' + esc(F('ph_label_inconsistency', 'plot_label')) + '</span></div>' +
@@ -621,13 +634,14 @@
       body + '<a class="lot-entry" href="#/lot"><span class="outline-icon">▦</span><span><b>ล็อตข้าว Digital ID</b><small>ตรวจสอบย้อนกลับจากแปลงถึงถุง</small></span><span>→</span></a><button class="btn ghost" id="addplot" style="margin-top:12px">+ เพิ่มแปลง</button></div>';
     app.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { params.set('tab', b.dataset.tab); route(); }; });
     app.querySelector('[data-go]').onclick = function () { location.hash = '#/analysis'; };
+    app.querySelectorAll('[data-pl]').forEach(function (b) { b.onclick = function () { S.activePlot = b.dataset.pl; save(); route(); }; });
     document.getElementById('addplot').onclick = function () { location.hash = '#/plotedit?new=1'; };
     bindKratong(p);
   };
   R.plotedit = function () {
     var isNew = /new=1/.test(location.hash), p = isNew ? null : P();
     app.innerHTML = header() + '<div class="sheet">' + titleRow(isNew ? 'เพิ่มแปลง' : 'แก้ไขแปลง') + '<div class="card" style="padding:12px">' + plotForm(p || {}) + '</div><button class="btn" id="sv" style="margin-top:12px">บันทึก</button></div>';
-    document.getElementById('sv').onclick = function () { if (savePlotForm(p)) { var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.plots.unshift(S.plots.pop()); save(); } syncPlot(np).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
+    document.getElementById('sv').onclick = function () { if (savePlotForm(p)) { var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.activePlot = np.id; save(); } syncPlot(np).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
   };
   function kratongList(p) {
     var due = sampleToday(p).map(function (k) { return k.seq; });
@@ -676,7 +690,7 @@
       $('qrin').onchange = function () { accept(this.value); };
       m.querySelectorAll('[data-st]').forEach(function (b) { b.onclick = function () { st.state = b.dataset.st; if (st.kratong) accept(st.code.replace(/-(WET|DRY)$/, '') + '-' + st.state); else $('qrok').textContent = 'สแกนหรือพิมพ์รหัสก่อน'; }; });
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function (s) {
+        Promise.resolve().then(function () { return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); }).then(function (s) {
           if (st.closed) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
           st.stream = s; var v = $('cv'); v.srcObject = s; v.play();
           var det = ('BarcodeDetector' in window) ? new BarcodeDetector({ formats: ['qr_code'] }) : null, c = $('cc'), cx = c.getContext('2d', { willReadFrequently: true });
@@ -685,12 +699,12 @@
             if (det) det.detect(v).then(function (r) { if (r[0]) accept(r[0].rawValue); }).catch(function () {});
             else if (window.jsQR) { c.width = v.videoWidth; c.height = v.videoHeight; cx.drawImage(v, 0, 0); var r = jsQR(cx.getImageData(0, 0, c.width, c.height).data, c.width, c.height); if (r) accept(r.data); }
           }, 400);
-        }).catch(function () { $('cv').hidden = true; $('qrok').textContent = 'เปิดกล้องไม่ได้ พิมพ์รหัสแทนได้'; });
+        }).catch(function () { $('cv').hidden = true; $('qrok').textContent = 'ไม่ได้รับอนุญาตใช้กล้อง หรือเปิดกล้องไม่ได้ พิมพ์รหัสแทนหรือกด "ถ่ายรูป" ได้ (เปิดสิทธิ์กล้องได้ที่ ตั้งค่า > แอป > RiceOS)'; });
       } else $('cv').hidden = true;
     }
     var gps = null, gpsStatus = 'unavailable';
-    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(function (g) { gpsStatus = 'ok'; gps = { lat: g.coords.latitude, lon: g.coords.longitude, acc: g.coords.accuracy }; $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)'; },
-      function (er) { gpsStatus = er && er.code === 1 ? 'denied' : 'unavailable'; $('gps').textContent = 'ไม่ได้รับพิกัด GPS (รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่)'; }, { enableHighAccuracy: true, timeout: 15000 });
+    if (navigator.geolocation) try { navigator.geolocation.getCurrentPosition(function (g) { gpsStatus = 'ok'; gps = { lat: g.coords.latitude, lon: g.coords.longitude, acc: g.coords.accuracy }; $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)'; },
+      function (er) { gpsStatus = er && er.code === 1 ? 'denied' : 'unavailable'; $('gps').textContent = (er && er.code === 1 ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS (เปิดได้ที่ ตั้งค่า > แอป > RiceOS > สิทธิ์) ' : 'ไม่ได้รับพิกัด GPS ') + '· รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่'; }, { enableHighAccuracy: true, timeout: 15000 }); } catch (e) { $('gps').textContent = 'ไม่ได้รับพิกัด GPS (รูปยังบันทึกและส่งได้)'; }
     $('ph').onchange = function () {
       var f = this.files[0]; if (!f) return;
       if (needQr && !st.kratong) { toast('สแกน QR ท่อก่อนถ่ายรูป'); this.value = ''; return; }
@@ -1126,6 +1140,14 @@
 
   /* ---------- router ---------- */
   var PUBLIC = ['register', 'login', 'reset', 'privacy', 'line', 'wallet', 'lot', 'dashboard'], routeTok = 0;
+  /* screens built on illustrative sample figures (prices, buyers, forecasts, lots, province totals) are not shown to real accounts */
+  var DEMO_ROUTES = ['analysis', 'options', 'market', 'lot', 'dashboard'];
+  var NODATA = { analysis: ['ตารางวิเคราะห์ AI', 'ยังไม่มีข้อมูลวิเคราะห์ของแปลงท่าน ระบบจะแสดงเมื่อมีผลดินและข้อมูลที่ตรวจสอบแล้ว'], options: ['ทางเลือกก่อนปลูก', 'ยังไม่มีข้อมูลเปรียบเทียบพันธุ์และราคาที่ตรวจสอบแล้ว'], market: ['ตลาดขายข้าว', 'ยังไม่มีข้อมูลราคาและผู้ซื้อที่ตรวจสอบแล้ว เมื่อโครงการเปิดตลาด จะแจ้งให้ทราบในแอป'], lot: ['ล็อตข้าว Digital ID', 'ยังไม่มีล็อตข้าวของท่าน จะแสดงเมื่อมีการเก็บเกี่ยวและบันทึกล็อตในระบบ'], dashboard: ['ภาพรวมจังหวัด', 'ยังไม่มีข้อมูลภาพรวมที่ตรวจสอบแล้ว'] };
+  function nodataScreen(h) {
+    var t = NODATA[h] || ['ข้อมูล', 'ยังไม่มีข้อมูล'];
+    document.body.classList.remove('dashboard-mode', 'farmer-mode', 'premium-mode');
+    app.innerHTML = header() + '<div class="sheet">' + titleRow(t[0]) + '<div class="card" style="padding:20px;text-align:center;font-size:18px"><div style="font-size:40px">🌾</div><b>ยังไม่มีข้อมูล</b><p>' + t[1] + '</p><a class="btn" href="#/home">กลับหน้าแรก</a></div></div>';
+  }
   var capClose = null;
   function route() {
     if (capClose) capClose();
@@ -1145,6 +1167,7 @@
     render(h);
   }
   function render(h) {
+    if (S.registered && !S.seeded && DEMO_ROUTES.indexOf(h) >= 0) { R.nodata = function () { nodataScreen(rh); }; var rh = h; h = 'nodata'; }
     document.body.classList.toggle('dashboard-mode', h === 'dashboard');
     document.body.classList.toggle('farmer-mode', h === 'wallet' || h === 'lot');
     document.body.classList.toggle('premium-mode', ['wallet', 'lot', 'dashboard'].indexOf(h) >= 0);
@@ -1159,6 +1182,26 @@
     if (['wallet', 'lot', 'dashboard'].indexOf(h) >= 0) app.insertAdjacentHTML('beforeend', '<a class="mentor-float" href="#/mentor" aria-label="พี่เลี้ยง AI">' + iconLine('<path d="M5 4h14a2 2 0 012 2v10a2 2 0 01-2 2h-8l-6 4v-4H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>') + '<span>AI</span></a>');
     if (!params.get('keep')) { window.scrollTo(0, 0); app.scrollTop = 0; if (document.body.classList.contains('premium-mode')) requestAnimationFrame(function () { app.scrollTop = 0; }); }
   }
+  /* in-app history (for hardware/gesture Back inside the Capacitor shell): modal first, then previous page, exit only at a root route */
+  var navStack = [location.hash || '#/home'], ROOTS = ['home', 'login', 'register', ''];
+  window.addEventListener('hashchange', function () {
+    var h = location.hash || '#/home';
+    if (navStack.length > 1 && navStack[navStack.length - 2] === h) navStack.pop(); else if (navStack[navStack.length - 1] !== h) navStack.push(h);
+    if (navStack.length > 60) navStack.shift();
+  });
+  window.riceosBack = function () {
+    var ms = document.querySelectorAll('.modal');
+    if (ms.length) { var top = ms[ms.length - 1], cl = top.querySelector('#cl,[data-close],.close'); if (capClose) capClose(); else if (cl) cl.click(); ms = document.querySelectorAll('.modal'); if (ms.length && ms[ms.length - 1] === top) top.remove(); return 'modal'; }
+    var d = document.querySelector('dialog[open]'); if (d) { d.close(); return 'dialog'; }
+    var h = (location.hash.replace(/^#\/?/, '') || '').split('?')[0];
+    if (ROOTS.indexOf(h) >= 0) return 'exit';
+    if (navStack.length > 1) { history.back(); return 'back'; }
+    location.replace('#/home'); return 'home';
+  };
+  (function () {
+    var A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if (!A || !A.addListener) return;
+    try { A.addListener('backButton', function () { if (window.riceosBack() === 'exit') { try { A.exitApp(); } catch (e) {} } }); } catch (e) {}
+  })();
   window.addEventListener('hashchange', function () { params = new URLSearchParams(location.search); route(); });
 
   Promise.all([getJSON('content/flags.json'), getJSON('data/knowledge.json'), getJSON('data/lessons.json'), getJSON('data/ruleset_v2.json')]).then(function (r) {
