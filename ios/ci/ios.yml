@@ -79,7 +79,7 @@ jobs:
           BN="${{ inputs.build_number }}"; BN="${BN:-${{ github.run_number }}}"
           cd ios/ios/App
           xcrun agvtool new-version -all "$BN"
-          xcode-project build-ipa --project App.xcodeproj --workspace App.xcworkspace --scheme App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
       - name: Upload to TestFlight (no review submission)
         if: inputs.mode == 'testflight'
         env:
