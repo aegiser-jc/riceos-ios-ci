@@ -1,0 +1,6 @@
+{
+  "appId": "th.riceos.farmer",
+  "appName": "RiceOS",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}

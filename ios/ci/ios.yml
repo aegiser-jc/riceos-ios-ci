@@ -1,0 +1,93 @@
+# RiceOS iOS CI (GitHub Actions, macOS). Mirrors the Yume/studio-remote route: Codemagic CLI signing via the ASC API key.
+# Repo layout = rice-farmer subset: app/ (web content, copied into ios/www at build time) + ios/ (Capacitor project).
+# Run: Actions > ios > Run workflow.  mode=sim (default): simulator build, no signing, no Apple calls.
+#      mode=testflight: needs the App Store Connect app record (preflight fails fast if absent), signs, uploads to TestFlight. Never submits for review.
+# macOS minutes count 10x on private repos (free plan 2000 min = ~200 real min); a run is ~8-12 real min.
+name: ios
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: sim | testflight
+        default: sim
+      build_number:
+        description: CFBundleVersion (blank = run number)
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: ios
+  cancel-in-progress: false
+env:
+  BUNDLE_ID: com.donaus.riceos
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Copy app/ into the iOS bundle (always current)
+        run: |
+          cd ios && ./sync-www.sh
+          echo "app files: $(find www -type f | wc -l)"; grep -o "const CACHE *= *'[^']*'\|CACHE_NAME *= *'[^']*'\|VERSION *= *'[^']*'" www/sw.js | head -2 || true
+      - name: Capacitor sync (npm ci + pod install)
+        run: |
+          cd ios && npm ci --no-audit --no-fund
+          npx cap sync ios
+      - name: Preflight (testflight only; no Apple writes)
+        if: inputs.mode == 'testflight'
+        env:
+          K: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          I: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          P: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          pip3 install --quiet --break-system-packages pyjwt cryptography requests
+          python3 - <<'PY'
+          import os,time,jwt,requests,sys
+          t=jwt.encode({'iss':os.environ['I'],'exp':int(time.time())+600,'aud':'appstoreconnect-v1'},os.environ['P'],algorithm='ES256',headers={'kid':os.environ['K']})
+          r=requests.get('https://api.appstoreconnect.apple.com/v1/apps',params={'filter[bundleId]':os.environ['BUNDLE_ID']},headers={'Authorization':'Bearer '+t})
+          print('ASC status',r.status_code)
+          if r.status_code!=200 or not r.json().get('data'):
+              print('::error::No App Store Connect app record for '+os.environ['BUNDLE_ID']+' yet. Create it first (see handoff/rice-store-request.md, section iOS request).'); sys.exit(3)
+          print('app record found')
+          PY
+      - name: Simulator build (no signing)
+        if: inputs.mode != 'testflight'
+        run: |
+          cd ios/ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -25
+      - name: Signing (cert + App Store profile via ASC API, automatic create)
+        if: inputs.mode == 'testflight'
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
+        run: |
+          set -o pipefail
+          pip3 install --quiet --break-system-packages codemagic-cli-tools
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles --project ios/ios/App/App.xcodeproj
+      - name: Archive + signed ipa
+        if: inputs.mode == 'testflight'
+        run: |
+          set -o pipefail
+          BN="${{ inputs.build_number }}"; BN="${BN:-${{ github.run_number }}}"
+          cd ios/ios/App
+          xcrun agvtool new-version -all "$BN"
+          xcode-project build-ipa --project App.xcodeproj --workspace App.xcworkspace --scheme App
+      - name: Upload to TestFlight (no review submission)
+        if: inputs.mode == 'testflight'
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          app-store-connect publish --path "$(ls ios/ios/App/build/ios/ipa/*.ipa | head -1)"
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.mode == 'testflight'
+        with: { name: ipa, path: 'ios/ios/App/build/ios/ipa/*.ipa', if-no-files-found: warn }
