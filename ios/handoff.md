@@ -20,3 +20,6 @@
 - Group 'RiceOS Internal' (internal) id 1fd61d5e-6698-4375-b184-8f89e67e330b; build 5 (ddef103e-e983-4c48-b8a7-2903057d7bb0) attached.
 - Tester added: jarin.chiangboon@gmail.com (state INVITED). aegiser@hotmail.com refused: 409 STATE_ERROR "Tester(s) cannot be assigned" (not retried).
 - Nothing else changed; no review submission.
+
+## Update 12 Nov (vc3 fixes)
+- push-ci sha 183768d24ce0 (CI repo); testflight run 43331550157 = success (should be build 6). Includes API base, CapacitorHttp, @capacitor/app Back handler, plots UX, no sample figures, BAAC wording. Not submitted for review.

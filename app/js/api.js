@@ -25,6 +25,16 @@
   function getToken() { if (token) return Promise.resolve(token); if (!prefs) { token = native ? lsTok() : null; return Promise.resolve(token); } return prefs.get({ key: 'riceos.token' }).then(function (r) { token = r && r.value || null; return token; }).catch(function () { return null; }); }
   function setToken(t) { token = t || null; if (native && !prefs) lsTok(token); if (prefs) { try { t ? prefs.set({ key: 'riceos.token', value: t }) : prefs.remove({ key: 'riceos.token' }); } catch (e) {} } }
 
+  /* current account id: the outbox is scoped to it so one farmer's pending photos never show or upload under another account */
+  var uid = null; try { uid = localStorage.getItem('riceos.uid') || null; } catch (e) {}
+  function lsUid(v) { try { v ? localStorage.setItem('riceos.uid', v) : localStorage.removeItem('riceos.uid'); } catch (e) {} }
+  function setUser(id) {
+    id = id || null; var prev = uid; uid = id; lsUid(id);
+    if (id && prev !== id) return OB.purgeOthers(id).catch(function () {}); /* a different account signed in: drop anything not theirs */
+    return Promise.resolve();
+  }
+  function seeUser(j) { var u = j && j.user; if (u && u.public_id) return setUser(u.public_id).then(function () { return j; }); return Promise.resolve(j); }
+
   function fail(status, j, network) {
     var code = network ? (typeof navigator !== 'undefined' && navigator.onLine === false ? 'network' : 'unreachable') : (j && j.error) || (status >= 500 ? 'server' : 'http_' + status);
     var e = new Error((j && j.message_th) || MSG[code] || MSG.server); e.code = code; e.status = status || 0; e.network = !!network; e.data = j || {};
@@ -49,21 +59,21 @@
   }
   var API = { MSG: MSG, base: base, native: native, req: req };
   API.health = function () { return req('GET', '/api/health'); };
-  API.me = function () { return req('GET', '/api/me'); };
-  API.register = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/register', b).then(function (j) { if (j.token) setToken(j.token); return j; }); };
-  API.login = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/login', b).then(function (j) { if (j.token) setToken(j.token); return j; }); };
-  API.logout = function () { return req('POST', '/api/auth/logout', {}).then(function (j) { setToken(null); return j; }, function (e) { setToken(null); throw e; }); };
+  API.me = function () { return req('GET', '/api/me').then(seeUser); };
+  API.register = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/register', b).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
+  API.login = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/login', b).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
+  API.logout = function () { return req('POST', '/api/auth/logout', {}).then(function (j) { setToken(null); return setUser(null).then(function () { return j; }); }, function (e) { setToken(null); return setUser(null).then(function () { throw e; }); }); };
   API.reset = function (phone, code, pin) { return req('POST', '/api/auth/reset', { phone: phone, code: code, new_pin: pin }); };
   API.patchMe = function (b) { return req('PATCH', '/api/me', b); };
   API.changePin = function (o, n) { return req('PUT', '/api/me/pin', { old_pin: o, new_pin: n }); };
   API.consent = function (purpose, granted, version) { return req('POST', '/api/me/consents', { purpose: purpose, granted: granted, version: version }); };
-  API.deleteMe = function (pin) { return req('DELETE', '/api/me', pin ? { pin: pin } : { confirm: true }).then(function (j) { setToken(null); return j; }); };
+  API.deleteMe = function (pin) { return req('DELETE', '/api/me', pin ? { pin: pin } : { confirm: true }).then(function (j) { setToken(null); return OB.purgeAll().catch(function () {}).then(function () { return setUser(null); }).then(function () { return j; }); }); };
   API.putState = function (blob) { return req('PUT', '/api/me/state', { blob: blob }); };
   API.createPlot = function (b) { return req('POST', '/api/plots', b); };
   API.config = function () { return req('GET', '/api/config'); };
   API.lineStart = function () { return req('POST', '/api/auth/line/start', {}); };
-  API.lineFinish = function (ticket, shared) { return req('POST', '/api/auth/line/finish', { ticket: ticket, client: native ? 'native' : 'web', shared_device: !!shared }).then(function (j) { if (j.token) setToken(j.token); return j; }); };
-  API.lineRegister = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/line/register', b).then(function (j) { if (j.token) setToken(j.token); return j; }); };
+  API.lineFinish = function (ticket, shared) { return req('POST', '/api/auth/line/finish', { ticket: ticket, client: native ? 'native' : 'web', shared_device: !!shared }).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
+  API.lineRegister = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/line/register', b).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
   API.linkLine = function () { return req('POST', '/api/me/line/start', {}); };
   API.unlinkLine = function () { return req('DELETE', '/api/me/line'); };
   API.addCredentials = function (phone, pin) { return req('POST', '/api/me/credentials', { phone: phone, pin: pin }); };
@@ -85,10 +95,14 @@
   }
   function tx(mode, fn) { return db().then(function (d) { return new Promise(function (ok, no) { var t = d.transaction('items', mode), res = fn(t.objectStore('items')); t.oncomplete = function () { ok(res && res.result !== undefined ? res.result : undefined); }; t.onerror = t.onabort = function () { no(t.error); }; }); }); }
   var OB = {};
-  OB.add = function (item) { return tx('readwrite', function (s) { return s.put(item); }); };
-  OB.all = function () { return tx('readonly', function (s) { return s.getAll(); }).then(function (a) { return (a || []).sort(function (x, y) { return (x.meta.client_time > y.meta.client_time) ? 1 : -1; }); }, function () { return []; }); };
+  OB.add = function (item) { item.uid = item.uid || uid; if (!item.uid) return Promise.reject(new Error('no user')); return tx('readwrite', function (s) { return s.put(item); }); };
+  OB.raw = function () { return tx('readonly', function (s) { return s.getAll(); }); };
+  OB.purgeAll = function () { return OB.raw().then(function (a) { return Promise.all((a || []).map(function (i) { return OB.del(i.client_uuid); })); }); };
+  OB.purgeOthers = function (id) { return OB.raw().then(function (a) { return Promise.all((a || []).filter(function (i) { return i.uid !== id; }).map(function (i) { return OB.del(i.client_uuid); })); }); };
+  OB.retry = function () { return OB.all().then(function (a) { return Promise.all(a.filter(function (i) { return i.failed; }).map(function (i) { delete i.failed; return OB.add(i); })); }); };
+  OB.all = function () { return tx('readonly', function (s) { return s.getAll(); }).then(function (a) { return (a || []).filter(function (x) { return uid && x.uid === uid; }).sort(function (x, y) { return (x.meta.client_time > y.meta.client_time) ? 1 : -1; }); }, function () { return []; }); };
   OB.del = function (id) { return tx('readwrite', function (s) { return s.delete(id); }); };
-  OB.count = function () { return OB.all().then(function (a) { return { pending: a.filter(function (x) { return !x.failed; }).length, failed: a.filter(function (x) { return x.failed; }).length }; }); };
+  OB.count = function () { return OB.all().then(function (a) { var f = a.filter(function (x) { return x.failed; }); return { pending: a.length - f.length, failed: f.length, reason: f[0] ? f[0].failed : null, msg: f[0] ? (MSG[f[0].failed] || null) : null }; }); };
   var flushing = null;
   /* hooks.prepare(item) may fill item.meta.plot_id; hooks.sent(item) is called after each upload. Resolves {sent, left, reason}. */
   OB.flush = function (hooks) {
@@ -117,6 +131,6 @@
     }).catch(function () { return { sent: 0, left: 0, reason: 'idb' }; }).then(function (o) { flushing = null; return o; });
     return flushing;
   };
-  API.outbox = OB;
+  API.outbox = OB; API.setUser = setUser; API.userId = function () { return uid; };
   window.RiceAPI = API;
 })();
