@@ -23,3 +23,10 @@
 
 ## Update 12 Nov (vc3 fixes)
 - push-ci sha 183768d24ce0 (CI repo); testflight run 43331550157 = success (should be build 6). Includes API base, CapacitorHttp, @capacitor/app Back handler, plots UX, no sample figures, BAAC wording. Not submitted for review.
+
+## ASC tester + build attach (13 Nov 2026, authorized by Jarin via Assist)
+- Build 7 (df23d99b-a267-4486-8482-947d1dd412a4, VALID) attached to group 1fd61d5e-6698-4375-b184-8f89e67e330b: POST relationships/builds -> 204. Verified GET group builds: build 7 + build 5 (ddef103e...) both VALID.
+- Tester aegiser@hotmail.com NOT added: POST /v1/betaTesters -> 409 "Tester(s) cannot be assigned" (same as 12 Nov, so the PLA acceptance did not clear it).
+- Cause (read-only check): aegiser@hotmail.com is DEVELOPER with allAppsVisible=false, and its visibleApps (6 apps: com.voyiro.*, com.aimee.mali, com.donaus.itmean) do NOT include RiceOS app 6834153807 (com.donaus.riceos). Internal testers must be able to see the app.
+- Fix needed (Jarin decision, not done): in ASC Users and Access, give aegiser@hotmail.com access to RiceOS (or allAppsVisible), then re-run the tester add. Not changed by the agent, since that is an access change outside the authorized scope.
+- Group now: testers = jarin.chiangboon@gmail.com (INVITED). No invites, metadata or review changes made.

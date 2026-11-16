@@ -9,12 +9,13 @@
 
   /* ---------- helpers ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  var FLAG_TEXT = {"agency_logo":{"identical":{"show_logo":true,"agency_line":"กรมการข้าว × จังหวัดพิษณุโลก"},"alt":{"show_logo":false,"agency_line":""}},"profit_before_2700":{"identical":{"before":"(เดิม 2,700 บ./ไร่)","pct":"+42.6%"},"alt":{"before":"(เดิม 3,150 บ./ไร่)","pct":"+22%"}},"yield_750_600":{"identical":{"y750":"750","y600":"600"},"alt":{"y750":"ไม่มีข้อมูลยืนยัน","y600":"ไม่มีข้อมูลยืนยัน"}},"prices_98_95_110":{"identical":{"p98":"9.8","p95":"9.5","p110":"11.0","p92":"9.2"},"alt":{"p98":"-","p95":"-","p110":"-","p92":"-","note":"ราคา: ไม่มีข้อมูลยืนยัน"}},"locked_15_ton":{"identical":{"locked":"ล็อกแล้ว 15 ตัน","cta":"รับสัญญา (ล็อกราคา)"},"alt":{"locked":"ยังไม่มีสัญญา","cta":"แจ้งความสนใจขาย"}},"ai_advice_figures":{"identical":{"use_his_chat":true,"ref":"อ้างอิง: คู่มือกรมการข้าว 2568"},"alt":{"use_his_chat":false,"ref":"อ้างอิง: ไม่มีข้อมูลยืนยัน"}},"ph_label_inconsistency":{"identical":{"plot_label":"ปานกลาง","table_label":"เป็นกรดเล็กน้อย"},"alt":{"plot_label":"ไม่มีข้อมูลยืนยัน","table_label":"ไม่มีข้อมูลยืนยัน"}},"typos_as_shown":{"identical":{"ask1":"กามได้ทุกเรื่อง","ask2":"กามพี่เลี้ยง AI","canal":"เขตชลประทานคลองช้าย","om":"(อินทริยวัตถุ)","offer_tag":"จ้งเสนอแนะนำ"},"alt":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยง AI","canal":"เขตชลประทานคลองซ้าย","om":"(อินทรียวัตถุ)","offer_tag":"ข้อเสนอแนะนำ"}}};
+  var FLAG_TEXT = {"agency_logo":{"identical":{"show_logo":true,"agency_line":"กรมการข้าว × จังหวัดพิษณุโลก"},"alt":{"show_logo":false,"agency_line":""}},"profit_before_2700":{"identical":{"before":"(เดิม 2,700 บ./ไร่)","pct":"+42.6%"},"alt":{"before":"(เดิม 3,150 บ./ไร่)","pct":"+22%"}},"yield_750_600":{"identical":{"y750":"750","y600":"600"},"alt":{"y750":"ไม่มีข้อมูลยืนยัน","y600":"ไม่มีข้อมูลยืนยัน"}},"prices_98_95_110":{"identical":{"p98":"9.8","p95":"9.5","p110":"11.0","p92":"9.2"},"alt":{"p98":"-","p95":"-","p110":"-","p92":"-","note":"ราคา: ไม่มีข้อมูลยืนยัน"}},"locked_15_ton":{"identical":{"locked":"ล็อกแล้ว 15 ตัน","cta":"รับสัญญา (ล็อกราคา)"},"alt":{"locked":"ยังไม่มีสัญญา","cta":"แจ้งความสนใจขาย"}},"ai_advice_figures":{"identical":{"use_his_chat":true,"ref":"อ้างอิง: คู่มือกรมการข้าว 2568"},"alt":{"use_his_chat":false,"ref":"อ้างอิง: ไม่มีข้อมูลยืนยัน"}},"ph_label_inconsistency":{"identical":{"plot_label":"ปานกลาง","table_label":"เป็นกรดเล็กน้อย"},"alt":{"plot_label":"ไม่มีข้อมูลยืนยัน","table_label":"ไม่มีข้อมูลยืนยัน"}},"typos_as_shown":{"identical":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยง AI","canal":"เขตชลประทานคลองช้าย","om":"(อินทริยวัตถุ)","offer_tag":"จ้งเสนอแนะนำ"},"alt":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยง AI","canal":"เขตชลประทานคลองซ้าย","om":"(อินทรียวัตถุ)","offer_tag":"ข้อเสนอแนะนำ"}}};
   function F(flag, key) { var t = FLAG_TEXT[flag]; if (!t || typeof FLAGS[flag] !== 'boolean') return ''; return (FLAGS[flag] ? t.identical : t.alt)[key]; }
   function fmt(n) { return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
   function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('บันทึกไม่ได้: พื้นที่เครื่องเต็ม'); } try { scheduleSync(); } catch (e) {} }
   function toast(t) { document.querySelectorAll('.toast').forEach(function (x) { x.remove(); }); var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
+  function fmtPhone(v) { v = String(v || '-'); return /^\d{10}$/.test(v) ? v.slice(0, 3) + '-' + v.slice(3, 6) + '-' + v.slice(6) : esc(v); }
   function today() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
   function daysSince(iso) { return Math.floor((today() - new Date(iso + 'T00:00:00')) / 864e5); }
   function isoDate(d) { return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }
@@ -48,7 +49,7 @@
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[name] + '</svg>'; }
   var NAV = [['home', 'หน้าแรก', 'home'], ['plot', 'แปลง', 'plot'], ['market', 'ตลาด', 'market'], ['wallet', 'เงิน', 'money'], ['missions', 'ภารกิจ', 'mission']];
-  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'wallet', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', mentor: '' };
+  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'missions', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', training: 'missions', league: 'missions', income: '', plotsummary: 'plot', mentor: '' };
   function drawNav(route) {
     var on = NAV_OF[route];
     nav.innerHTML = NAV.map(function (n) { return '<a href="#/' + n[0] + '" class="' + (n[0] === 'home' ? 'home ' : '') + (on === n[0] ? 'on' : '') + '">' + svg(n[2]) + n[1] + '</a>'; }).join('');
@@ -60,12 +61,14 @@
     var logo = F('agency_logo', 'show_logo') ? '<img class="logo" alt="" src="' + (opts.pl ? 'img/logo-pl.png' : 'img/logo.png') + '">' : '';
     return '<header class="hdr' + (opts.tall ? ' tall' : '') + '">' + logo + '<div><div class="brand">Rice<span>OS</span></div>' +
       '<div class="l2">โครงการนาเดียว หลายรายได้</div><div class="l3">' + esc(F('agency_logo', 'agency_line')) + '</div></div>' +
-      (opts.bell ? '<button class="bell" aria-label="แจ้งเตือน" onclick="location.hash=\'#/missions\'">🔔<i></i></button>' : '') + '</header>';
+      (opts.bell ? '<button class="bell" aria-label="แจ้งเตือน" onclick="location.hash=\'#/missions\'">' + RiceIco('bell') + '<i></i></button>' : '') + '</header>';
   }
   function titleRow(title, sub, extra, pre) {
     return '<div class="titlerow"><button class="back" aria-label="กลับ" onclick="history.length>1?history.back():location.hash=\'#/home\'">←</button>' + (pre || '') +
       '<div><h1>' + title + '</h1>' + (sub ? '<div class="sub">' + sub + '</div>' : '') + '</div>' + (extra || '') + '</div>';
   }
+  function okConsentVer(v) { var a = API && API.consentAccepted ? API.consentAccepted() : null; return a ? a.indexOf(v) >= 0 : /^c\d+$/.test(v || ''); }
+  function CV() { return API && API.consentVer ? API.consentVer() : 'c3'; }
   function P() { var a = S.plots || []; for (var i = 0; i < a.length; i++) if (a[i].id === S.activePlot) return a[i]; return a[0]; }
   function age(p) { return p && p.sowDate ? Math.max(0, daysSince(p.sowDate)) : null; }
   function profileCard(rows, thumb) {
@@ -95,12 +98,16 @@
     rows.forEach(function (r) { r.id = (S.ledger.length + 1); r.state = state; r.occurred_at = ts; S.ledger.push(r); sum += r.points; });
     save(); return sum;
   }
-  function previewPoints(missionType) {
+  /* Preview label: '+N แต้ม', or the weekly-cap text when a matching rule is capped (cap_per_week used up). */
+  var CAP_TEXT = 'ครบโควตาสัปดาห์นี้แล้ว';
+  function previewLabel(missionType) {
     var rs = RicePoints.inForce(RULESETS, new Date().toISOString()), p = P();
-    if (!rs || !p) return 0;
+    if (!rs || !p) return '+0 แต้ม';
     var used = RicePoints.usedFromLedger((S.ledger || []).filter(function (r) { return r.rule_id !== 'OPENING'; }));
-    return RicePoints.evaluate(rs, { type: 'mission_completed', payload: { mission_type: missionType, quality: 'pass' }, occurred_at: new Date().toISOString() }, p.rai, p.area_source, used)
-      .reduce(function (a, r) { return a + r.points; }, 0);
+    var rows = RicePoints.evaluate(rs, { type: 'mission_completed', payload: { mission_type: missionType, quality: 'pass' }, occurred_at: new Date().toISOString() }, p.rai, p.area_source, used);
+    var sum = rows.reduce(function (a, r) { return a + r.points; }, 0);
+    if (sum <= 0 && rows.some(function (r) { return r.inputs.formula.cap_per_week != null; })) return CAP_TEXT;
+    return '+' + fmt(sum) + ' แต้ม';
   }
 
   /* ---------- missions by rice age (placeholder calendar, awaiting expert approval) ---------- */
@@ -113,9 +120,9 @@
     var a = age(p);
     if (a == null) return null;
     if (p.harvested) return { type: 'no_burn', title: 'ไม่เผาฟางและตอซัง', sub: 'ถ่ายรูปแปลงหลังเก็บเกี่ยวพร้อมพิกัด' };
-    var due = sampleToday(p), done = due.filter(function (k) { return k.lastRead && k.lastRead.slice(0, 10) === isoDate(today()); }).length;
+    var due = sampleToday(p), done = due.filter(function (k) { return k.lastRead && isoDate(new Date(k.lastRead)) === isoDate(today()); }).length;
     var dayN = (a % 7) + 1;
-    return { type: 'awd_tube_photo', title: 'ปล่อยน้ำแห้ง วันที่ ' + dayN + '/7 (AWD)', sub: 'ช่วยลดต้นทุน เพิ่มผลผลิต และลดคาร์บอน',
+    return { type: 'awd_tube_photo', title: 'ปล่อยน้ำแห้ง วันที่ ' + dayN + '/7 (AWD = เปียกสลับแห้ง)', sub: 'ช่วยลดต้นทุน เพิ่มผลผลิต และลดคาร์บอน',
       detail: 'วันนี้ถ่ายรูปกระทงที่ ' + due.map(function (k) { return k.seq; }).join(', ') + ' (จากทั้งหมด ' + p.kratongs.length + ' กระทง) ถ่ายแล้ว ' + done + ' จาก ' + due.length, due: due };
   }
 
@@ -168,8 +175,27 @@
     if (noApi()) return Promise.reject({ network: true });
     if (!force && ME) return Promise.resolve(ME);
     if (!force && MEPROMISE) return MEPROMISE;
-    MEPROMISE = API.me().then(function (j) { ME = j; OFFLINE = false; MEPROMISE = null; return j; }, function (e) { MEPROMISE = null; if (e.status !== 401) OFFLINE = true; throw e; });
+    MEPROMISE = API.me().then(function (j) { ME = j; OFFLINE = false; MEPROMISE = null; setTimeout(pullToday, 0); return j; }, function (e) { MEPROMISE = null; if (e.status !== 401) OFFLINE = true; throw e; });
     return MEPROMISE;
+  }
+  /* restore today's tube readings from GET /api/evidence so the counter survives logout/login and a new phone */
+  var PULLING = null;
+  function bkkDayStartIso() { var t = Date.now(), off = 7 * 36e5; return new Date(Math.floor((t + off) / 864e5) * 864e5 - off).toISOString(); }
+  function pullToday() {
+    if (noApi() || PULLING || !(S.plots || []).some(function (p) { return p.pid; })) return Promise.resolve(false);
+    PULLING = API.evidenceSince(bkkDayStartIso()).then(function (j) {
+      var changed = false, list = (j && j.evidence) || [];
+      list.forEach(function (e) {
+        if (e.mission_type !== 'awd_tube_photo' || !e.kratong_seq) return;
+        var p = (S.plots || []).filter(function (x) { return x.pid && x.pid === e.plot_id; })[0]; if (!p) return;
+        var k = p.kratongs.filter(function (x) { return x.seq === Number(e.kratong_seq); })[0]; if (!k) return;
+        var t = e.client_time || e.server_time; if (!t || (k.lastRead && k.lastRead >= t)) return;
+        k.lastRead = t; var m = /-(WET|DRY)$/.exec(String(e.scanned_code || '')); if (m) k.state = m[1]; changed = true;
+      });
+      PULLING = null; if (changed) { save(); var sc = document.body.dataset.screen; if (sc === 'home' || sc === 'plot') route(); }
+      return changed;
+    }, function () { PULLING = null; return false; });
+    return PULLING;
   }
   /* rebuild local state from the server on a new phone or after login */
   function hydrate(me, fresh) {
@@ -183,7 +209,7 @@
     var extra = {}; ((blob && blob.plotMeta) || []).forEach(function (m) { extra[m.pid] = m; });
     if ((me.plots || []).length) S.plots = me.plots.map(function (sp, i) {
       var pid = sp.id, p = byPid[pid] || { id: 'p' + (i + 1), code: String.fromCharCode(65 + i), area_source: 'self_declared', kratongs: [] };
-      p.pid = pid; p.name = sp.name || p.name; p.rai = Number(sp.rai) || p.rai; p.sowDate = sp.sow_date || p.sowDate; p.district = sp.district || p.district; p.variety = p.variety || (extra[pid] || {}).variety || '';
+      p.pid = pid; if (window.RiceP2 && RiceP2.absorb) RiceP2.absorb(p, sp); p.name = sp.name || p.name; p.rai = Number(sp.rai) || p.rai; p.sowDate = sp.sow_date || p.sowDate; p.district = sp.district || p.district; p.variety = p.variety || (extra[pid] || {}).variety || '';
       var n = Number(sp.kratong_count) || p.kratongs.length || 1; while (p.kratongs.length < n) { var s = p.kratongs.length + 1; p.kratongs.push({ seq: s, label: 'กระทง ' + s, qr: 'RICE-TUBE-' + p.code + '-' + s, lastRead: null }); }
       p.kratongs = p.kratongs.slice(0, n); return p;
     });
@@ -191,8 +217,8 @@
     if (blob && blob.lessons && (fresh || !S.lessons)) S.lessons = blob.lessons;
     S.ledger = S.ledger || []; S.evidence = S.evidence || []; S.lessons = S.lessons || {};
     var c = me.consents || {};
-    if (c.core) S.consent = { core: true, public_rank: !!c.public_rank, baac: !!c.baac, ver: c.version || 'c2', at: (S.consent || {}).at || new Date().toISOString() };
-    S.registered = true; S.regStep = 1; save();
+    if (c.core) S.consent = { core: true, public_rank: !!c.public_rank, baac: !!c.baac, ver: c.version || CV(), at: (S.consent || {}).at || new Date().toISOString() };
+    S.registered = true; S.regStep = 1; save(); pullToday();
   }
   function goHome() { if (location.hash === '#/home') route(); else location.hash = '#/home'; }
   var syncT = null;
@@ -201,11 +227,26 @@
     if (noApi() || !S.registered || S.seeded || !ME) return; clearTimeout(syncT);
     syncT = setTimeout(function () { try { API.putState(stateBlob()).catch(function () {}); } catch (e) {} }, 5000);
   }
-  function plotBody(p) { return { name: p.name, rai: p.rai, district: p.district || (S.profile || {}).district || '-', sow_date: p.sowDate, kratong_count: p.kratongs.length }; }
+  function plotBody(p) {
+    var b = { name: p.name, rai: p.rai, district: p.district || (S.profile || {}).district || '-', sow_date: p.sowDate, kratong_count: p.kratongs.length, lat: p.lat || undefined, lon: p.lon || undefined, acc_m: p.lat && p.acc ? p.acc : undefined };
+    var x = window.RiceP2 && RiceP2.body ? RiceP2.body(p) : null; if (x) { for (var k in x) b[k] = x[k]; if (x.area) delete b.rai; } /* plots2.js: variety, area rai/ngan/wa, soil, irrigation, method, tenure, owner, polygon */
+    return b;
+  }
+  /* best-effort one-shot GPS for the plot (only kept when inside Thailand, the range the server accepts) */
+  function locatePlot(p) { /* resolves true when the plot has a GPS point afterwards; p.gpsDenied is set when the user blocked location */
+    return new Promise(function (ok) {
+      var has = function () { return !!(p && p.lat && p.lon); };
+      if (!p || has() || !RiceNative.geoAvailable()) return ok(has());
+      var t = setTimeout(function () { ok(has()); }, 9000);
+      try { RiceNative.getPosition(function (g) { clearTimeout(t); var la = g.coords.latitude, lo = g.coords.longitude; if (la >= 5 && la <= 21 && lo >= 97 && lo <= 106) { p.lat = la; p.lon = lo; p.acc = Math.round(g.coords.accuracy || 0) || undefined; p.gpsDenied = false; p.gpsSent = false; save(); } ok(has()); }, function (er) { clearTimeout(t); if (er && er.code === 1 && p) p.gpsDenied = true; ok(has()); }, { timeout: 8000, maximumAge: 30000, enableHighAccuracy: true }); } catch (e) { clearTimeout(t); ok(has()); }
+    });
+  }
   function syncPlot(p) {
     if (noApi() || !p) return Promise.reject({ network: true });
-    if (p.pid) return API.req('PATCH', '/api/plots/' + encodeURIComponent(p.pid), plotBody(p));
-    return API.createPlot(plotBody(p)).then(function (j) { var sp = j.plot || j; p.pid = sp.id; save(); return j; });
+    var sent = !!(p.lat && p.lon);
+    var done = function (j) { var sp = j.plot || j; p.pid = sp.id || p.pid; p.gpsSent = sent; if (window.RiceP2 && RiceP2.absorb) RiceP2.absorb(p, sp); save(); return j; };
+    if (p.pid) return API.req('PATCH', '/api/plots/' + encodeURIComponent(p.pid), plotBody(p)).then(done);
+    return API.createPlot(plotBody(p)).then(done);
   }
   /* ---------- outbox glue ---------- */
   function updateBadge() {
@@ -214,32 +255,38 @@
       var n = c.pending + c.failed; b.hidden = !n;
       b.innerHTML = n ? '📤 รอส่ง ' + n + ' รายการ' + (c.failed ? ' <small>(ส่งไม่ผ่าน ' + c.failed + (c.msg ? ': ' + esc(c.msg) : c.reason ? ': ' + esc(c.reason) : '') + ' · แตะเพื่อส่งใหม่)</small>' : '') : '';
       b.style.cursor = c.failed ? 'pointer' : ''; b.setAttribute('role', 'button');
-      b.onclick = c.failed ? function () { toast('กำลังส่งใหม่...'); API.outbox.retry().then(function () { return flushOutbox(); }).then(function (r) { toast(r.left ? 'ยังส่งไม่ครบ ' + (r.reason ? '(' + (API.MSG[r.reason] || r.reason) + ')' : '') : 'ส่งครบแล้ว'); updateBadge(); }, function () { toast('ส่งใหม่ไม่ได้ในขณะนี้'); }); } : null;
+      b.onclick = c.failed ? failDialog : null;
     });
   }
   function flushOutbox() {
     if (noApi() || (S.seeded && !S.registered)) return Promise.resolve({ sent: 0, left: 0 });
-    var need = (S.plots || []).filter(function (p) { return !p.pid; });
-    return Promise.all(need.map(function (p) { return syncPlot(p).catch(function () {}); })).then(function () {
+    var retryGps = (S.plots || []).filter(function (p) { return !(p.lat && p.lon) && !p.gpsDenied && (p.gpsTries || 0) < 3 && !document.hidden; });
+    retryGps.forEach(function (p) { p.gpsTries = (p.gpsTries || 0) + 1; }); /* W7 fix: a plot without GPS is retried (max 3 times, never after the user blocked location) */
+    return Promise.all(retryGps.map(function (p) { return locatePlot(p); })).then(function () {
+      var need = (S.plots || []).filter(function (p) { return !p.pid || (p.lat && p.lon && !p.gpsSent); }); /* new plots, and plots whose GPS point never reached the server */
+      return Promise.all(need.map(function (p) { return syncPlot(p).catch(function () {}); }));
+    }).then(function () {
       return API.outbox.flush({
         prepare: function (it) { if (!it.meta.plot_id) { var p = (S.plots || []).filter(function (x) { return x.id === it.plot_local; })[0]; if (p && p.pid) it.meta.plot_id = p.pid; } },
         sent: function (it) { (S.evidence || []).forEach(function (e) { if (e.uuid === it.client_uuid) e.sent = true; }); }
       });
-    }).then(function (r) { save(); updateBadge(); return r; });
+    }).then(function (r) { save(); updateBadge(); if (r && !r.left && r.sent && document.getElementById('sentcard')) confirmSent('sent', 0); return r; }); /* a waiting 'รอส่ง' card turns into 'ส่งแล้ว' when the background send lands */
   }
   setInterval(function () { if (!document.hidden) flushOutbox().catch(function () {}); }, 60000);
   window.addEventListener('online', function () { flushOutbox().catch(function () {}); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) flushOutbox().catch(function () {}); });
+  RiceNative.onResume(function () { flushOutbox().catch(function () {}); }); /* iOS app back to foreground: send queued photos (server dedupes on client_uuid) */
 
   /* ---------- register (consent, account + PIN, plot, voice) ---------- */
   R.register = function () {
-    var consent = S.consent && S.consent.core && S.consent.ver === 'c2';
+    var consent = S.consent && S.consent.core && okConsentVer(S.consent.ver);
     var step = !consent ? 0 : (!S.account && !S.seeded ? 1 : Math.min(3, Math.max(S.account ? 2 : 1, Number(params.get('step') || S.regStep || 1))));
     if (S.seeded && !S.account && step === 1) step = 2;
     var steps = [['สร้างบัญชี', '& PIN'], ['ยืนยัน', 'แปลง'], ['เลือก', 'เสียงพี่เลี้ยง']];
     var body = '', pr = S.profile || {};
     if (!consent) {
-      body = '<div class="stepcard auth"><h2>ความยินยอม (PDPA)</h2><p class="big">ใช้ข้อมูลเพื่อบริการในโครงการเท่านั้น <b>เก็บชื่อ แปลง รูปหลักฐานและพิกัด GPS ตอนถ่ายรูปภารกิจ</b> ไม่เก็บรูปบัตรประชาชน เลขบัตรเก็บเฉพาะเมื่อท่านเลือกส่งเองและยินยอมแยกต่างหาก ถอนความยินยอมหรือลบบัญชีได้<span class="nw"> ทุกเมื่อ</span></p>' +
+      body = '<div class="stepcard auth intro"><h2>RiceOS ช่วยท่านอย่างไร</h2><p class="big">แอปของโครงการนาข้าว ใช้ฟรี</p><ul class="in-list"><li><span aria-hidden="true">🌾</span>จดแปลงนาและดูงานที่ต้องทำวันนี้</li><li><span aria-hidden="true">📷</span>ถ่ายรูปยืนยัน ได้แต้ม</li><li><span aria-hidden="true">📚</span>เรียนรู้การทำนาแบบประหยัดน้ำ</li></ul></div>' +
+        '<div class="stepcard auth"><h2>ความยินยอม (PDPA)</h2><p class="big">ใช้ข้อมูลเพื่อบริการในโครงการเท่านั้น <b>เก็บชื่อ แปลง รูปหลักฐานและพิกัด GPS ตอนถ่ายรูปภารกิจ</b> ไม่เก็บรูปบัตรประชาชน เลขบัตรเก็บเฉพาะเมื่อท่านเลือกส่งเองและยินยอมแยกต่างหาก ถอนความยินยอมหรือลบบัญชีได้<span class="nw"> ทุกเมื่อ</span></p>' +
         '<a class="lnk" href="#/privacy">อ่านประกาศความเป็นส่วนตัวฉบับเต็ม</a>' +
         '<label class="chk"><input type="checkbox" id="c1" checked onclick="return false" aria-readonly="true"> ใช้งานหลักของแอป: บัญชี แปลง รูปหลักฐานและพิกัด (จำเป็น)</label>' +
         '<label class="chk"><input type="checkbox" id="c2"> แสดงชื่อแสดงตนในอันดับลีก (เลือกได้)</label>' +
@@ -276,7 +323,7 @@
     wireForm(app); wireDate(app);
     if (!consent) {
       el('ag').onchange = function () { el('agree').disabled = !el('ag').checked; el('agh').hidden = el('ag').checked; };
-      el('agree').onclick = function () { if (!el('ag').checked) return; S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() }; S.ledger = S.ledger || []; save(); route(); };
+      el('agree').onclick = function () { if (!el('ag').checked) return; S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: CV(), at: new Date().toISOString() }; S.ledger = S.ledger || []; save(); route(); };
       return;
     }
     if (step === 1) {
@@ -291,7 +338,7 @@
         if ((bad = pinProblem(pin, el('pin2').value))) return showErr(bad);
         if (noApi()) return showErr('ระบบยังไม่พร้อม กรุณาลองใหม่');
         var b = el('next'), c = S.consent; busy(b, true);
-        API.register({ name: name, phone: phone, pin: pin, shared_device: el('sh').checked, consent: { version: 'c2', core: true, age_guardian: c.age_guardian === true, public_rank: !!c.public_rank, baac: !!c.baac } }).then(function (j) {
+        API.register({ name: name, phone: phone, pin: pin, shared_device: el('sh').checked, consent: { version: CV(), core: true, age_guardian: c.age_guardian === true, public_rank: !!c.public_rank, baac: !!c.baac } }).then(function (j) {
           ME = { user: j.user || {}, plots: [], consents: {} }; S.account = { phone: phone, id: (j.user || {}).public_id }; S.shared = el('sh').checked;
           S.profile = S.profile || {}; S.profile.name = name; delete S.profile.idHash; S.profile.avatar = S.profile.avatar || 'img/avatar.png'; go(2);
         }, function (e) {
@@ -306,7 +353,7 @@
         var p = P(); p.district = ds || p.district;
         if (noApi() || (S.seeded && !S.account)) return go(3);
         var b = el('next'); busy(b, true);
-        syncPlot(p).then(function () { go(3); }, function (e) { busy(b, false); if (e.status === 401) { location.hash = '#/login'; return; } showErr(e.message); });
+        locatePlot(p).then(function (has) { return syncPlot(p).then(function () { if (!has) toast('ยังไม่ได้ตำแหน่ง GPS ของแปลง ระบบจะลองใหม่ให้เอง หรือกด "วัดตำแหน่ง" ที่หน้าแปลง'); go(3); }); }).catch(function (e) { busy(b, false); if (e && e.status === 401) { location.hash = '#/login'; return; } showErr((e && e.message) || 'ส่งข้อมูลแปลงไม่สำเร็จ กรุณาลองใหม่'); });
       };
     } else {
       app.querySelectorAll('[data-voice]').forEach(function (b) { b.onclick = function () { S.profile.voice = b.dataset.voice; save(); speak('สวัสดีครับ พี่เลี้ยงพร้อมช่วยแล้ว'); app.querySelectorAll('[data-voice]').forEach(function (x) { x.classList.toggle('sel', x === b); }); }; });
@@ -407,9 +454,9 @@
       if (!el('ag').checked) return;
       var name = el('nm').value.trim(); if (!name) return showErr('กรุณากรอกชื่อ');
       var b = el('go'); busy(b, true);
-      API.lineRegister({ ticket: ticket, name: name, shared_device: el('sh').checked, consent: { version: 'c2', core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked } }).then(function (j) {
+      API.lineRegister({ ticket: ticket, name: name, shared_device: el('sh').checked, consent: { version: CV(), core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked } }).then(function (j) {
         ME = { user: j.user || {}, plots: [], consents: {} }; S.shared = el('sh').checked;
-        S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: 'c2', at: new Date().toISOString() };
+        S.consent = { core: true, age_guardian: true, public_rank: el('c2').checked, baac: el('c3').checked, ver: CV(), at: new Date().toISOString() };
         S.account = { phone: (j.user || {}).phone || null, id: (j.user || {}).public_id }; S.profile = S.profile || {}; S.profile.name = name; S.profile.avatar = S.profile.avatar || 'img/avatar.png';
         S.ledger = S.ledger || []; S.regStep = 2; save(); location.hash = '#/register';
       }, function (e) { busy(b, false); showErr(e.message); });
@@ -465,7 +512,7 @@
   R.settings = function () {
     var pr = S.profile || {}, c = S.consent || {};
     app.innerHTML = header() + '<div class="sheet setpage">' + titleRow('ข้อมูลของฉัน') +
-      '<div class="card auth" style="padding:14px"><b style="font-size:22px">' + esc(pr.name || '') + '</b><div class="big" id="ph0">📱 ' + esc((S.account || {}).phone || '-') + '</div><div class="big">📍 ' + esc(pr.district || '-') + '</div></div>' +
+      '<div class="card auth" style="padding:14px"><b style="font-size:22px">' + esc(pr.name || '') + '</b><div class="big ln" id="ph0">' + RiceIco('phone') + ' ' + fmtPhone((S.account || {}).phone) + '</div><div class="big ln">' + RiceIco('pin') + ' ' + esc(pr.district || '-') + '</div><button class="btn ghost" id="edprof" style="margin-top:12px">แก้ไขข้อมูลส่วนตัว</button></div>' +
       '<div class="card auth" id="acct" style="padding:14px;margin-top:10px"><h3 class="ph3">วิธีเข้าสู่ระบบ</h3><p class="big" id="acctb">กำลังเปิด...</p></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><h3 class="ph3">ความยินยอม</h3>' +
       '<label class="chk"><input type="checkbox" id="k2"' + (c.public_rank ? ' checked' : '') + '> แสดงชื่อแสดงตนในอันดับลีก</label>' +
@@ -484,7 +531,7 @@
       getConfig().then(function (c) {
         if (!el('acct')) return;
         var h = '<h3 class="ph3">วิธีเข้าสู่ระบบ</h3>';
-        if (u.phone) { var ph0 = el('ph0'); if (ph0) ph0.textContent = '📱 ' + u.phone; }
+        if (u.phone) { var ph0 = el('ph0'); if (ph0) ph0.innerHTML = RiceIco('phone') + ' ' + fmtPhone(u.phone); }
         if (lineAllowed(c) || u.has_line) h += '<div class="arow"><div><b>LINE</b><br><span class="muted">' + (u.has_line ? 'ผูกบัญชีแล้ว' : 'ยังไม่ได้ผูก') + '</span></div>' +
           (u.has_line ? (u.has_pin ? '<button class="btn ghost sm" id="unln">ยกเลิกการผูก</button>' : '<button class="btn ghost sm" id="unln" disabled aria-describedby="unlh">ยกเลิกการผูก</button>') : '<button class="btn sm" id="linebtn">ผูก LINE</button>') + '</div>' + (u.has_line && !u.has_pin ? '<p class="hint" id="unlh">ต้องเพิ่มเบอร์มือถือและ PIN ก่อน จึงจะยกเลิกการผูก LINE ได้ ไม่เช่นนั้นจะเข้าบัญชีไม่ได้</p>' : '');
         h += '<div class="arow"><div><b>เบอร์มือถือและ PIN</b><br><span class="muted">' + (u.has_pin ? 'ตั้งไว้แล้ว' : 'ยังไม่ได้ตั้ง') + '</span></div>' + (u.has_pin ? '' : '<button class="btn sm" id="addcr">เพิ่มเบอร์และ PIN</button>') + '</div>';
@@ -518,7 +565,7 @@
       el(x[0]).onchange = function () {
         var box = this, v = box.checked;
         if (noApi()) { box.checked = !v; return toast('ต้องต่อระบบก่อนจึงเปลี่ยนความยินยอมได้'); }
-        API.consent(x[1], v, 'c2').then(function () { S.consent[x[1]] = v; S.consent.at = new Date().toISOString(); save(); toast('บันทึกแล้ว'); }, function (e) { box.checked = !v; toast(e.message); });
+        API.consent(x[1], v, CV()).then(function () { S.consent[x[1]] = v; S.consent.at = new Date().toISOString(); save(); toast('บันทึกแล้ว'); }, function (e) { box.checked = !v; toast(e.message); });
       };
     });
     el('chpin').onclick = function () {
@@ -529,6 +576,44 @@
         var o = m.querySelector('#o').value, n = m.querySelector('#n').value, bad = !/^\d{6}$/.test(o) ? 'PIN เดิมต้องเป็นตัวเลข 6 หลัก' : pinProblem(n, m.querySelector('#n2').value);
         if (bad) return showErr(bad); var b = m.querySelector('#ok'); busy(b, true);
         API.changePin(o, n).then(function () { m.remove(); toast('เปลี่ยน PIN แล้ว'); }, function (e) { busy(b, false); showErr(e.code === 'bad_credentials' ? 'PIN เดิมไม่ถูกต้อง' : e.message); });
+      };
+    };
+    el('edprof').onclick = function () {
+      if (noApi()) return toast('ต้องต่ออินเทอร์เน็ตก่อนจึงแก้ไขข้อมูลได้');
+      var u = (ME || {}).user || {}, curName = u.name || pr.name || '', curPhone = u.phone || (S.account || {}).phone || '';
+      var m = sheetModal('<div class="mh"><h2>แก้ไขข้อมูลส่วนตัว</h2><button class="xbtn" id="x2" aria-label="ปิด">✕</button></div>' +
+        '<p class="hint">แก้ชื่อที่พิมพ์ผิด หรือเปลี่ยนเบอร์มือถือใหม่ ข้อมูลแปลงและแต้มยังอยู่ครบ</p>' +
+        '<label for="epn">ชื่อ-นามสกุล</label><input id="epn" autocomplete="name" maxlength="80" value="' + esc(curName) + '">' +
+        (curPhone ? '<label for="epp">เบอร์มือถือ (10 หลัก)</label><input id="epp" inputmode="tel" maxlength="10" autocomplete="tel" value="' + esc(curPhone) + '">' +
+          '<div id="eppin" hidden><p class="hint">เปลี่ยนเบอร์ ต้องใส่ PIN ที่ใช้อยู่ตอนนี้ เพื่อยืนยันว่าเป็นเจ้าของบัญชี ครั้งหน้าให้เข้าสู่ระบบด้วยเบอร์ใหม่</p>' + pinField('epin', 'PIN ที่ใช้อยู่ (6 หลัก)') + '</div>' : '') +
+        '<p class="err" id="err" role="alert" hidden></p><button class="btn" id="ok" style="margin-top:8px">บันทึก</button><button class="btn ghost" id="x" style="margin-top:8px">ปิด</button>');
+      var ip = m.querySelector('#epp'), pinBox = m.querySelector('#eppin');
+      var phoneChanged = function () { return !!ip && normPhone(ip.value) !== curPhone; };
+      if (ip) ip.addEventListener('input', function () { pinBox.hidden = !phoneChanged(); });
+      m.querySelector('#x').onclick = m.querySelector('#x2').onclick = function () { m.remove(); };
+      m.querySelector('#ok').onclick = function () {
+        var name = m.querySelector('#epn').value.replace(/\s+/g, ' ').trim(), body = {};
+        if (!name) return showErr('กรุณากรอกชื่อ');
+        if (name !== curName) body.name = name;
+        if (phoneChanged()) {
+          var phone = normPhone(ip.value), pin = m.querySelector('#epin').value;
+          if (!/^0[689]\d{8}$/.test(phone)) return showErr('เบอร์มือถือไม่ถูกต้อง ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 06 08 หรือ 09');
+          if (!/^\d{6}$/.test(pin)) return showErr('กรุณาใส่ PIN 6 หลักที่ใช้อยู่ตอนนี้');
+          body.phone = phone; body.pin = pin;
+        }
+        if (!Object.keys(body).length) { m.remove(); return toast('ไม่มีอะไรเปลี่ยน'); }
+        var b = m.querySelector('#ok'); busy(b, true, 'กำลังบันทึก...');
+        API.updateProfile(body).then(function (j) {
+          var nu = (j && j.user) || {};
+          S.profile = S.profile || {}; S.profile.name = nu.name || name;
+          if (nu.phone) { S.account = S.account || {}; S.account.phone = nu.phone; }
+          save(); m.remove();
+          toast(body.phone ? 'บันทึกแล้ว ครั้งหน้าเข้าสู่ระบบด้วยเบอร์ใหม่' : 'บันทึกชื่อแล้ว');
+          return getMe(true).catch(function () {}).then(function () { if (document.body.dataset.screen === 'settings') R.settings(); });
+        }, function (e) {
+          busy(b, false);
+          showErr(e.code === 'bad_pin' ? 'PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง (ใส่ผิด 5 ครั้งจะถูกพักไว้ 15 นาที)' : e.code === 'phone_taken' ? 'เบอร์นี้มีผู้ใช้แล้ว กรุณาใช้เบอร์อื่น หรือติดต่อเจ้าหน้าที่' : (e.message || 'บันทึกไม่สำเร็จ กรุณาลองใหม่'));
+        });
       };
     };
     el('lo').onclick = function () { logout(); };
@@ -543,9 +628,13 @@
       };
     };
   };
-  function wipeLocal() { try { localStorage.removeItem(KEY); } catch (e) {} S = {}; ME = null; if (API) API.outbox.purgeAll().catch(function () {}).then(function () { return API.setUser(null); }); }
+  function wipeLocal() { try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0) localStorage.removeItem(k); }); } catch (e) {} S = {}; ME = null; if (API) API.outbox.purgeAll().catch(function () {}).then(function () { return API.setUser(null); }); }
+  function clearPersonal() { /* PDPA: a normal logout also removes plots, thumbnails and evidence from this phone (server copy stays); pending photos stay queued for the same user */
+    try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0) localStorage.removeItem(k); }); } catch (e) {}
+    S = { registered: true, consent: S.consent }; save();
+  }
   function logout() {
-    function done() { var shared = S.shared; ME = null; API.logout().catch(function () {}).then(function () { if (shared) wipeLocal(); else { S.registered = true; save(); } location.hash = '#/login'; if (shared) location.reload(); }); }
+    function done() { var shared = S.shared; ME = null; API.logout().catch(function () {}).then(function () { if (shared) wipeLocal(); else { clearPersonal(); } location.hash = '#/login'; if (shared) location.reload(); }); }
     flushOutbox().catch(function () {}).then(function () { return API.outbox.count(); }).then(function (c) {
       if (c.pending + c.failed > 0 && S.shared && !confirm('ยังมีรูปที่ส่งไม่ครบ ' + (c.pending + c.failed) + ' รายการ ถ้าออกจากระบบบนเครื่องใช้ร่วม รูปจะหายไป ออกจากระบบต่อไหม?')) return;
       done();
@@ -562,10 +651,10 @@
   }
   function plotForm(p) {
     return '<label for="pn">ชื่อแปลง</label><input id="pn" value="' + esc(p.name || '') + '">' +
-      '<label for="pr">พื้นที่ (ไร่)</label><input id="pr" inputmode="decimal" value="' + esc(p.rai || '') + '">' +
+      '<label for="pr">พื้นที่ (ไร่)</label><input id="pr" inputmode="decimal" value="' + esc(p.area ? p.area.rai : (p.rai || '')) + '">' +
       '<label for="pv">พันธุ์ข้าว</label><input id="pv" value="' + esc(p.variety || '') + '">' +
       '<label for="pd">วันปลูก</label><div class="datebox"><span id="pdt" class="dt' + (p.sowDate ? '' : ' empty') + '">' + thDate(p.sowDate) + '</span><span class="dtc" aria-hidden="true">📅</span><input id="pd" type="date" value="' + esc(p.sowDate || '') + '" aria-label="วันปลูก"></div>' +
-      '<label for="pk">จำนวนกระทง (1-30)</label><input id="pk" inputmode="numeric" value="' + esc(p.kratongs ? p.kratongs.length : 1) + '"><p class="hint">1 กระทง = 1 ท่อวัดน้ำ ถ่ายรูปท่อละ 1 ภาพ</p>';
+      '<label for="pk">จำนวนกระทง (1-30)</label><input id="pk" inputmode="numeric" value="' + esc(p.kratongs ? p.kratongs.length : 1) + '"><p class="hint">กระทง คือผืนนาย่อยที่คั่นด้วยคันนา · ท่อวัดน้ำ คือท่อพลาสติกที่ปักในนาไว้ดูระดับน้ำ เจ้าหน้าที่ช่วยติดตั้งให้ · ไม่แน่ใจ ใส่ 1 ได้เลย · ถ่ายรูปท่อละ 1 ภาพ</p>' + (window.RiceP2 ? RiceP2.formHtml(p) : '');
   }
   function savePlotForm(p) {
     var g = function (id) { return document.getElementById(id).value.trim(); };
@@ -576,6 +665,8 @@
     if (bad) {
       var MS = { pr: 'กรุณากรอกพื้นที่เป็นตัวเลข มากกว่า 0 ไร่', pd: 'กรุณาเลือกวันปลูก', pk: 'จำนวนกระทงต้องอยู่ระหว่าง 1-30' }, f = document.getElementById(bad), host = bad === 'pd' ? f.parentNode : f;
       host.classList.add('invalid'); host.insertAdjacentHTML('afterend', '<p class="fielderr" role="alert">⚠️ ' + MS[bad] + '</p>');
+      var okNow = { pr: function () { return Number(f.value.trim()) > 0; }, pd: function () { return !!f.value; }, pk: function () { var q = Math.round(Number(f.value.trim())); return q >= 1 && q <= 30; } }[bad], clr = function () { if (!okNow()) return; var e = host.nextElementSibling; if (e && e.classList.contains('fielderr')) e.remove(); host.classList.remove('invalid'); f.removeEventListener('input', clr); f.removeEventListener('change', clr); };
+      f.addEventListener('input', clr); f.addEventListener('change', clr);
       try { host.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (bad !== 'pd') f.focus(); } catch (e) {} toast(MS[bad]); return false;
     }
     S.plots = S.plots || [];
@@ -583,26 +674,35 @@
     p.name = g('pn') || ('แปลง ' + p.code); p.rai = rai; p.variety = g('pv'); p.sowDate = g('pd');
     while (p.kratongs.length < n) { var s = p.kratongs.length + 1; p.kratongs.push({ seq: s, label: 'กระทง ' + s, qr: 'RICE-TUBE-' + p.code + '-' + s, lastRead: null }); }
     if (p.kratongs.length > n) p.kratongs = p.kratongs.slice(0, n);
+    if (window.RiceP2) RiceP2.read(p);
     save(); return true;
   }
 
+  /* first-run card: what RiceOS is + the next three steps. Hidden once dismissed or once a photo exists. */
+  function welcomeCard() {
+    if (S.welcomed || S.seeded || !S.registered || (S.evidence || []).length) return '';
+    return '<section class="welcome" aria-label="เริ่มต้นใช้ RiceOS"><button class="wl-x" id="wlx" aria-label="ปิดคำแนะนำ">✕</button><h2>RiceOS คืออะไร?</h2>' +
+      '<p>แอปช่วยชาวนา จดแปลง ถ่ายรูปยืนยันการทำนา เรียนรู้ และสะสมแต้มในโครงการ</p>' +
+      '<details class="wl-more"><summary>3 ขั้นตอนเริ่มต้น</summary><ol class="wl-steps"><li><b>1</b><span>ถ่ายรูปท่อวัดน้ำ<small>ไม่มีรหัสก็ถ่ายได้</small></span></li><li><b>2</b><span>เรียนบทเรียนสั้น ๆ<small>ได้แต้มเมื่อเรียนจบ</small></span></li><li><b>3</b><span>ดูแต้มของท่าน<small>แตะ ⭐ บนหน้าแรก</small></span></li></ol></details>' +
+      '<button class="btn" id="wlgo">' + RiceIco('camera') + ' เริ่มถ่ายรูปแรก</button></section>';
+  }
   R.home = function () {
     var pr = S.profile || {}, p = P(), m = mission(p), t = totals(), w = pr.weather || {};
     var tiles = [['plot', 'แปลง<br>ของฉัน', '', '#/plot'], ['soil', 'ดิน & ปุ๋ย', '', '#/analysis'], ['mentor', 'พี่เลี้ยง AI', '', '#/mentor'], ['market', 'ตลาดขายข้าว', '', '#/market'],
       ['wallet', 'เงิน', '(Wallet)', '#/wallet'], ['carbon', 'คาร์บอน & QR', '(ลดคาร์บอน)', '#/kratong'], ['mission', 'ภารกิจ', '& แต้ม', '#/missions'], ['gov', 'บริการรัฐ', '(เชื่อมข้อมูล)', '#/gov']];
-    app.innerHTML = header({ tall: true, bell: true }) + '<div class="sheet">' +
+    app.innerHTML = header({ tall: true, bell: true }) + '<div class="sheet">' + welcomeCard() +
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
-      '<div><span class="green">📍</span> ' + esc(pr.district || '') + '</div>' +
-      '<a class="setlink" href="#/settings" aria-label="ข้อมูลของฉันและตั้งค่า">⚙️</a><div id="obx" class="obx" hidden></div>' +
-      (p ? '<div>🌾 ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + (p.variety ? esc(p.variety) + ' · ' : '') + '<span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
-      '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? '🌧️ <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + '</span>' : '🌤️ <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
-      '<a class="ptspill" href="#/points" style="text-decoration:none">⭐ <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
-      '<div class="row"><a class="wallet" href="#/wallet" style="flex:0 0 58%;color:inherit;text-decoration:none"><span style="color:#0c8208;font-size:20px">👛</span><span style="font:600 15px Prompt">ยอด Wallet</span> <b>' + (pr.wallet ? esc(pr.wallet) + ' บ.' : 'รอเชื่อมต่อ') + '</b><span style="margin-left:auto">›</span></a>' +
+      '<div class="pl"><span class="green">' + RiceIco('pin') + '</span> ' + esc(pr.district || '') + '</div>' +
+      '<a class="setlink" href="#/settings" aria-label="ข้อมูลของฉันและตั้งค่า">' + RiceIco('gear') + '</a><div id="obx" class="obx" hidden></div>' +
+      (p ? '<div class="pl"><span class="green">' + RiceIco('sprout') + '</span> ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + (p.variety ? esc(p.variety) + ' · ' : '') + '<span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
+      '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? RiceIco('rain') + ' <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + '</span>' : RiceIco('sun') + ' <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
+      '<a class="ptspill" href="#/points" style="text-decoration:none">' + RiceIco('star') + ' <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
+      '<div class="row"><a class="wallet" href="#/wallet" style="flex:0 0 58%;color:inherit;text-decoration:none"><span class="wi">' + RiceIco('wallet') + '</span><span class="wl">ยอด Wallet</span> <b>' + (pr.wallet ? esc(pr.wallet) + ' บ.' : 'รอเชื่อมต่อ') + '</b><span style="margin-left:auto">›</span></a>' +
       '<div class="credit">เครดิต ' + (pr.credit ? '<span class="badgeA">' + esc(pr.credit) + '</span>' : '<b>รอประเมิน</b>') + '</div></div>' +
-      (m ? '<div class="today"><div class="tag">📋 วันนี้ต้องทำ</div><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' +
-        '<button class="shoot" id="shoot"><i>📷</i>ถ่ายรูปยืนยัน</button><span class="plus">⭐ +' + fmt(Math.round(previewPoints(m.type))) + ' แต้ม</span></div>' : '<a class="btn" href="#/register" style="margin-top:12px">เพิ่มแปลงของท่าน</a>') +
+      (m ? '<div class="today"><div class="tag">' + RiceIco('clip') + ' วันนี้ต้องทำ</div><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' +
+        '<button class="shoot" id="shoot"><i>' + RiceIco('camera') + '</i>ถ่ายรูปยืนยัน</button><span class="plus">' + RiceIco('star') + ' ' + previewLabel(m.type) + '</span></div>' : '<a class="btn" href="#/register" style="margin-top:12px">เพิ่มแปลงของท่าน</a>') +
       (m && m.detail ? '<p class="note">' + esc(m.detail) + '</p>' : '') + '</div><div class="hc2"><div class="grid4">' + tiles.map(function (x) { return '<a class="tile" href="' + x[3] + '"><img alt="" src="img/ic-' + x[0] + '.jpg">' + x[1] + (x[2] ? '<small>' + x[2] + '</small>' : '') + '</a>'; }).join('') + '</div>' +
-      (w.rain ? '<a class="alert" href="#/mentor" style="text-decoration:none"><span style="font-size:34px">🌧️</span><span style="flex:1"><b>' + esc(w.rain) + '</b>แนะนำ: เลื่อนใส่ปุ๋ยออกไปก่อน</span><span style="font-size:26px">›</span></a>' : '<a class="alert calm" href="#/mentor" style="text-decoration:none"><span style="font-size:30px">💧</span><span style="flex:1"><b>ตรวจระดับน้ำก่อนใส่ปุ๋ย</b>เมื่อเชื่อมข้อมูลอากาศแล้ว จะแจ้งเตือนฝนที่นี่</span><span style="font-size:26px">›</span></a>') +
+      (w.rain ? '<a class="alert" href="#/mentor" style="text-decoration:none"><span class="alico">' + RiceIco('rain') + '</span><span style="flex:1"><b>' + esc(w.rain) + '</b>แนะนำ: เลื่อนใส่ปุ๋ยออกไปก่อน</span><span style="font-size:26px">›</span></a>' : '<a class="alert calm" href="#/mentor" style="text-decoration:none"><span class="alico">' + RiceIco('drop') + '</span><span style="flex:1"><b>ตรวจระดับน้ำก่อนใส่ปุ๋ย</b>เมื่อเชื่อมข้อมูลอากาศแล้ว จะแจ้งเตือนฝนที่นี่</span><span style="font-size:26px">›</span></a>') +
       '<div style="position:relative"><a class="status" href="#/plot" style="display:block;color:inherit;text-decoration:none"><h3>สภาพแปลงล่าสุด</h3>' +
       (S.seeded ? '<div class="row"><img alt="" src="img/ears-thumb.jpg" style="width:44px;height:58px;border-radius:8px;object-fit:cover"><div class="cols" style="flex:1">' +
       '<div><span class="dot" style="background:#2e9a2e">✓</span><br>น้ำ<br><span style="color:#0e6e0c">เหมาะสม</span></div>' +
@@ -611,6 +711,8 @@
       '</div><a class="askai" href="#/mentor"><img alt="" src="img/mascot.jpg"><span><b>พี่เลี้ยง AI</b>' + esc(F('typos_as_shown', 'ask2')) + ' ได้ทุกเรื่อง</span><span class="chev" aria-hidden="true">›</span></a>' +
       '</div></div></div>';
     var b = document.getElementById('shoot'); if (b) b.onclick = function () { capture(m.type); };
+    var wx = document.getElementById('wlx'); if (wx) wx.onclick = function () { S.welcomed = true; save(); route(); };
+    var wg = document.getElementById('wlgo'); if (wg) wg.onclick = function () { S.welcomed = true; save(); capture('awd_tube_photo'); };
     updateBadge();
   };
 
@@ -646,8 +748,9 @@
   };
   R.plotedit = function () {
     var isNew = /new=1/.test(location.hash), p = isNew ? null : P();
-    app.innerHTML = header() + '<div class="sheet">' + titleRow(isNew ? 'เพิ่มแปลง' : 'แก้ไขแปลง') + '<div class="card" style="padding:12px">' + plotForm(p || {}) + '</div><button class="btn" id="sv" style="margin-top:12px">บันทึก</button></div>';
-    document.getElementById('sv').onclick = function () { if (savePlotForm(p)) { var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.activePlot = np.id; save(); } syncPlot(np).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
+    app.innerHTML = header() + '<div class="sheet">' + titleRow(isNew ? 'เพิ่มแปลง' : 'แก้ไขแปลง') + '<div class="card" style="padding:12px">' + plotForm(p || {}) + '</div><button class="btn btn-sticky" id="sv" style="margin-top:12px">บันทึก</button></div>';
+    wireDate(app);
+    document.getElementById('sv').onclick = function () { if (this.dataset.busy) return; if (savePlotForm(p)) { this.dataset.busy = '1'; this.disabled = true; this.textContent = 'กำลังบันทึก...'; var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.activePlot = np.id; save(); } locatePlot(np).then(function () { return syncPlot(np); }).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
   };
   function kratongList(p) {
     var due = sampleToday(p).map(function (k) { return k.seq; });
@@ -669,14 +772,14 @@
   function capture(missionType) {
     var p = P(); if (!p) return;
     var m = document.createElement('div'); m.className = 'modal';
-    var needQr = missionType === 'awd_tube_photo';
-    m.innerHTML = '<div><h2 style="margin:0 0 8px;font:700 22px Prompt">' + (needQr ? 'สแกน QR ที่ท่อวัดน้ำ' : 'ถ่ายรูปแปลง') + '</h2>' +
-      (needQr ? '<video id="cv" playsinline muted></video><canvas id="cc" hidden></canvas><label for="qrin">หรือพิมพ์รหัสบนท่อ</label><input id="qrin" placeholder="RICE-TUBE-' + p.code + '-1">' +
-        '<div class="row" style="margin-top:6px"><button class="btn sm" data-st="WET">มีน้ำ</button><button class="btn sm" data-st="DRY">แห้ง</button></div>' : '') +
-      '<p id="qrok" style="font-size:17px"></p><label class="btn" for="ph" id="phl">📷 ถ่ายรูป</label><input id="ph" type="file" accept="image/*" capture="environment" hidden>' +
-      '<p id="gps" class="note"></p><button class="btn ghost" id="cl" style="margin-top:8px">ปิด</button></div>';
+    var needQr = missionType === 'awd_tube_photo', IN_LINE = /\bLine\//i.test(navigator.userAgent || '');
+    m.innerHTML = '<div class="capsheet"><span class="grab" aria-hidden="true"></span><button type="button" class="cs-x" aria-label="ปิด" onclick="document.getElementById(\'cl\').click()">✕</button><div class="cs-body"><h2 class="cs-title">' + (needQr ? 'ถ่ายรูปท่อวัดน้ำ' : 'ถ่ายรูปแปลง') + '</h2>' +
+      (needQr ? '<div id="vbox"><video id="cv" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video><div class="qrguide" aria-hidden="true"><i></i><span>เล็งกล้องให้เห็น QR บนท่อ</span></div><div id="vok" hidden></div></div><canvas id="cc" hidden></canvas><label for="qrin" class="cs-lab">หรือพิมพ์รหัสบนท่อ (ถ้ามี)</label><input id="qrin" autocomplete="off" placeholder="เช่น RICE-TUBE-' + p.code + '-1">' +
+        '<button type="button" class="nocode" id="nocode"><span aria-hidden="true">🙋</span><span><b>ไม่มีรหัส / ยังไม่มีท่อ</b><small>ไม่ต้องสแกน ถ่ายรูปได้เลย เจ้าหน้าที่จะช่วยตรวจให้</small></span></button><div class="cs-seg" role="group" aria-label="สภาพน้ำในท่อ"><button type="button" class="btn sm" data-st="WET" aria-pressed="false">💧 มีน้ำ</button><button type="button" class="btn sm" data-st="DRY" aria-pressed="false">🌾 แห้ง</button></div>' : '') +
+      '<p id="qrok" class="cs-status"></p><p id="camhint" class="note cs-hint" role="status" hidden>ถ้าไม่เห็นภาพกล้องในหน้านี้ ไม่เป็นไร กรุณาแตะปุ่ม "ถ่ายรูป" ด้านล่าง เพื่อเปิดกล้องของเครื่องแล้วถ่ายรูปได้เลย</p>' + (IN_LINE ? '<p id="chromehint" class="note cs-hint">เปิดในแอป LINE: ถ้ากล้องไม่ขึ้น ให้กดเมนู ⋮ แล้วเลือก "เปิดใน Chrome" (หรือ "เปิดด้วยเบราว์เซอร์อื่น") เพื่อเห็นภาพกล้องสด</p>' : '') + '<p id="gps" class="note cs-gps"></p></div>' +
+      '<div class="cs-foot"><button class="btn ghost" id="gpsretry" style="display:none">📍 ลองหาพิกัดใหม่</button><label class="btn" for="ph" id="phl">📷 ถ่ายรูปยืนยัน</label><input id="ph" type="file" accept="image/*" capture="environment" hidden><button class="btn ghost cs-close" id="cl">ปิด</button></div></div>';
     document.body.appendChild(m);
-    var st = { code: null, kratong: null, state: null, stream: null, timer: null, closed: false };
+    var st = { code: null, kratong: null, state: null, stream: null, timer: null, closed: false, noCode: false };
     var $ = function (id) { return m.querySelector('#' + id); };
     function close() { st.closed = true; if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; } clearInterval(st.timer); try { var vv = m.querySelector('video'); if (vv) { vv.pause(); vv.srcObject = null; } } catch (e) {} m.remove(); if (capClose === close) capClose = null; }
     if (capClose) capClose(); capClose = close;
@@ -689,13 +792,21 @@
       if (!k) { $('qrok').textContent = 'ไม่พบกระทงนี้ในแปลง'; return false; }
       st.code = v; st.kratong = k; if (mm[3]) st.state = mm[3];
       $('qrok').innerHTML = '✅ ' + esc(k.label) + (st.state ? ' · ' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') : '') + ' แล้วกดถ่ายรูป';
-      if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); clearInterval(st.timer); $('cv').hidden = true; }
+      if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); clearInterval(st.timer); st.stream = null; }
+      var vo = $('vok'), vb = $('vbox'); if (vb && vb.style.display !== 'none') { $('cv').style.display = 'none'; vo.hidden = false; vo.style.display = 'flex'; vb.classList.add('done'); vo.dataset.s = st.state || ''; vo.textContent = '✅ ' + k.label + (st.state ? ' · ' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') : ''); }
       return true;
     }
     var startCam = function () {}; /* camera (getUserMedia) starts only after the GPS prompt is settled: two native permission prompts at once crash Capacitor's WebChromeClient */
     if (needQr) {
+      $('nocode').onclick = function () {
+        st.noCode = true; st.code = null; st.kratong = null; this.classList.add('on'); this.setAttribute('aria-pressed', 'true');
+        $('qrin').value = ''; $('qrok').innerHTML = '✅ ไม่ใช้รหัส · กดปุ่มเขียว "ถ่ายรูปยืนยัน" ได้เลย';
+        if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); clearInterval(st.timer); st.stream = null; }
+        var vb = $('vbox'); if (vb) vb.style.display = 'none';
+      };
       $('qrin').onchange = function () { accept(this.value); };
-      m.querySelectorAll('[data-st]').forEach(function (b) { b.onclick = function () { st.state = b.dataset.st; if (st.kratong) accept(st.code.replace(/-(WET|DRY)$/, '') + '-' + st.state); else $('qrok').textContent = 'สแกนหรือพิมพ์รหัสก่อน'; }; });
+      $('qrin').oninput = function () { if (/^RICE-TUBE-[A-Z0-9]+-\d+(-(WET|DRY))?$/i.test(this.value.trim())) accept(this.value); };
+      m.querySelectorAll('[data-st]').forEach(function (b) { b.onclick = function () { st.state = b.dataset.st; m.querySelectorAll('[data-st]').forEach(function (o) { var on = o === b; o.classList.toggle('on', on); o.setAttribute('aria-pressed', on ? 'true' : 'false'); }); if (st.kratong) accept(st.code.replace(/-(WET|DRY)$/, '') + '-' + st.state); else $('qrok').textContent = '✅ เลือก' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') + ' แล้วกดถ่ายรูปได้เลย'; }; });
       startCam = function () { if (st.closed) return; if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         Promise.resolve().then(function () { return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); }).then(function (s) {
           if (st.closed) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
@@ -706,24 +817,42 @@
             if (det) det.detect(v).then(function (r) { if (r[0]) accept(r[0].rawValue); }).catch(function () {});
             else if (window.jsQR) { c.width = v.videoWidth; c.height = v.videoHeight; cx.drawImage(v, 0, 0); var r = jsQR(cx.getImageData(0, 0, c.width, c.height).data, c.width, c.height); if (r) accept(r.data); }
           }, 400);
-        }).catch(function () { $('cv').hidden = true; $('qrok').textContent = 'ไม่ได้รับอนุญาตใช้กล้อง หรือเปิดกล้องไม่ได้ พิมพ์รหัสแทนหรือกด "ถ่ายรูป" ได้ (เปิดสิทธิ์กล้องได้ที่ ตั้งค่า > แอป > RiceOS)'; });
-      } else $('cv').hidden = true; };
+        }).catch(function () { $('vbox').style.display = 'none'; $('camhint').hidden = false; $('qrok').textContent = 'ไม่ได้รับอนุญาตใช้กล้อง หรือเปิดกล้องไม่ได้ พิมพ์รหัสแทนหรือกด "ถ่ายรูป" ได้ (เปิดสิทธิ์กล้องได้ที่ ตั้งค่า > แอป > RiceOS)'; });
+      } else { $('vbox').style.display = 'none'; $('camhint').hidden = false; } };
     }
     var gps = null, gpsStatus = 'unavailable';
     var phl = $('phl'), gpsSettled = false;
-    function gpsDone() { if (gpsSettled) return; gpsSettled = true; phl.style.pointerEvents = ''; phl.style.opacity = ''; phl.textContent = '📷 ถ่ายรูป'; startCam(); }
+    function gpsDone() { if (gpsSettled) return; gpsSettled = true; phl.style.pointerEvents = ''; phl.style.opacity = ''; phl.textContent = '📷 ถ่ายรูปยืนยัน'; startCam(); }
     phl.style.pointerEvents = 'none'; phl.style.opacity = '.55'; phl.textContent = '⏳ กำลังหาพิกัด...'; setTimeout(function () { if (!st.closed) gpsDone(); }, 20000);
     phl.addEventListener('click', function (ev) {
-      if (needQr && !st.kratong) { ev.preventDefault(); toast('สแกน QR ท่อก่อนถ่ายรูป'); return; }
-      if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; clearInterval(st.timer); var cv = $('cv'); if (cv) { cv.pause(); cv.srcObject = null; cv.hidden = true; } } /* free the camera for the system camera app */
+      if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; clearInterval(st.timer); var cv = $('cv'); if (cv) { cv.pause(); cv.srcObject = null; } } /* free the camera for the system camera app */
     });
-    if (!navigator.geolocation) gpsDone();
-    if (navigator.geolocation) try { navigator.geolocation.getCurrentPosition(function (g) { gpsDone(); gpsStatus = 'ok'; gps = { lat: g.coords.latitude, lon: g.coords.longitude, acc: g.coords.accuracy }; $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)'; },
-      function (er) { gpsDone(); gpsStatus = er && er.code === 1 ? 'denied' : 'unavailable'; $('gps').textContent = (er && er.code === 1 ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS (เปิดได้ที่ ตั้งค่า > แอป > RiceOS > สิทธิ์) ' : 'ไม่ได้รับพิกัด GPS ') + '· รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่'; }, { enableHighAccuracy: true, timeout: 15000 }); } catch (e) { gpsDone(); $('gps').textContent = 'ไม่ได้รับพิกัด GPS (รูปยังบันทึกและส่งได้)'; }
+    if (!RiceNative.geoAvailable()) gpsDone();
+    function tryGps() {
+      $('gps').textContent = '⏳ กำลังหาพิกัด...'; $('gpsretry').style.display = 'none';
+      readGps().then(function (r) {
+        if (st.closed) return; gpsDone(); gpsStatus = r.status; gps = r.gps || null;
+        if (gps) { $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)'; return; }
+        $('gps').innerHTML = esc((r.status === 'denied' ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS (เปิดได้ที่ ตั้งค่า > แอป > RiceOS > สิทธิ์) ' : 'ไม่ได้รับพิกัด GPS ') + '· รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่') + '<br>' + esc(GPS_HELP);
+        $('gpsretry').style.display = '';
+      });
+    }
+    $('gpsretry').onclick = tryGps;
+    if (!RiceNative.geoAvailable()) { gpsDone(); $('gps').textContent = 'เครื่องนี้ไม่รองรับ GPS (รูปยังบันทึกและส่งได้)'; } else tryGps();
     $('ph').onchange = function () {
       var f = this.files[0]; if (!f) return;
-      if (needQr && !st.kratong) { toast('สแกน QR ท่อก่อนถ่ายรูป'); this.value = ''; return; }
-      Promise.all([thumb(f), resizeJpeg(f)]).then(function (r) {
+      usePhoto(f, this);
+    };
+    if (RiceNative.takePhoto) phl.addEventListener('click', function (ev) { /* iOS app: native camera instead of <input capture>; the photo goes through the same path below */
+      ev.preventDefault(); if (st.closed || !gpsSettled) return;
+      RiceNative.takePhoto().then(function (b) { if (b && !st.closed) usePhoto(b, $('ph')); }, function (e) {
+        toast(e && e.denied ? 'ไม่ได้รับอนุญาตใช้กล้อง เปิดสิทธิ์ได้ที่ ตั้งค่า > RiceOS > กล้อง แล้วลองใหม่' : 'เปิดกล้องไม่ได้ กรุณาลองใหม่');
+      });
+    });
+    function usePhoto(f, fin) {
+      var asImage = !f.type || /^image\//i.test(f.type);
+      Promise.all([asImage ? thumb(f) : null, asImage ? resizeJpeg(f) : null]).then(function (r) {
+        if (!r[0] || !r[1]) { fin.value = ''; toast('ไฟล์นี้ไม่ใช่รูปภาพ กรุณาถ่ายรูปใหม่หรือเลือกไฟล์รูป'); return; } /* fake .jpg / PDF: decode fails, nothing saved, no points */
         var data = r[0], blob = r[1], now = new Date().toISOString(), uuid = newUuid();
         S.evidence.push({ id: S.evidence.length + 1, uuid: uuid, mission_type: missionType, plot: p.id, kratong: st.kratong ? st.kratong.seq : null, qr: st.code, state: st.state, captured_at_client: now, gps: gps, thumb: data, review_state: 'pending' });
         if (st.kratong) { st.kratong.lastRead = now; st.kratong.state = st.state; }
@@ -734,14 +863,66 @@
         if (st.kratong) meta.kratong_seq = st.kratong.seq; if (st.code) meta.scanned_code = st.code;
         if (gps) { meta.lat = gps.lat; meta.lon = gps.lon; meta.acc_m = Math.round(gps.acc); }
         var msg = pts > 0 ? 'บันทึกแล้ว +' + fmt(pts) + ' แต้ม (รอตรวจ)' : 'บันทึกหลักฐานแล้ว (รอตรวจ)';
-        if (!blob || !API) { toast(msg + ' · ส่งรูปไม่ได้ในเครื่องนี้'); route(); return; }
+        if (!API) { toast(msg + ' · ส่งรูปไม่ได้ในเครื่องนี้'); route(); return; }
+        confirmSent('saving', pts);   /* big status card at once: farmers never wonder whether the photo went */
         API.outbox.add({ client_uuid: uuid, plot_local: p.id, meta: meta, blob: blob, saved_at: now }).then(function () { return flushOutbox(); }).then(function (r) {
-          toast(r.left ? msg + (r.reason === 'unreachable' ? ' · รอส่ง (ระบบยังติดต่อไม่ได้)' : ' · รอส่ง (ไม่มีสัญญาณ)') : msg + ' · ส่งแล้ว');
+          return API.outbox.count().then(function (c) { confirmSent(c.failed ? 'rejected' : r.left ? 'queued' : 'sent', pts, r.reason); });
+        }).then(function () {
           if (document.body.dataset.screen === 'home' || document.body.dataset.screen === 'settings') updateBadge();
-        }, function () { toast(msg + ' · เก็บรูปในเครื่องไม่ได้ พื้นที่เต็ม'); });
+        }, function () { confirmSent('full', pts); });
         route();
       });
-    };
+    }
+  }
+  /* persistent status card after a photo: saving -> sent | queued (no signal) | full. Stays until the farmer taps OK. */
+  function confirmSent(state, pts, reason) {
+    var d = document.getElementById('sentcard');
+    if (!d) { d = document.createElement('div'); d.id = 'sentcard'; d.className = 'modal sentm'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-live', 'assertive'); document.body.appendChild(d); }
+    var T = {
+      saving: ['⏳', 'กำลังส่งรูป...', 'บันทึกรูปในเครื่องแล้ว กรุณารอสักครู่', 'wait'],
+      sent: ['✅', 'ส่งรูปแล้ว', 'รอเจ้าหน้าที่ตรวจ' + (pts > 0 ? ' · แต้ม +' + fmt(pts) + ' จะนับเมื่อตรวจผ่าน' : ''), 'good'],
+      queued: ['📤', 'บันทึกรูปแล้ว รอส่ง', (reason === 'unreachable' ? 'ระบบยังติดต่อไม่ได้' : 'ตอนนี้ไม่มีสัญญาณ') + ' · แอปจะส่งให้เองเมื่อมีสัญญาณ ไม่ต้องถ่ายซ้ำ', 'wait'],
+      rejected: ['⚠️', 'ส่งรูปไม่ผ่าน', 'ระบบไม่รับรูปนี้ รูปยังอยู่ในเครื่อง แตะ "ส่งไม่ผ่าน" บนหน้าแรกเพื่อดูวิธีแก้', 'bad'],
+      full: ['⚠️', 'เก็บรูปไม่ได้', 'พื้นที่ในเครื่องเต็ม ลบรูปหรือแอปที่ไม่ใช้แล้วถ่ายใหม่', 'bad']
+    }[state];
+    d.innerHTML = '<div class="sentcard ' + T[3] + '"><div class="sc-ic" aria-hidden="true">' + T[0] + '</div><h2>' + T[1] + '</h2><p>' + esc(T[2]) + '</p>' + (state === 'saving' ? '' : '<button class="btn" id="scok">ตกลง</button>') + '</div>';
+    clearTimeout(confirmSent.t); if (state === 'sent') confirmSent.t = setTimeout(function () { d.remove(); }, 4500); /* good news fades; queued / full stay until OK */
+    var ok = d.querySelector('#scok'); if (ok) { ok.onclick = function () { d.remove(); }; try { ok.focus(); } catch (e) {} }
+  }
+  var GPS_HELP = 'วิธีแก้: 1) เปิด "ตำแหน่ง (GPS)" ในเครื่อง และอนุญาตให้แอป RiceOS ใช้ตำแหน่ง 2) ออกมาที่โล่งแจ้ง เช่น กลางแปลงนา ห่างจากหลังคาและต้นไม้หนาทึบ 3) รอสักครู่ให้จับสัญญาณ แล้วกด "ลองใหม่"';
+  /* fresh GPS read (never cached): resolves {status:'ok', gps} or {status:'denied'|'unavailable'} */
+  function readGps() {
+    return new Promise(function (ok) {
+      if (!RiceNative.geoAvailable()) return ok({ status: 'unavailable' });
+      try { RiceNative.getPosition(function (g) { ok({ status: 'ok', gps: { lat: g.coords.latitude, lon: g.coords.longitude, acc: g.coords.accuracy } }); },
+        function (er) { ok({ status: er && er.code === 1 ? 'denied' : 'unavailable' }); }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }); } catch (e) { ok({ status: 'unavailable' }); }
+    });
+  }
+  var GPS_CODES = ['bad_gps', 'bad_lat', 'bad_lon', 'bad_gps_status'];
+  /* a photo the server permanently rejected: explain, let the farmer retry (GPS re-read for GPS errors) or delete it */
+  function failDialog() {
+    API.outbox.all().then(function (a) {
+      var it = a.filter(function (x) { return x.failed; })[0]; if (!it) return;
+      var isGps = GPS_CODES.indexOf(it.failed) >= 0, m = document.createElement('div'); m.className = 'modal';
+      m.innerHTML = '<div role="dialog" aria-label="ส่งรูปไม่ผ่าน"><h2 style="margin:0 0 8px;font:700 22px Prompt">ส่งรูปไม่ผ่าน</h2>' +
+        '<p style="font-size:17px">' + esc(API.MSG[it.failed] || ('ระบบไม่รับรูปนี้ (' + it.failed + ')')) + '</p>' +
+        (isGps ? '<p class="note" style="font-size:16px">' + esc(GPS_HELP) + '</p>' : '<p class="note">กด "ลองใหม่" เพื่อส่งอีกครั้ง หรือลบรายการนี้แล้วถ่ายใหม่</p>') +
+        '<p id="fdm" class="note" role="status"></p><button class="btn" id="fdr">ลองใหม่</button><button class="btn ghost" id="fdd" style="margin-top:8px">ลบรายการนี้ แล้วถ่ายใหม่</button><button class="btn ghost" id="fdc" style="margin-top:8px">ปิด</button></div>';
+      document.body.appendChild(m);
+      var $ = function (id) { return m.querySelector('#' + id); }, done = function () { m.remove(); updateBadge(); if (document.body.dataset.screen === 'home') route(); };
+      $('fdc').onclick = function () { m.remove(); };
+      $('fdd').onclick = function () { if (!confirm('ลบรูปนี้ออกจากเครื่อง? (ต้องถ่ายใหม่)')) return; API.outbox.del(it.client_uuid).then(function () { toast('ลบรายการแล้ว กดถ่ายรูปใหม่ได้เลย'); done(); }); };
+      $('fdr').onclick = function () {
+        var b = this, msg = $('fdm'); b.disabled = true; b.textContent = isGps ? '⏳ กำลังหาพิกัดใหม่...' : 'กำลังส่ง...';
+        var go = isGps ? readGps().then(function (r) {
+          if (r.status !== 'ok') { msg.textContent = (r.status === 'denied' ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS ' : 'ยังหาพิกัดไม่ได้ ') + '— ' + GPS_HELP; return false; }
+          var g = r.gps; if (!(g.lat >= 5 && g.lat <= 21 && g.lon >= 97 && g.lon <= 106)) { msg.textContent = 'พิกัดที่อ่านได้ (' + g.lat.toFixed(3) + ', ' + g.lon.toFixed(3) + ') อยู่นอกพื้นที่โครงการ กรุณาไปที่แปลงของท่านแล้วกด "ลองใหม่"'; return false; }
+          return API.outbox.update(it.client_uuid, function (x) { x.meta.gps_status = 'ok'; x.meta.lat = g.lat; x.meta.lon = g.lon; x.meta.acc_m = Math.round(g.acc); delete x.failed; }).then(function () { return true; });
+        }) : API.outbox.update(it.client_uuid, function (x) { delete x.failed; }).then(function () { return true; });
+        go.then(function (go1) { if (!go1) return; return flushOutbox().then(function (r) { toast(r.left ? 'ยังส่งไม่ครบ ' + (r.reason ? '(' + (API.MSG[r.reason] || r.reason) + ')' : '') : 'ส่งครบแล้ว'); done(); }); })
+          .catch(function () { msg.textContent = 'ส่งไม่สำเร็จ กรุณาลองใหม่'; }).then(function () { b.disabled = false; b.textContent = 'ลองใหม่'; });
+      };
+    });
   }
   function newUuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); }
   /* resize to at most 1024 px and re-encode as JPEG q0.6: the canvas drops EXIF; retry smaller if over the 600 KB server limit */
@@ -903,8 +1084,8 @@
   R.missions = function () {
     var p = P(), m = mission(p), done = LESSONS ? LESSONS.lessons.filter(function (l) { return (S.lessons || {})[l.id] >= LESSONS.pass_score; }).length : 0;
     app.innerHTML = header() + '<div class="sheet">' + titleRow('ภารกิจ & แต้ม', p ? 'อายุข้าว ' + age(p) + ' วัน · ปฏิทินเบื้องต้น รอผู้เชี่ยวชาญยืนยัน' : '') +
-      (m ? '<div class="card" style="padding:12px"><b style="font-size:20px">📋 ' + esc(m.title) + '</b><p style="font-size:16px;margin:6px 0">' + esc(m.detail || m.sub) + '</p><button class="btn" id="go">📷 ถ่ายรูปยืนยัน (+' + fmt(Math.round(previewPoints(m.type))) + ' แต้ม)</button></div>' : '<a class="btn" href="#/register">เพิ่มแปลงก่อน</a>') +
-      '<div class="card" style="padding:12px;margin-top:10px"><b style="font-size:20px">📚 บทเรียน</b><p style="font-size:16px;margin:6px 0">ผ่านแล้ว ' + done + ' จาก ' + (LESSONS ? LESSONS.lessons.length : 0) + ' บท</p><a class="btn" href="#/lessons">เปิดบทเรียน</a></div>' +
+      (m ? '<div class="card" style="padding:12px"><b class="mh">' + RiceIco('clip') + ' ' + esc(m.title) + '</b><p style="font-size:16px;margin:6px 0">' + esc(m.detail || m.sub) + '</p><button class="btn" id="go">' + RiceIco('camera') + ' ถ่ายรูปยืนยัน (' + previewLabel(m.type) + ')</button></div>' : '<a class="btn" href="#/register">เพิ่มแปลงก่อน</a>') +
+      '<div class="card" style="padding:12px;margin-top:10px"><b class="mh">' + RiceIco('book') + ' บทเรียน</b><p id="lscount" style="font-size:16px;margin:6px 0">ผ่านแล้ว ' + done + ' จาก ' + (LESSONS ? LESSONS.lessons.length : 0) + ' บท</p><a class="btn" href="#/lessons">เปิดบทเรียน</a></div>' +
       '<div class="card" style="padding:12px;margin-top:10px"><b style="font-size:20px">🖼️ หลักฐานล่าสุด</b>' + ((S.evidence || []).slice(-6).reverse().map(function (e) { return '<div class="row" style="margin-top:8px">' + (e.thumb ? '<img alt="" src="' + e.thumb + '" style="width:64px;height:64px;object-fit:cover;border-radius:10px">' : '') + '<div style="font-size:15px">' + (e.kratong ? 'กระทง ' + e.kratong : 'แปลง') + ' · ' + new Date(e.captured_at_client).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) + '<br>' + (e.gps ? e.gps.lat.toFixed(4) + ', ' + e.gps.lon.toFixed(4) : 'ไม่มีพิกัด') + ' · รอตรวจ</div></div>'; }).join('') || '<p class="note">ยังไม่มี</p>') + '</div></div>';
     var g = document.getElementById('go'); if (g) g.onclick = function () { capture(m.type); };
   };
@@ -1153,8 +1334,15 @@
     };
   };
 
+  /* ---------- hooks for the W8 modules (js/regpoint.js, plots2.js, enrol.js): they register routes in R and decorate screens after render ---------- */
+  var AFTER = [];
+  window.RiceApp = { R: R, app: app, S: function () { return S; }, save: save, toast: toast, esc: esc, fmt: fmt, header: header, titleRow: titleRow, busy: busy, wireForm: wireForm, P: P,
+    locatePlot: locatePlot, syncPlot: syncPlot, api: API, me: function () { return ME; }, getMe: getMe, hydrate: hydrate, goHome: goHome, route: route, lessons: function () { return LESSONS; },
+    flush: function () { return flushOutbox(); }, after: function (f) { AFTER.push(f); } };
+  (window.RiceModules || []).forEach(function (f) { try { f(window.RiceApp); } catch (e) { console.error(e); } });
+
   /* ---------- router ---------- */
-  var PUBLIC = ['register', 'login', 'reset', 'privacy', 'line', 'wallet', 'lot', 'dashboard'], routeTok = 0;
+  var PUBLIC = ['register', 'login', 'reset', 'privacy', 'line', 'wallet', 'lot', 'dashboard', 'regpoint', 'claim'], routeTok = 0;
   /* screens built on illustrative sample figures (prices, buyers, forecasts, lots, province totals) are not shown to real accounts */
   var DEMO_ROUTES = ['analysis', 'options', 'market', 'lot', 'dashboard'];
   var NODATA = { analysis: ['ตารางวิเคราะห์ AI', 'ยังไม่มีข้อมูลวิเคราะห์ของแปลงท่าน ระบบจะแสดงเมื่อมีผลดินและข้อมูลที่ตรวจสอบแล้ว'], options: ['ทางเลือกก่อนปลูก', 'ยังไม่มีข้อมูลเปรียบเทียบพันธุ์และราคาที่ตรวจสอบแล้ว'], market: ['ตลาดขายข้าว', 'ยังไม่มีข้อมูลราคาและผู้ซื้อที่ตรวจสอบแล้ว เมื่อโครงการเปิดตลาด จะแจ้งให้ทราบในแอป'], lot: ['ล็อตข้าว Digital ID', 'ยังไม่มีล็อตข้าวของท่าน จะแสดงเมื่อมีการเก็บเกี่ยวและบันทึกล็อตในระบบ'], dashboard: ['ภาพรวมจังหวัด', 'ยังไม่มีข้อมูลภาพรวมที่ตรวจสอบแล้ว'] };
@@ -1168,6 +1356,7 @@
     if (capClose) capClose();
     document.querySelectorAll('.modal').forEach(function (x) { x.remove(); });
     var h = (location.hash.replace(/^#\/?/, '') || '').split('?')[0], tok = ++routeTok;
+    if (/^plot\/[^/]+\/summary$/.test(h)) h = 'plotsummary';
     if (!S.consent || (!S.registered && !S.seeded)) { if (PUBLIC.indexOf(h) < 0) h = 'register'; }
     if (!R[h]) h = S.registered || S.seeded ? 'home' : 'register';
     /* guard: a registered farmer needs a live session. A 401 goes to #/login; no backend or no signal keeps the app usable offline. */
@@ -1190,10 +1379,10 @@
     if (lotDockObserver) { lotDockObserver.disconnect(); lotDockObserver = null; }
     app.style.removeProperty('--lot-dock-h');
     document.querySelectorAll('.service-notice').forEach(function (d) { d.close(); d.remove(); });
-    drawNav(h);
-    nav.style.display = ['login', 'reset', 'register', 'line', 'idcheck'].indexOf(h) >= 0 ? 'none' : '';
-    document.body.classList.toggle('nonav', ['login', 'reset', 'register', 'line', 'idcheck'].indexOf(h) >= 0);
-    try { R[h](); } catch (e) { console.error(e); app.innerHTML = '<p style="padding:20px;font-size:18px">เกิดข้อผิดพลาด กรุณาเปิดใหม่</p>'; }
+    drawNav(h === 'nodata' ? rh : h);
+    nav.style.display = ['login', 'reset', 'register', 'line', 'idcheck', 'regpoint', 'claim'].indexOf(h) >= 0 ? 'none' : '';
+    document.body.classList.toggle('nonav', ['login', 'reset', 'register', 'line', 'idcheck', 'regpoint', 'claim'].indexOf(h) >= 0);
+    try { R[h](); AFTER.forEach(function (f) { try { f(h); } catch (e) { console.error(e); } }); } catch (e) { console.error(e); app.innerHTML = '<p style="padding:20px;font-size:18px">เกิดข้อผิดพลาด กรุณาเปิดใหม่</p>'; }
     if (['wallet', 'lot', 'dashboard'].indexOf(h) >= 0) app.insertAdjacentHTML('beforeend', '<a class="mentor-float" href="#/mentor" aria-label="พี่เลี้ยง AI">' + iconLine('<path d="M5 4h14a2 2 0 012 2v10a2 2 0 01-2 2h-8l-6 4v-4H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>') + '<span>AI</span></a>');
     if (!params.get('keep')) { window.scrollTo(0, 0); app.scrollTop = 0; if (document.body.classList.contains('premium-mode')) requestAnimationFrame(function () { app.scrollTop = 0; }); }
   }

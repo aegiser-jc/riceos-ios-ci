@@ -1,0 +1,48 @@
+/* W9 part A: server points, lessons, training hours, league. Elderly-friendly: 18px+ text, 48px targets. Loaded after w8.css. */
+.w9{padding-bottom:24px}
+.w9card{padding:16px;margin-top:12px;font-size:18px}
+.w9card h3{margin:0 0 8px;font:700 21px/1.3 Prompt;color:var(--g800)}
+.w9p{font-size:19px;line-height:1.5;margin:6px 0}
+.w9note{font-size:17px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+.w9stale{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:#fff6d6;border:1px solid #f0d36a;font-size:17px;line-height:1.4}
+.w9hero{text-align:center;background:linear-gradient(180deg,#f2fae9,#e4f3d2);border-color:#cfe6b6}
+.w9hero span{display:block;font:600 19px Prompt;color:var(--g800)}
+.w9hero b{display:block;font:800 48px/1.15 Prompt;color:var(--g800);margin:4px 0}
+.w9hero small{display:block;font-size:18px;color:#3b4a3b;line-height:1.4}
+.w9hero .w9bar{margin:12px 4px 4px}
+.w9grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.w9grid div{background:#f5f8f2;border-radius:14px;padding:10px 8px;text-align:center}
+.w9grid b{display:block;font:800 28px/1.2 Prompt;color:var(--g800)}
+.w9grid small{display:block;font-size:16px;line-height:1.3;color:var(--muted)}
+.w9bar{height:16px;border-radius:999px;background:#e3e8e0;overflow:hidden;margin:8px 0}
+.w9bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#5fbb3f,#2e8b2e);min-width:4px}
+.w9rank,.w9hours{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:8px 0;color:inherit;text-decoration:none;font-size:18px;border-top:1px solid #edf0ea}
+.w9hours{border-top:0;padding:14px 16px}
+.w9rank b{color:var(--g800);text-align:right}
+.w9hours span:first-child{display:flex;flex-direction:column}.w9hours small{font-size:17px;color:var(--muted)}
+.w9btn{margin-top:12px;text-decoration:none}
+.w9list{list-style:none;margin:0;padding:0}
+.w9list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #edf0ea;font-size:18px;line-height:1.35;min-height:52px}
+.w9list li:first-child{border-top:0}
+.w9list li>span{display:flex;flex-direction:column;min-width:0;flex:1;overflow-wrap:anywhere}
+.w9list small{font-size:16px;color:var(--muted);font-weight:400}
+.w9list b{font:700 19px Prompt;color:var(--g800);text-align:right;flex:none;max-width:48%}
+.w9list b.neg{color:var(--red)}.w9list b.wait{color:#8a5a00;font-size:17px}.w9list b.ok{color:var(--g600);font-size:17px}
+.w9ol li{gap:10px}.w9ol i{flex:none;width:40px;height:40px;border-radius:50%;background:#eef2eb;display:flex;align-items:center;justify-content:center;font:700 18px Prompt;font-style:normal;color:var(--g800)}
+.w9ol li.me{background:#eaf6dc;border-radius:12px;padding-left:8px;padding-right:8px;font-weight:600}
+.w9lesson{display:block;color:inherit;text-decoration:none}
+.w9lesson h3{font-size:20px}
+.w9meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:17px;color:var(--muted)}
+.w9tag{display:inline-block;padding:4px 12px;border-radius:999px;background:#eef2eb;color:#2d3d2d;font-size:16px;line-height:1.35}
+.w9tag.ok{background:#d8f0c2;color:#0b4a14}.w9tag.warn{background:#fff0c2;color:#6b4a00}.w9tag.srp{background:#e3eefb;color:#173b66}
+.w9read p{font-size:19px;line-height:1.6;margin:0 0 12px}
+.w9row{display:flex;gap:10px;flex-wrap:wrap}
+.w9result b{display:block;font:800 52px/1.15 Prompt}.w9result.pass b{color:var(--g600)}.w9result.fail b{color:#a15d00}
+.w9result span{font:600 19px Prompt}
+.w9tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.w9tabs a{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:14px;background:#fff;border:2px solid #d5dccf;color:var(--g800);font:600 18px Prompt;text-decoration:none;text-align:center;padding:0 2px}
+.w9tabs a.on{background:var(--g700);border-color:var(--g700);color:#fff}
+.w9opt{display:flex;align-items:center;gap:12px;min-height:52px;font-size:19px;margin-top:10px}
+.w9opt input{width:28px;height:28px;flex:none}
+@media (max-width:380px){.w9hero b{font-size:42px}.w9tabs a{font-size:17px}}
+@media (min-width:900px){.w9{max-width:720px;margin-left:auto;margin-right:auto}}

@@ -13,15 +13,39 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+.splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#064623;color:#fff;font-family:Prompt,Sarabun,system-ui,sans-serif}
+.splash img{width:88px;height:88px;border-radius:22px}.splash b{font-size:30px}.splash p{margin:0;font-size:20px;line-height:1.4}
+.splash .bar{width:min(260px,70vw);height:8px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden}
+.splash .bar i{display:block;width:40%;height:100%;border-radius:99px;background:#7cc243;animation:splashbar 1.4s ease-in-out infinite}
+@keyframes splashbar{0%{margin-left:-40%}100%{margin-left:100%}}
+.splash .slow{opacity:0;transition:opacity .4s;font-size:18px;color:#d8eccb}.splash .slow.on{opacity:1}
+</style>
 <link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/w8.css">
+<link rel="stylesheet" href="css/w9.css">
+<link rel="stylesheet" href="css/w9b.css">
+<link rel="stylesheet" href="css/vc6.css">
 </head>
 <body>
-<div id="app"><p style="padding:24px;font-size:20px">กำลังเปิด RiceOS...</p></div>
+<div id="app"><div class="splash" role="status" aria-live="polite"><img src="icons/icon-192.png" alt=""><b>RiceOS</b><div class="bar" aria-hidden="true"><i></i></div><p>กำลังเปิด RiceOS...</p><p class="slow" id="splowslow">สัญญาณช้า กำลังโหลดอยู่ กรุณารอสักครู่ ครั้งต่อไปจะเปิดเร็วขึ้น</p></div></div>
+<script>setTimeout(function(){var e=document.getElementById('splowslow');if(e)e.className='slow on'},5000)</script>
 <nav class="nav" id="nav"></nav>
-<script src="vendor/qrcode.js"></script>
-<script src="vendor/jsqr.js"></script>
-<script src="js/points.js"></script>
-<script src="js/api.js"></script>
-<script src="js/app.js"></script>
+<script defer src="vendor/qrcode.js"></script>
+<script defer src="vendor/jsqr.js"></script>
+<script defer src="js/vc6.js"></script>
+<script defer src="js/points.js"></script>
+<script defer src="js/native.js"></script>
+<script defer src="js/api.js"></script>
+<script defer src="js/idreader.js"></script>
+<script defer src="js/regpoint.js"></script>
+<script defer src="js/plots2.js"></script>
+<script defer src="js/enrol.js"></script>
+<script defer src="js/points2.js"></script>
+<script defer src="js/lessons.js"></script>
+<script defer src="js/league.js"></script>
+<script defer src="js/w9b.js"></script>
+<script defer src="js/booth.js"></script>
+<script defer src="js/app.js"></script>
 </body>
 </html>

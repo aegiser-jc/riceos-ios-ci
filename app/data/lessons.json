@@ -4,6 +4,8 @@
   "lessons": [
     {
       "id": "L1-awd",
+      "minutes": 10,
+      "srp": "การจัดการน้ำ (เปียกสลับแห้ง)",
       "title": "ท่อวัดน้ำ 1 กระทง 1 ท่อ",
       "rice_age_from": 0, "rice_age_to": 120,
       "body": [
@@ -19,6 +21,8 @@
     },
     {
       "id": "L2-noburn",
+      "minutes": 8,
+      "srp": "การจัดการฟางและตอซัง ไม่เผา",
       "title": "ไม่เผาฟางและตอซัง",
       "rice_age_from": 90, "rice_age_to": 200,
       "body": [
@@ -32,6 +36,7 @@
     },
     {
       "id": "L3-pdpa",
+      "minutes": 5,
       "title": "ข้อมูลส่วนตัวของท่าน",
       "rice_age_from": 0, "rice_age_to": 200,
       "body": [

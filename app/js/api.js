@@ -11,6 +11,7 @@
     storage_full: 'พื้นที่เก็บรูปของระบบเต็ม กรุณาติดต่อเจ้าหน้าที่', bad_code: 'รหัสจากเจ้าหน้าที่ไม่ถูกต้องหรือหมดอายุ',
     network: 'ติดต่อระบบไม่ได้ (ไม่มีสัญญาณอินเทอร์เน็ต) กรุณาลองใหม่', server: 'ระบบขัดข้อง กรุณาลองใหม่ภายหลัง'
   };
+  MSG.bad_gps = 'ตำแหน่ง GPS ของรูปนี้ไม่ถูกต้องหรืออยู่นอกพื้นที่โครงการ'; MSG.bad_lat = MSG.bad_gps; MSG.bad_lon = MSG.bad_gps; MSG.bad_gps_status = MSG.bad_gps;
   MSG.unreachable = 'เชื่อมต่อระบบของโครงการไม่ได้ในขณะนี้ ข้อมูลของท่านยังอยู่ในเครื่อง กรุณาลองอีกครั้งภายหลัง';
   MSG.line_disabled = 'ยังไม่เปิดใช้การเข้าสู่ระบบด้วย LINE'; MSG.bad_ticket = 'ลิงก์เข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่'; MSG.line_taken = 'บัญชี LINE นี้ผูกกับบัญชีอื่นแล้ว';
   MSG.last_login_method = 'ต้องตั้งเบอร์มือถือและ PIN ก่อน จึงจะยกเลิกการผูก LINE ได้'; MSG.has_pin = 'บัญชีนี้มีเบอร์และ PIN อยู่แล้ว'; MSG.no_pin = 'บัญชีนี้ยังไม่ได้ตั้งเบอร์มือถือและ PIN';
@@ -65,10 +66,12 @@
   API.logout = function () { return req('POST', '/api/auth/logout', {}).then(function (j) { setToken(null); return setUser(null).then(function () { return j; }); }, function (e) { setToken(null); return setUser(null).then(function () { throw e; }); }); };
   API.reset = function (phone, code, pin) { return req('POST', '/api/auth/reset', { phone: phone, code: code, new_pin: pin }); };
   API.patchMe = function (b) { return req('PATCH', '/api/me', b); };
+  API.updateProfile = function (b) { return req('PATCH', '/api/me/profile', b); };
   API.changePin = function (o, n) { return req('PUT', '/api/me/pin', { old_pin: o, new_pin: n }); };
   API.consent = function (purpose, granted, version) { return req('POST', '/api/me/consents', { purpose: purpose, granted: granted, version: version }); };
   API.deleteMe = function (pin) { return req('DELETE', '/api/me', pin ? { pin: pin } : { confirm: true }).then(function (j) { setToken(null); return OB.purgeAll().catch(function () {}).then(function () { return setUser(null); }).then(function () { return j; }); }); };
   API.putState = function (blob) { return req('PUT', '/api/me/state', { blob: blob }); };
+  API.evidenceSince = function (iso) { return req('GET', '/api/evidence' + (iso ? '?since=' + encodeURIComponent(iso) : '')); };
   API.createPlot = function (b) { return req('POST', '/api/plots', b); };
   API.config = function () { return req('GET', '/api/config'); };
   API.lineStart = function () { return req('POST', '/api/auth/line/start', {}); };
@@ -79,7 +82,12 @@
   API.addCredentials = function (phone, pin) { return req('POST', '/api/me/credentials', { phone: phone, pin: pin }); };
   API.putNationalId = function (number) { return req('PUT', '/api/me/national-id', { number: number, consent: true, version: 'id1' }); };
   API.deleteNationalId = function () { return req('DELETE', '/api/me/national-id'); };
-  API.consentCurrent = function () { return req('GET', '/api/consent/current'); };
+  /* consent version comes from the server (GET /api/consent/current {current, accepted_versions}); fallback c3, never hard-coded elsewhere */
+  var CV = 'c3', CACC = null; /* null until the server has answered: any stored version is kept */
+  API.consentVer = function () { return CV; };
+  API.consentAccepted = function () { return CACC; };
+  API.consentCurrent = function () { return req('GET', '/api/consent/current').then(function (j) { var v = j && (j.current || j.version); if (/^c\d+$/.test(v || '')) { CV = v; CACC = j.accepted_versions && j.accepted_versions.length ? j.accepted_versions.slice() : [v]; } return j; }); };
+  API.consentCurrent().then(null, function () {});
 
   /* ---------- outbox: photos stay in IndexedDB until the server confirms the upload ---------- */
   var DB = null;
@@ -101,6 +109,7 @@
   OB.purgeOthers = function (id) { return OB.raw().then(function (a) { return Promise.all((a || []).filter(function (i) { return i.uid !== id; }).map(function (i) { return OB.del(i.client_uuid); })); }); };
   OB.retry = function () { return OB.all().then(function (a) { return Promise.all(a.filter(function (i) { return i.failed; }).map(function (i) { delete i.failed; return OB.add(i); })); }); };
   OB.all = function () { return tx('readonly', function (s) { return s.getAll(); }).then(function (a) { return (a || []).filter(function (x) { return uid && x.uid === uid; }).sort(function (x, y) { return (x.meta.client_time > y.meta.client_time) ? 1 : -1; }); }, function () { return []; }); };
+  OB.update = function (id, fn) { return OB.all().then(function (a) { var it = a.filter(function (x) { return x.client_uuid === id; })[0]; if (!it) return null; fn(it); return OB.add(it).then(function () { return it; }); }); };
   OB.del = function (id) { return tx('readwrite', function (s) { return s.delete(id); }); };
   OB.count = function () { return OB.all().then(function (a) { var f = a.filter(function (x) { return x.failed; }); return { pending: a.length - f.length, failed: f.length, reason: f[0] ? f[0].failed : null, msg: f[0] ? (MSG[f[0].failed] || null) : null }; }); };
   var flushing = null;
@@ -131,6 +140,6 @@
     }).catch(function () { return { sent: 0, left: 0, reason: 'idb' }; }).then(function (o) { flushing = null; return o; });
     return flushing;
   };
-  API.outbox = OB; API.setUser = setUser; API.userId = function () { return uid; };
+  API.outbox = OB; API.setToken = setToken; API.setUser = setUser; API.userId = function () { return uid; };
   window.RiceAPI = API;
 })();
