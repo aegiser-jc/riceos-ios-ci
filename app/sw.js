@@ -1,5 +1,5 @@
 /* RiceOS service worker: cache-first app shell so the app opens offline. Bump VERSION on every release. */
-const VERSION = 'riceos-next-v33';
+const VERSION = 'riceos-next-v34';
 const ASSETS = [
   './',
   './content/flags.json',

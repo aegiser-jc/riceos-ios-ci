@@ -67,7 +67,7 @@
       '<div class="card w9card" id="inc-prices"><h3>ราคาอ้างอิง</h3><span class="w9b-tag">ตัวอย่างเพื่อวางแผน</span>' +
       '<p class="w9note">ตัวเลข x,xxx ด้านล่างเป็นที่ว่างสำหรับจดราคา ตัวอย่างเพื่อวางแผน ยังไม่ใช่ราคาจริง กรุณาสอบถามราคาปัจจุบันก่อนตัดสินใจ</p><ul class="w9list">' +
       PRICES.map(function (r) { return '<li><span>' + r[0] + '<small>' + r[1] + '</small></span><b class="w9b-ph">x,xxx</b></li>'; }).join('') + '</ul></div>' +
-      '<div class="card w9card"><h3>ขั้นต่อไป</h3><a class="btn w9btn" href="#/lessons">เรียนบทเรียนการจัดการน้ำ</a><a class="btn ghost w9btn" href="#/mentor">ถามพี่เลี้ยง AI</a></div>' +
+      '<div class="card w9card"><h3>ขั้นต่อไป</h3><a class="btn w9btn" href="#/lessons">เรียนบทเรียนการจัดการน้ำ</a><a class="btn ghost w9btn" href="#/mentor">ถามพี่เลี้ยงนาข้าว</a></div>' +
       '<footer class="w9b-src" id="inc-src"><h3>แหล่งที่มา</h3><ul>' + SOURCES.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>' +
       '<p>ข้อมูลในหน้านี้เป็นความรู้ทั่วไป ไม่ใช่คำแนะนำทางการเงิน ไม่รับประกันรายได้</p></footer></div>';
   }

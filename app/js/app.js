@@ -9,7 +9,7 @@
 
   /* ---------- helpers ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  var FLAG_TEXT = {"agency_logo":{"identical":{"show_logo":true,"agency_line":"กรมการข้าว × จังหวัดพิษณุโลก"},"alt":{"show_logo":false,"agency_line":""}},"profit_before_2700":{"identical":{"before":"(เดิม 2,700 บ./ไร่)","pct":"+42.6%"},"alt":{"before":"(เดิม 3,150 บ./ไร่)","pct":"+22%"}},"yield_750_600":{"identical":{"y750":"750","y600":"600"},"alt":{"y750":"ไม่มีข้อมูลยืนยัน","y600":"ไม่มีข้อมูลยืนยัน"}},"prices_98_95_110":{"identical":{"p98":"9.8","p95":"9.5","p110":"11.0","p92":"9.2"},"alt":{"p98":"-","p95":"-","p110":"-","p92":"-","note":"ราคา: ไม่มีข้อมูลยืนยัน"}},"locked_15_ton":{"identical":{"locked":"ล็อกแล้ว 15 ตัน","cta":"รับสัญญา (ล็อกราคา)"},"alt":{"locked":"ยังไม่มีสัญญา","cta":"แจ้งความสนใจขาย"}},"ai_advice_figures":{"identical":{"use_his_chat":true,"ref":"อ้างอิง: คู่มือกรมการข้าว 2568"},"alt":{"use_his_chat":false,"ref":"อ้างอิง: ไม่มีข้อมูลยืนยัน"}},"ph_label_inconsistency":{"identical":{"plot_label":"ปานกลาง","table_label":"เป็นกรดเล็กน้อย"},"alt":{"plot_label":"ไม่มีข้อมูลยืนยัน","table_label":"ไม่มีข้อมูลยืนยัน"}},"typos_as_shown":{"identical":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยง AI","canal":"เขตชลประทานคลองช้าย","om":"(อินทริยวัตถุ)","offer_tag":"จ้งเสนอแนะนำ"},"alt":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยง AI","canal":"เขตชลประทานคลองซ้าย","om":"(อินทรียวัตถุ)","offer_tag":"ข้อเสนอแนะนำ"}}};
+  var FLAG_TEXT = {"agency_logo":{"identical":{"show_logo":true,"agency_line":"กรมการข้าว × จังหวัดพิษณุโลก"},"alt":{"show_logo":false,"agency_line":""}},"profit_before_2700":{"identical":{"before":"(เดิม 2,700 บ./ไร่)","pct":"+42.6%"},"alt":{"before":"(เดิม 3,150 บ./ไร่)","pct":"+22%"}},"yield_750_600":{"identical":{"y750":"750","y600":"600"},"alt":{"y750":"ไม่มีข้อมูลยืนยัน","y600":"ไม่มีข้อมูลยืนยัน"}},"prices_98_95_110":{"identical":{"p98":"9.8","p95":"9.5","p110":"11.0","p92":"9.2"},"alt":{"p98":"-","p95":"-","p110":"-","p92":"-","note":"ราคา: ไม่มีข้อมูลยืนยัน"}},"locked_15_ton":{"identical":{"locked":"ล็อกแล้ว 15 ตัน","cta":"รับสัญญา (ล็อกราคา)"},"alt":{"locked":"ยังไม่มีสัญญา","cta":"แจ้งความสนใจขาย"}},"ai_advice_figures":{"identical":{"use_his_chat":true,"ref":"อ้างอิง: คู่มือกรมการข้าว 2568"},"alt":{"use_his_chat":false,"ref":"อ้างอิง: ไม่มีข้อมูลยืนยัน"}},"ph_label_inconsistency":{"identical":{"plot_label":"ปานกลาง","table_label":"เป็นกรดเล็กน้อย"},"alt":{"plot_label":"ไม่มีข้อมูลยืนยัน","table_label":"ไม่มีข้อมูลยืนยัน"}},"typos_as_shown":{"identical":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยงนาข้าว","canal":"เขตชลประทานคลองช้าย","om":"(อินทริยวัตถุ)","offer_tag":"จ้งเสนอแนะนำ"},"alt":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยงนาข้าว","canal":"เขตชลประทานคลองซ้าย","om":"(อินทรียวัตถุ)","offer_tag":"ข้อเสนอแนะนำ"}}};
   function F(flag, key) { var t = FLAG_TEXT[flag]; if (!t || typeof FLAGS[flag] !== 'boolean') return ''; return (FLAGS[flag] ? t.identical : t.alt)[key]; }
   function fmt(n) { return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
   function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
@@ -688,7 +688,7 @@
   }
   R.home = function () {
     var pr = S.profile || {}, p = P(), m = mission(p), t = totals(), w = pr.weather || {};
-    var tiles = [['plot', 'แปลง<br>ของฉัน', '', '#/plot'], ['soil', 'ดิน & ปุ๋ย', '', '#/analysis'], ['mentor', 'พี่เลี้ยง AI', '', '#/mentor'], ['market', 'ตลาดขายข้าว', '', '#/market'],
+    var tiles = [['plot', 'แปลง<br>ของฉัน', '', '#/plot'], ['soil', 'ดิน & ปุ๋ย', '', '#/analysis'], ['mentor', 'พี่เลี้ยงนาข้าว', '', '#/mentor'], ['market', 'ตลาดขายข้าว', '', '#/market'],
       ['wallet', 'เงิน', '(Wallet)', '#/wallet'], ['carbon', 'คาร์บอน & QR', '(ลดคาร์บอน)', '#/kratong'], ['mission', 'ภารกิจ', '& แต้ม', '#/missions'], ['gov', 'บริการรัฐ', '(เชื่อมข้อมูล)', '#/gov']];
     app.innerHTML = header({ tall: true, bell: true }) + '<div class="sheet">' + welcomeCard() +
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
@@ -708,7 +708,7 @@
       '<div><span class="dot" style="background:#2e9a2e">✓</span><br>น้ำ<br><span style="color:#0e6e0c">เหมาะสม</span></div>' +
       '<div><span class="dot" style="background:#f5b800;color:#2b1d00">!</span><br>ธาตุอาหาร<br><span style="color:#d71013">ต่ำ</span></div>' +
       '<div><span class="dot" style="background:#e53935">!</span><br>เสี่ยงโรค<br><span style="font-weight:500">(ไหม้คอรวง)</span></div></div></div>' : '<p class="note" style="margin:6px 0 0">ยังไม่มีข้อมูล · จะแสดงหลังท่านส่งรูปภารกิจและเจ้าหน้าที่ตรวจแล้ว</p>') + '</a>' +
-      '</div><a class="askai" href="#/mentor"><img alt="" src="img/mascot.jpg"><span><b>พี่เลี้ยง AI</b>' + esc(F('typos_as_shown', 'ask2')) + ' ได้ทุกเรื่อง</span><span class="chev" aria-hidden="true">›</span></a>' +
+      '</div><a class="askai" href="#/mentor"><img alt="" src="img/mascot.jpg"><span><b>พี่เลี้ยงนาข้าว</b>' + esc(F('typos_as_shown', 'ask2')) + ' ได้ทุกเรื่อง</span><span class="chev" aria-hidden="true">›</span></a>' +
       '</div></div></div>';
     var b = document.getElementById('shoot'); if (b) b.onclick = function () { capture(m.type); };
     var wx = document.getElementById('wlx'); if (wx) wx.onclick = function () { S.welcomed = true; save(); route(); };
@@ -728,7 +728,7 @@
         '<div><div style="font:500 16px Prompt">แนวโน้ม 5 ปี</div><div style="font:700 19px Prompt;color:#047106">ผลผลิตเพิ่มขึ้น  +8.7%</div><div style="font-size:16px">ต้นทุนลดลง -23.9%</div></div>' +
         '<img alt="" src="img/trend-chart.jpg" style="width:80px;margin-left:auto"></div><img class="mascot" alt="" src="img/mascot-plot.jpg" style="right:-4px;top:4px;width:74px"></div>'
         : '<p class="note">ประวัติผลผลิตของแปลงนี้: ไม่มีข้อมูลยืนยัน</p>') +
-        '<a class="btn" href="#/analysis" style="width:82%;margin-top:6px;font-size:21px">🤖 ดูตารางวิเคราะห์ AI <span>→</span></a><a class="btn ghost" href="#/options" style="margin-top:10px">ทางเลือกก่อนปลูก</a>';
+        '<a class="btn" href="#/analysis" style="width:82%;margin-top:6px;font-size:21px">📊 ดูตารางวิเคราะห์แปลง <span>→</span></a><a class="btn ghost" href="#/options" style="margin-top:10px">ทางเลือกก่อนปลูก</a>';
     } else body = kratongList(p);
     var sw = (S.plots || []).length > 1 ? '<div class="plotsw" role="tablist" aria-label="เลือกแปลง">' + S.plots.map(function (x) { return '<button data-pl="' + esc(x.id) + '" class="' + (x === p ? 'on' : '') + '"><b>' + esc(x.name || ('แปลง ' + x.code)) + '</b><small>' + fmt(x.rai) + ' ไร่</small></button>'; }).join('') + '</div>' : '';
     app.innerHTML = header() + '<div class="sheet">' + titleRow(esc(p.name || 'แปลงของฉัน'), fmt(p.rai) + ' ไร่' + ((S.plots || []).length > 1 ? ' · แปลงที่ ' + ((S.plots || []).indexOf(p) + 1) + ' จาก ' + S.plots.length : ''), '<div class="ico"><span>🔗</span><a href="#/plotedit" aria-label="แก้ไขแปลง" style="color:inherit;text-decoration:none">✏️</a></div>') + sw +
@@ -738,7 +738,7 @@
         '<div style="background:linear-gradient(#fcf0f0,#fce4ea);border:1px solid #f3d0d6">OM<div style="font:400 13px Sarabun">' + esc(F('typos_as_shown', 'om')) + '</div><div class="v" style="color:#bf040f;font-size:24px">' + esc(soil.om) + '</div><span class="pill" style="background:#f6aeb4;font-size:12.5px;padding:0 8px"><span style="color:#b0000f">●</span> ต่ำ</span></div>' +
         '<div style="background:#f9fafc;border:1px solid #e3e5e8">N - P - K<div style="margin:6px 0 2px;display:flex;justify-content:space-around"><span class="dot" style="background:#fc0204"></span><span class="dot" style="background:#ffce00"></span><span class="dot" style="background:#15a208"></span></div><div style="font:600 13px Prompt;display:flex;justify-content:space-around">ต่ำ<span>กลาง</span>สูง</div></div>' +
         '<div style="background:#eaf8e1;border:1px solid #cfe8c0">ผลผลิตคาด<div class="v" style="color:#006603;font-size:' + (F('yield_750_600', 'y750').length > 4 ? '13px' : '30px') + '">' + esc(F('yield_750_600', 'y750')) + '</div><div style="font:600 13px Prompt;color:#0a5a13">กก./ไร่</div></div></div>' : '') +
-      '<div class="seg"><button data-tab="hist" class="' + (tab === 'hist' ? 'on' : '') + '">📊 ประวัติ 5 ปี</button><button data-tab="kt" class="' + (tab === 'kt' ? 'on' : '') + '">📅 ไทม์ไลน์ดูแล</button><button data-go="analysis">✨ วิเคราะห์ AI</button></div>' +
+      '<div class="seg"><button data-tab="hist" class="' + (tab === 'hist' ? 'on' : '') + '">📊 ประวัติ 5 ปี</button><button data-tab="kt" class="' + (tab === 'kt' ? 'on' : '') + '">📅 ไทม์ไลน์ดูแล</button><button data-go="analysis">📊 วิเคราะห์แปลง</button></div>' +
       body + '<a class="lot-entry" href="#/lot"><span class="outline-icon">▦</span><span><b>ล็อตข้าว Digital ID</b><small>ตรวจสอบย้อนกลับจากแปลงถึงถุง</small></span><span>→</span></a><button class="btn ghost" id="addplot" style="margin-top:12px">+ เพิ่มแปลง</button></div>';
     app.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { params.set('tab', b.dataset.tab); route(); }; });
     app.querySelector('[data-go]').onclick = function () { location.hash = '#/analysis'; };
@@ -971,7 +971,7 @@
     var p = P() || {};
     S.chat = S.chat || [];
     var intro = F('ai_advice_figures', 'use_his_chat') && S.seeded ? hisChat() : answer('awd');
-    app.innerHTML = header() + '<div class="sheet">' + titleRow('พี่เลี้ยง AI', 'ผู้ช่วยเกษตรกรมืออาชีพ 24 ชม.', '<span style="margin-left:auto;font-size:22px;color:#074810">⋮</span>', '<img alt="" src="img/mascot-title.png" style="width:55px">') +
+    app.innerHTML = header() + '<div class="sheet">' + titleRow('พี่เลี้ยงนาข้าว', 'ถามเรื่องทำนา ตอบจากคำแนะนำที่เตรียมไว้', '<span style="margin-left:auto;font-size:22px;color:#074810">⋮</span>', '<img alt="" src="img/mascot-title.png" style="width:55px">') +
       '<div class="card farm"><img class="av" alt="" src="' + esc((S.profile || {}).avatar || 'icons/icon-192.png') + '"><div style="flex:1"><b style="font-size:19px">แปลง ' + esc((S.profile || {}).name || '') + '</b><div style="font-size:14px">📍 ' + esc((S.profile || {}).district || '') + '</div></div>' +
       '<div style="border-left:1px solid #c3c9c5;padding-left:8px;font-size:14px;line-height:1.4">🌾 ' + fmt(p.rai || 0) + ' ไร่<br>📅 ' + esc(p.variety || '-') + '<br>🌱 อายุข้าว ' + (age(p) == null ? '-' : age(p)) + ' วัน</div>' + (p.map ? '<img alt="" src="img/map-thumb.jpg" style="width:72px;border-radius:10px">' : '') + '</div>' +
       '<div id="thread">' + intro + S.chat.join('') + '</div>' +
@@ -1007,12 +1007,12 @@
       ['🪙 ต้นทุน', '4,200 บ./ไร่', 'ลดต้นทุนได้', '🪙 ปรับเหลือ<br>3,500 บ./ไร่', 'ลดลง<br>700 บ./ไร่'],
       ['🏪 ตลาด', 'โรงสี A<br>' + esc(F('prices_98_95_110', 'p98')) + ' บ./กก.', 'ตลาดรองรับดี', '📄 ทำสัญญาขาย<br>ล่วงหน้า', 'รายได้มั่นคง']];
     if (!F('ai_advice_figures', 'use_his_chat')) rows.forEach(function (r) { r[4] = KB ? esc(KB.no_data) : '-'; });
-    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตารางวิเคราะห์แปลง (AI)', 'ผลวิเคราะห์จากข้อมูลดิน น้ำ พันธุ์ และสภาพอากาศ') +
+    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตารางวิเคราะห์แปลง', 'ตัวอย่างเพื่อวางแผน · ผลวิเคราะห์จากข้อมูลดิน น้ำ พันธุ์ และสภาพอากาศ') +
       '<img class="mascot" alt="" src="img/mascot-top.jpg" style="right:4px;top:-14px;width:76px;border-radius:38px">' +
       profileCard(stdRows(), 'img/map-thumb.jpg') +
       '<div class="profit"><img alt="" src="img/coins.jpg" style="width:66px;border-radius:10px"><div style="flex:1"><div style="font:600 17px Prompt">กำไรคาด</div><div class="big">3,850 <small>บ./ไร่</small></div></div>' +
       '<div style="text-align:right;border-left:1px solid rgba(255,255,255,.4);padding-left:8px;font-size:14px">' + esc(F('profit_before_2700', 'before')) + '<br><span class="up">↗ เพิ่มขึ้น <b>' + esc(F('profit_before_2700', 'pct')) + '</b></span></div></div>' +
-      '<div class="card" style="margin-top:6px;overflow:hidden;border-radius:14px"><table class="an"><tr><th>หัวข้อ</th><th>ค่าที่วัด /<br>สถานะ</th><th>AI วิเคราะห์</th><th>คำแนะนำ<br>(ปฏิบัติ)</th><th>ผลต่อเงิน</th></tr>' +
+      '<div class="card" style="margin-top:6px;overflow:hidden;border-radius:14px"><table class="an"><tr><th>หัวข้อ</th><th>ค่าที่วัด /<br>สถานะ</th><th>วิเคราะห์แปลง</th><th>คำแนะนำ<br>(ปฏิบัติ)</th><th>ผลต่อเงิน</th></tr>' +
       rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</table></div>' +
       '<div class="plan"><b style="color:#023b01;font-size:16px">🎯 สรุปแผนปฏิบัติ (3 ขั้นตอนสำคัญ)</b><div class="steps">' +
       '<div class="st"><i>1</i>🟤<br>ปรับปรุงดิน<br><small>(โดโลไมต์ + ไถกลบฟาง)</small></div><b class="green">›</b><div class="st"><i>2</i>💧<br>จัดการน้ำแบบ<br>AWD</div><b class="green">›</b><div class="st"><i>3</i>🧺<br>ให้ปุ๋ยสั่งตัด<br><small>46-0-0 + 18-46-0</small></div></div></div>' +
@@ -1040,7 +1040,7 @@
       '<tr class="hl"><td><b>👑 กข85</b></td><td>' + y7 + '</td><td>' + F('prices_98_95_110', 'p98') + '</td><td>7,350</td><td>3,500</td><td><b style="color:#1d7a14">3,850</b></td></tr>' +
       '<tr><td><b>พิษณุโลก 2</b></td><td>720</td><td>' + F('prices_98_95_110', 'p95') + '</td><td>6,840</td><td>3,440</td><td><b>3,400</b></td></tr>' +
       '<tr><td><b>หอมมะลิ</b></td><td>' + y6 + '</td><td>' + F('prices_98_95_110', 'p110') + '</td><td>6,600</td><td>3,700</td><td><b>2,900</b></td></tr></table></div>' +
-      '<div class="airec"><span class="p">🎯 ข้อแนะนำจาก AI</span><span><b>เลือก “กข85”</b> ปลูก 15 มิ.ย. 2569<br>เพื่อกำไรสูงสุด และความเสี่ยงต่ำ</span></div>' +
+      '<div class="airec"><span class="p">🎯 ข้อแนะนำ (ตัวอย่างเพื่อวางแผน)</span><span><b>เลือก “กข85”</b> ปลูก 15 มิ.ย. 2569<br>เพื่อกำไรสูงสุด และความเสี่ยงต่ำ</span></div>' +
       '<button class="btn" style="margin-top:6px" onclick="location.hash=\'#/plot\'">⊙ เลือกทางนี้ →</button>' + advice() + '</div>';
   };
 
@@ -1345,7 +1345,7 @@
   var PUBLIC = ['register', 'login', 'reset', 'privacy', 'line', 'wallet', 'lot', 'dashboard', 'regpoint', 'claim'], routeTok = 0;
   /* screens built on illustrative sample figures (prices, buyers, forecasts, lots, province totals) are not shown to real accounts */
   var DEMO_ROUTES = ['analysis', 'options', 'market', 'lot', 'dashboard'];
-  var NODATA = { analysis: ['ตารางวิเคราะห์ AI', 'ยังไม่มีข้อมูลวิเคราะห์ของแปลงท่าน ระบบจะแสดงเมื่อมีผลดินและข้อมูลที่ตรวจสอบแล้ว'], options: ['ทางเลือกก่อนปลูก', 'ยังไม่มีข้อมูลเปรียบเทียบพันธุ์และราคาที่ตรวจสอบแล้ว'], market: ['ตลาดขายข้าว', 'ยังไม่มีข้อมูลราคาและผู้ซื้อที่ตรวจสอบแล้ว เมื่อโครงการเปิดตลาด จะแจ้งให้ทราบในแอป'], lot: ['ล็อตข้าว Digital ID', 'ยังไม่มีล็อตข้าวของท่าน จะแสดงเมื่อมีการเก็บเกี่ยวและบันทึกล็อตในระบบ'], dashboard: ['ภาพรวมจังหวัด', 'ยังไม่มีข้อมูลภาพรวมที่ตรวจสอบแล้ว'] };
+  var NODATA = { analysis: ['ตารางวิเคราะห์แปลง', 'ยังไม่มีข้อมูลวิเคราะห์ของแปลงท่าน ระบบจะแสดงเมื่อมีผลดินและข้อมูลที่ตรวจสอบแล้ว'], options: ['ทางเลือกก่อนปลูก', 'ยังไม่มีข้อมูลเปรียบเทียบพันธุ์และราคาที่ตรวจสอบแล้ว'], market: ['ตลาดขายข้าว', 'ยังไม่มีข้อมูลราคาและผู้ซื้อที่ตรวจสอบแล้ว เมื่อโครงการเปิดตลาด จะแจ้งให้ทราบในแอป'], lot: ['ล็อตข้าว Digital ID', 'ยังไม่มีล็อตข้าวของท่าน จะแสดงเมื่อมีการเก็บเกี่ยวและบันทึกล็อตในระบบ'], dashboard: ['ภาพรวมจังหวัด', 'ยังไม่มีข้อมูลภาพรวมที่ตรวจสอบแล้ว'] };
   function nodataScreen(h) {
     var t = NODATA[h] || ['ข้อมูล', 'ยังไม่มีข้อมูล'];
     document.body.classList.remove('dashboard-mode', 'farmer-mode', 'premium-mode');
@@ -1383,7 +1383,7 @@
     nav.style.display = ['login', 'reset', 'register', 'line', 'idcheck', 'regpoint', 'claim'].indexOf(h) >= 0 ? 'none' : '';
     document.body.classList.toggle('nonav', ['login', 'reset', 'register', 'line', 'idcheck', 'regpoint', 'claim'].indexOf(h) >= 0);
     try { R[h](); AFTER.forEach(function (f) { try { f(h); } catch (e) { console.error(e); } }); } catch (e) { console.error(e); app.innerHTML = '<p style="padding:20px;font-size:18px">เกิดข้อผิดพลาด กรุณาเปิดใหม่</p>'; }
-    if (['wallet', 'lot', 'dashboard'].indexOf(h) >= 0) app.insertAdjacentHTML('beforeend', '<a class="mentor-float" href="#/mentor" aria-label="พี่เลี้ยง AI">' + iconLine('<path d="M5 4h14a2 2 0 012 2v10a2 2 0 01-2 2h-8l-6 4v-4H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>') + '<span>AI</span></a>');
+    if (['wallet', 'lot', 'dashboard'].indexOf(h) >= 0) app.insertAdjacentHTML('beforeend', '<a class="mentor-float" href="#/mentor" aria-label="พี่เลี้ยงนาข้าว">' + iconLine('<path d="M5 4h14a2 2 0 012 2v10a2 2 0 01-2 2h-8l-6 4v-4H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>') + '<span>ถาม</span></a>');
     if (!params.get('keep')) { window.scrollTo(0, 0); app.scrollTop = 0; if (document.body.classList.contains('premium-mode')) requestAnimationFrame(function () { app.scrollTop = 0; }); }
   }
   /* in-app history (for hardware/gesture Back inside the Capacitor shell): modal first, then previous page, exit only at a root route */
