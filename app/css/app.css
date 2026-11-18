@@ -1,4 +1,4 @@
-:root{--riceos-build:37} /* release marker (sw riceos-next-v37); e2e reads it to prove a client got this build's CSS */
+:root{--riceos-build:38} /* release marker (sw riceos-next-v38); e2e reads it to prove a client got this build's CSS */
 @font-face{font-family:Prompt;src:url(../fonts/Prompt-SemiBold.ttf) format('truetype');font-weight:500 600;font-display:swap;ascent-override:100%;descent-override:30%;line-gap-override:0%}
 @font-face{font-family:Prompt;src:url(../fonts/Prompt-Bold.ttf) format('truetype');font-weight:700 900;font-display:swap;ascent-override:100%;descent-override:30%;line-gap-override:0%}
 @font-face{font-family:Sarabun;src:url(../fonts/Sarabun-Regular.ttf) format('truetype');font-weight:400;font-display:swap}

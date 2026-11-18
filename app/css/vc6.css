@@ -204,3 +204,6 @@ body.farmer-mode .nav a{flex:1;flex-direction:row;justify-content:center;gap:10p
 body.farmer-mode #app{margin:18px auto 48px;width:calc(100% - 48px);max-width:1180px}
 }
 /* 18 Nov (PingEris): the bar sizes to its text (min-height, all 3 lines), the sheet no longer overlaps it, and 14px (sheet padding-top) stays clear between the bar and the first row on every header()+.sheet screen */
+/* 18 Nov (v38): home gear is labelled (Apple 5.1.1(v): account deletion must be easy to find) */
+.setlink.lbl{position:static!important;display:inline-flex!important;align-items:center;gap:8px;width:auto!important;height:auto!important;min-height:48px;margin:8px 0 0!important;padding:0 16px!important;border-radius:22px!important;font:600 16px Prompt,sans-serif;text-decoration:none;white-space:nowrap}
+.setlink.lbl .ri{width:22px;height:22px;flex:none}

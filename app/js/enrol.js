@@ -146,7 +146,7 @@
     }
     if (h === 'login') {
       var au = app.querySelector('.stepcard.auth');
-      if (au && !au.querySelector('.w8alt')) au.insertAdjacentHTML('beforeend', '<div class="w8alt"><a href="#/claim">มีรหัสรับบัญชีจากเจ้าหน้าที่</a><a href="#/regpoint">สำหรับเจ้าหน้าที่จุดลงทะเบียน</a></div>');
+      if (au && !au.querySelector('.w8alt')) au.insertAdjacentHTML('beforeend', '<div class="w8alt"><a href="#/claim">มีรหัสรับบัญชีจากเจ้าหน้าที่</a>' + (window.RiceNative && window.RiceNative.native ? '' : '<a href="#/regpoint">สำหรับเจ้าหน้าที่จุดลงทะเบียน</a>') + '</div>');
     }
   }
   (window.RiceModules = window.RiceModules || []).push(function (app) {

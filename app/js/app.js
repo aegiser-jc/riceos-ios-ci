@@ -565,6 +565,7 @@
     var pr = S.profile || {}, c = S.consent || {};
     app.innerHTML = header() + '<div class="sheet setpage">' + titleRow('ข้อมูลของฉัน') +
       '<div class="card auth" style="padding:14px"><b style="font-size:22px">' + esc(pr.name || '') + '</b><div class="big ln" id="ph0">' + RiceIco('phone') + ' ' + fmtPhone((S.account || {}).phone) + '</div><div class="big ln">' + RiceIco('pin') + ' ' + esc(pr.district || '-') + '</div><button class="btn ghost" id="edprof" style="margin-top:12px">แก้ไขข้อมูลส่วนตัว</button></div>' +
+      '<div class="card auth danger" style="padding:14px;margin-top:10px"><h3 class="ph3">ลบบัญชี</h3><p class="big">ลบบัญชีและรูปหลักฐานทั้งหมดของท่านออกจากระบบถาวร ย้อนกลับไม่ได้ ใช้ PIN ยืนยัน</p><button class="btn dng" id="del">ลบบัญชีของฉัน</button></div>' +
       '<div class="card auth" id="acct" style="padding:14px;margin-top:10px"><h3 class="ph3">วิธีเข้าสู่ระบบ</h3><p class="big" id="acctb">กำลังเปิด...</p></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><h3 class="ph3">ความยินยอม</h3>' +
       '<label class="chk"><input type="checkbox" id="k2"' + (c.public_rank ? ' checked' : '') + '> แสดงชื่อแสดงตนในอันดับลีก</label>' +
@@ -573,7 +574,7 @@
       '<div class="card auth" style="padding:14px;margin-top:10px"><h3 class="ph3">เกี่ยวกับแอป</h3><p class="big">' + DISC.th + '</p><a class="lnk" href="#/about" id="setabout">เกี่ยวกับแอป</a> · <a class="lnk" href="#/sources">แหล่งข้อมูล</a></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><div id="obx" class="obx" hidden></div>' +
       '<button class="btn" id="chpin">เปลี่ยน PIN</button><button class="btn ghost" id="lo" style="margin-top:10px">ออกจากระบบ</button></div>' +
-      '<div class="card auth danger" style="padding:14px;margin-top:10px"><h3 class="ph3">ลบบัญชี</h3><p class="big">ลบบัญชีและรูปหลักฐานทั้งหมดของท่านออกจากระบบถาวร ย้อนกลับไม่ได้ ใช้ PIN ยืนยัน</p><button class="btn dng" id="del">ลบบัญชีของฉัน</button></div></div>';
+      '</div>';
     updateBadge();
     var el = function (id) { return document.getElementById(id); };
     function reloadAcct() { return getMe(true).then(fillAcct, function () { var b = el('acctb'); if (b) b.textContent = 'ดูข้อมูลบัญชีไม่ได้ในขณะนี้ กรุณาเชื่อมต่อระบบ'; }); }
@@ -746,7 +747,7 @@
     app.innerHTML = header({ tall: true, bell: true }) + '<div class="sheet">' + welcomeCard() +
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
       '<div class="pl"><span class="green">' + RiceIco('pin') + '</span> ' + esc(pr.district || '') + '</div>' +
-      '<a class="setlink" href="#/settings" aria-label="ข้อมูลของฉันและตั้งค่า">' + RiceIco('gear') + '</a><div id="obx" class="obx" hidden></div>' +
+      '<a class="setlink lbl" id="setlink" href="#/settings" aria-label="ตั้งค่า / ลบบัญชี">' + RiceIco('gear') + '<span>ตั้งค่า / ลบบัญชี</span></a><div id="obx" class="obx" hidden></div>' +
       (p ? '<div class="pl"><span class="green">' + RiceIco('sprout') + '</span> ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + (p.variety ? esc(p.variety) + ' · ' : '') + '<span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
       '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? RiceIco('rain') + ' <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + (STORE ? ' (ตัวอย่างเพื่อวางแผน)' : '') + '</span>' : RiceIco('sun') + ' <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
       '<a class="ptspill" href="#/points" style="text-decoration:none">' + RiceIco('star') + ' <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
@@ -1438,6 +1439,7 @@
     document.querySelectorAll('.modal').forEach(function (x) { x.remove(); });
     var h = (location.hash.replace(/^#\/?/, '') || '').split('?')[0], tok = ++routeTok;
     if (/^plot\/[^/]+\/summary$/.test(h)) h = 'plotsummary';
+    if (STORE && h === 'regpoint') { location.hash = '#/login'; return; } /* A1 (Apple 18 Nov): the store app has one role (farmer); the officer console is web only */
     if (!S.consent || (!S.registered && !S.seeded)) { if (PUBLIC.indexOf(h) < 0) h = 'register'; }
     if (!R[h]) h = S.registered || S.seeded ? 'home' : 'register';
     /* guard: a registered farmer needs a live session. A 401 goes to #/login; no backend or no signal keeps the app usable offline. */
