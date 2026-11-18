@@ -7,6 +7,56 @@
   var params = new URLSearchParams(location.search);
   if (params.get('shot')) document.body.classList.add('shot');
 
+  /* ---------- not-a-government-app disclaimer + official sources (Play "Misleading Claims", 18 Nov) ----------
+     Disclaimer and แหล่งข้อมูล: web and store app. STORE (Capacitor app only) also hides the partner's seal, the agency header line,
+     the provincial dashboard and labels sample figures; the web /next/ keeps the partner's branding unchanged. */
+  var STORE = !!(window.RiceNative && window.RiceNative.native);
+  var DISC = {
+    th: 'แอปนี้ไม่ใช่แอปของหน่วยงานรัฐ และไม่ได้เป็นตัวแทนหน่วยงานรัฐ',
+    en: 'This app is not affiliated with or representing any government entity',
+    opTh: 'RiceOS ให้บริการโดย บริษัท ดลอัส จำกัด (DONAUS COMPANY LIMITED) ติดต่อ admin@donaus.com',
+    opEn: 'RiceOS is operated by DONAUS COMPANY LIMITED. Contact: admin@donaus.com',
+    guideTh: 'ข้อมูลความรู้ในแอปเป็นแนวทางทั่วไป อ้างอิงจากแหล่งข้อมูลที่ระบุในหน้า "แหล่งข้อมูล" โปรดตรวจสอบกับหน่วยงานต้นทางก่อนตัดสินใจ',
+    guideEn: 'Information in the app is general guidance. See "Sources" for the original government pages and check with them before you decide.'
+  };
+  /* [inventory items, Thai / English topic, agency, URL]; URLs verified 18 Nov (handoff rice-play-gov-sources-18nov.md section C) */
+  var GOV_SOURCES = [
+    ['B1 B2 B4', 'พันธุ์ข้าว ระยะการเจริญเติบโต ศัตรูข้าว / Rice varieties, growth stages, pests', 'กรมการข้าว Rice Knowledge Bank', 'https://rkb.ricethailand.go.th/web/index.php'],
+    ['B3', 'ดินและปุ๋ย / Soil and fertiliser', 'กรมพัฒนาที่ดิน', 'https://www.ldd.go.th/home/'],
+    ['B10', 'คำแนะนำการเกษตรและเกษตรอำเภอ / Farm extension advice', 'กรมส่งเสริมการเกษตร', 'https://www.doae.go.th/'],
+    ['B6', 'พยากรณ์อากาศ / Weather forecast', 'กรมอุตุนิยมวิทยา', 'https://www.tmd.go.th/forecast/daily'],
+    ['B7', 'ราคาสินค้าเกษตร / Farm prices', 'สำนักงานเศรษฐกิจการเกษตร', 'https://oae.go.th/'],
+    ['B5', 'เปียกสลับแห้ง (AWD) และคาร์บอนเครดิต / AWD and carbon credits', 'อบก. T-VER', 'https://tver.tgo.or.th/database/public/methodology/90?category_id=28&lang=th'],
+    ['B8', 'ธ.ก.ส. / BAAC', 'ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร', 'https://www.baac.or.th/'],
+    ['B9', 'สหกรณ์ / Cooperatives', 'กรมส่งเสริมสหกรณ์', 'https://cpd.go.th/'],
+    ['B11', 'กระทรวงเกษตรและสหกรณ์ / Ministry of Agriculture and Cooperatives', 'กระทรวงเกษตรและสหกรณ์', 'https://www.moac.go.th/']
+  ];
+  var GOV_NOTE = ['ปฏิทินภารกิจ ตัวเลขผลผลิต ราคา ผู้ซื้อ และแดชบอร์ดในแอปเป็นตัวอย่างเพื่อวางแผน ไม่ใช่ข้อมูลจากหน่วยงานรัฐ',
+    'Mission calendar, yield figures, prices, buyers and dashboard figures in the app are planning examples, not government data.'];
+  function extLink(url, label) { return '<a class="ext" href="' + url.replace(/&/g, '&amp;') + '" target="_blank" rel="noopener">' + label + '</a>'; }
+  function discLine() { return '<p class="disc-line" id="discline">' + DISC.th + ' · <a href="#/sources">แหล่งข้อมูล</a> · <a href="#/about">เกี่ยวกับแอป</a></p>'; }
+  function discBlock() {
+    return '<div class="card disc-block" role="note"><p><b>' + DISC.th + '</b></p><p>' + DISC.opTh + '</p><p>' + DISC.guideTh + '</p>' +
+      '<p lang="en"><b>' + DISC.en + '.</b></p><p lang="en">' + DISC.opEn + '</p><p lang="en">' + DISC.guideEn + '</p></div>';
+  }
+  /* B items with no official source, store app only */
+  function storeNote(t) { return STORE ? '<p class="gen-note" role="note">' + (t || 'คำแนะนำทั่วไป · ตัวอย่างเพื่อวางแผน ไม่ใช่ข้อมูลจากหน่วยงานรัฐ') + '</p>' : ''; }
+  /* first launch: one-time sheet, acknowledged flag in its own key (not riceos.v1 / riceos.next.*) */
+  var DISC_KEY = 'riceos.disclaimerSeen';
+  function discSeen() { try { return localStorage.getItem(DISC_KEY) === '1'; } catch (e) { return false; } }
+  function showDisclaimerOnce() {
+    if (discSeen() || document.getElementById('discsheet')) return;
+    var d = document.createElement('div'); d.className = 'disc-sheet'; d.id = 'discsheet';
+    d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'disch');
+    d.innerHTML = '<div class="disc-card"><h2 id="disch">ข้อควรทราบ / Notice</h2>' + discBlock() +
+      '<p class="disc-links"><a href="#/sources" id="discsrc">ดูแหล่งข้อมูล / Sources</a></p><button class="btn" id="discok" type="button">ตกลง / OK</button></div>';
+    document.body.appendChild(d);
+    function ack() { try { localStorage.setItem(DISC_KEY, '1'); } catch (e) {} d.remove(); }
+    d.querySelector('#discok').onclick = ack;
+    d.querySelector('#discsrc').onclick = ack;
+    try { d.querySelector('#discok').focus(); } catch (e) {}
+  }
+
   /* ---------- helpers ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   var FLAG_TEXT = {"agency_logo":{"identical":{"show_logo":true,"agency_line":"กรมการข้าว × จังหวัดพิษณุโลก"},"alt":{"show_logo":false,"agency_line":""}},"profit_before_2700":{"identical":{"before":"(เดิม 2,700 บ./ไร่)","pct":"+42.6%"},"alt":{"before":"(เดิม 3,150 บ./ไร่)","pct":"+22%"}},"yield_750_600":{"identical":{"y750":"750","y600":"600"},"alt":{"y750":"ไม่มีข้อมูลยืนยัน","y600":"ไม่มีข้อมูลยืนยัน"}},"prices_98_95_110":{"identical":{"p98":"9.8","p95":"9.5","p110":"11.0","p92":"9.2"},"alt":{"p98":"-","p95":"-","p110":"-","p92":"-","note":"ราคา: ไม่มีข้อมูลยืนยัน"}},"locked_15_ton":{"identical":{"locked":"ล็อกแล้ว 15 ตัน","cta":"รับสัญญา (ล็อกราคา)"},"alt":{"locked":"ยังไม่มีสัญญา","cta":"แจ้งความสนใจขาย"}},"ai_advice_figures":{"identical":{"use_his_chat":true,"ref":"อ้างอิง: คู่มือกรมการข้าว 2568"},"alt":{"use_his_chat":false,"ref":"อ้างอิง: ไม่มีข้อมูลยืนยัน"}},"ph_label_inconsistency":{"identical":{"plot_label":"ปานกลาง","table_label":"เป็นกรดเล็กน้อย"},"alt":{"plot_label":"ไม่มีข้อมูลยืนยัน","table_label":"ไม่มีข้อมูลยืนยัน"}},"typos_as_shown":{"identical":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยงนาข้าว","canal":"เขตชลประทานคลองช้าย","om":"(อินทริยวัตถุ)","offer_tag":"จ้งเสนอแนะนำ"},"alt":{"ask1":"ถามได้ทุกเรื่อง","ask2":"ถามพี่เลี้ยงนาข้าว","canal":"เขตชลประทานคลองซ้าย","om":"(อินทรียวัตถุ)","offer_tag":"ข้อเสนอแนะนำ"}}};
@@ -49,7 +99,7 @@
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[name] + '</svg>'; }
   var NAV = [['home', 'หน้าแรก', 'home'], ['plot', 'แปลง', 'plot'], ['market', 'ตลาด', 'market'], ['wallet', 'เงิน', 'money'], ['missions', 'ภารกิจ', 'mission']];
-  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'missions', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', training: 'missions', league: 'missions', income: '', plotsummary: 'plot', mentor: '' };
+  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'missions', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', training: 'missions', league: 'missions', income: '', plotsummary: 'plot', mentor: '', about: '', sources: '' };
   function drawNav(route) {
     var on = NAV_OF[route];
     nav.innerHTML = NAV.map(function (n) { return '<a href="#/' + n[0] + '" class="' + (n[0] === 'home' ? 'home ' : '') + (on === n[0] ? 'on' : '') + '">' + svg(n[2]) + n[1] + '</a>'; }).join('');
@@ -58,6 +108,8 @@
   /* ---------- shared blocks ---------- */
   function header(opts) {
     opts = opts || {};
+    if (STORE) return '<header class="hdr' + (opts.tall ? ' tall' : '') + '"><div><div class="brand">Rice<span>OS</span></div><div class="l2">RiceOS นาข้าว</div></div>' + /* A1-A3: no seal, no agency line, no programme name */
+      (opts.bell ? '<button class="bell" aria-label="แจ้งเตือน" onclick="location.hash=\'#/missions\'">' + RiceIco('bell') + '<i></i></button>' : '') + '</header>';
     var logo = F('agency_logo', 'show_logo') ? '<img class="logo" alt="" src="' + (opts.pl ? 'img/logo-pl.png' : 'img/logo.png') + '">' : '';
     return '<header class="hdr' + (opts.tall ? ' tall' : '') + '">' + logo + '<div><div class="brand">Rice<span>OS</span></div>' +
       '<div class="l2">โครงการนาเดียว หลายรายได้</div><div class="l3">' + esc(F('agency_logo', 'agency_line')) + '</div></div>' +
@@ -497,7 +549,7 @@
   /* ---------- privacy notice ---------- */
   var PRIV = null;
   R.privacy = function () {
-    app.innerHTML = header() + '<div class="sheet">' + titleRow('ความเป็นส่วนตัว (PDPA)') + '<div class="card auth" id="pv" style="padding:14px"><p class="big">กำลังเปิด...</p></div></div>';
+    app.innerHTML = header() + '<div class="sheet">' + titleRow('ความเป็นส่วนตัว (PDPA)') + discBlock() + '<div class="card auth" id="pv" style="padding:14px"><p class="big">กำลังเปิด...</p></div></div>';
     (PRIV ? Promise.resolve(PRIV) : getJSON('content/privacy.json')).then(function (j) {
       PRIV = j; var h = '<p class="big"><b>ผู้ควบคุมข้อมูล:</b> ' + esc(j.controller_name) + '<br><b>ติดต่อ:</b> ' + esc(j.contact) + '</p>';
       if (j.summary) h += '<h3 class="ph3">สรุปสั้น ๆ</h3><ul class="sum">' + j.summary.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
@@ -518,6 +570,7 @@
       '<label class="chk"><input type="checkbox" id="k2"' + (c.public_rank ? ' checked' : '') + '> แสดงชื่อแสดงตนในอันดับลีก</label>' +
       '<label class="chk"><input type="checkbox" id="k3"' + (c.baac ? ' checked' : '') + '> บันทึกความสนใจเรื่อง ธ.ก.ส. (ยังไม่ส่งข้อมูล)</label>' +
       '<a class="lnk" href="#/privacy">ประกาศความเป็นส่วนตัว</a></div>' +
+      '<div class="card auth" style="padding:14px;margin-top:10px"><h3 class="ph3">เกี่ยวกับแอป</h3><p class="big">' + DISC.th + '</p><a class="lnk" href="#/about" id="setabout">เกี่ยวกับแอป</a> · <a class="lnk" href="#/sources">แหล่งข้อมูล</a></div>' +
       '<div class="card auth" style="padding:14px;margin-top:10px"><div id="obx" class="obx" hidden></div>' +
       '<button class="btn" id="chpin">เปลี่ยน PIN</button><button class="btn ghost" id="lo" style="margin-top:10px">ออกจากระบบ</button></div>' +
       '<div class="card auth danger" style="padding:14px;margin-top:10px"><h3 class="ph3">ลบบัญชี</h3><p class="big">ลบบัญชีและรูปหลักฐานทั้งหมดของท่านออกจากระบบถาวร ย้อนกลับไม่ได้ ใช้ PIN ยืนยัน</p><button class="btn dng" id="del">ลบบัญชีของฉัน</button></div></div>';
@@ -689,19 +742,19 @@
   R.home = function () {
     var pr = S.profile || {}, p = P(), m = mission(p), t = totals(), w = pr.weather || {};
     var tiles = [['plot', 'แปลง<br>ของฉัน', '', '#/plot'], ['soil', 'ดิน & ปุ๋ย', '', '#/analysis'], ['mentor', 'พี่เลี้ยงนาข้าว', '', '#/mentor'], ['market', 'ตลาดขายข้าว', '', '#/market'],
-      ['wallet', 'เงิน', '(Wallet)', '#/wallet'], ['carbon', 'คาร์บอน & QR', '(ลดคาร์บอน)', '#/kratong'], ['mission', 'ภารกิจ', '& แต้ม', '#/missions'], ['gov', 'บริการรัฐ', '(เชื่อมข้อมูล)', '#/gov']];
+      ['wallet', 'เงิน', '(Wallet)', '#/wallet'], ['carbon', 'คาร์บอน & QR', '(ลดคาร์บอน)', '#/kratong'], ['mission', 'ภารกิจ', '& แต้ม', '#/missions'], STORE ? ['gov', 'บริการ', '(ข้อมูลอ้างอิง)', '#/gov', 'book'] : ['gov', 'บริการรัฐ', '(เชื่อมข้อมูล)', '#/gov']]; /* A4: store app has no government building/flag icon */
     app.innerHTML = header({ tall: true, bell: true }) + '<div class="sheet">' + welcomeCard() +
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
       '<div class="pl"><span class="green">' + RiceIco('pin') + '</span> ' + esc(pr.district || '') + '</div>' +
       '<a class="setlink" href="#/settings" aria-label="ข้อมูลของฉันและตั้งค่า">' + RiceIco('gear') + '</a><div id="obx" class="obx" hidden></div>' +
       (p ? '<div class="pl"><span class="green">' + RiceIco('sprout') + '</span> ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + (p.variety ? esc(p.variety) + ' · ' : '') + '<span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
-      '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? RiceIco('rain') + ' <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + '</span>' : RiceIco('sun') + ' <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
+      '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? RiceIco('rain') + ' <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + (STORE ? ' (ตัวอย่างเพื่อวางแผน)' : '') + '</span>' : RiceIco('sun') + ' <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
       '<a class="ptspill" href="#/points" style="text-decoration:none">' + RiceIco('star') + ' <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
       '<div class="row"><a class="wallet" href="#/wallet" style="flex:0 0 58%;color:inherit;text-decoration:none"><span class="wi">' + RiceIco('wallet') + '</span><span class="wl">ยอด Wallet</span> <b>' + (pr.wallet ? esc(pr.wallet) + ' บ.' : 'รอเชื่อมต่อ') + '</b><span style="margin-left:auto">›</span></a>' +
       '<div class="credit">เครดิต ' + (pr.credit ? '<span class="badgeA">' + esc(pr.credit) + '</span>' : '<b>รอประเมิน</b>') + '</div></div>' +
-      (m ? '<div class="today"><div class="tag">' + RiceIco('clip') + ' วันนี้ต้องทำ</div><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' +
+      (m ? '<div class="today"><div class="tag">' + RiceIco('clip') + ' วันนี้ต้องทำ' + (STORE ? ' · คำแนะนำทั่วไป' : '') + '</div><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' +
         '<button class="shoot" id="shoot"><i>' + RiceIco('camera') + '</i>ถ่ายรูปยืนยัน</button><span class="plus">' + RiceIco('star') + ' ' + previewLabel(m.type) + '</span></div>' : '<a class="btn" href="#/register" style="margin-top:12px">เพิ่มแปลงของท่าน</a>') +
-      (m && m.detail ? '<p class="note">' + esc(m.detail) + '</p>' : '') + '</div><div class="hc2"><div class="grid4">' + tiles.map(function (x) { return '<a class="tile" href="' + x[3] + '"><img alt="" src="img/ic-' + x[0] + '.jpg">' + x[1] + (x[2] ? '<small>' + x[2] + '</small>' : '') + '</a>'; }).join('') + '</div>' +
+      (m && m.detail ? '<p class="note">' + esc(m.detail) + '</p>' : '') + '</div><div class="hc2"><div class="grid4">' + tiles.map(function (x) { return '<a class="tile" href="' + x[3] + '">' + (x[4] ? '<span class="tico">' + RiceIco(x[4]) + '</span>' : '<img alt="" src="img/ic-' + x[0] + '.jpg">') + x[1] + (x[2] ? '<small>' + x[2] + '</small>' : '') + '</a>'; }).join('') + '</div>' +
       (w.rain ? '<a class="alert" href="#/mentor" style="text-decoration:none"><span class="alico">' + RiceIco('rain') + '</span><span style="flex:1"><b>' + esc(w.rain) + '</b>แนะนำ: เลื่อนใส่ปุ๋ยออกไปก่อน</span><span style="font-size:26px">›</span></a>' : '<a class="alert calm" href="#/mentor" style="text-decoration:none"><span class="alico">' + RiceIco('drop') + '</span><span style="flex:1"><b>ตรวจระดับน้ำก่อนใส่ปุ๋ย</b>เมื่อเชื่อมข้อมูลอากาศแล้ว จะแจ้งเตือนฝนที่นี่</span><span style="font-size:26px">›</span></a>') +
       '<div style="position:relative"><a class="status" href="#/plot" style="display:block;color:inherit;text-decoration:none"><h3>สภาพแปลงล่าสุด</h3>' +
       (S.seeded ? '<div class="row"><img alt="" src="img/ears-thumb.jpg" style="width:44px;height:58px;border-radius:8px;object-fit:cover"><div class="cols" style="flex:1">' +
@@ -709,7 +762,7 @@
       '<div><span class="dot" style="background:#f5b800;color:#2b1d00">!</span><br>ธาตุอาหาร<br><span style="color:#d71013">ต่ำ</span></div>' +
       '<div><span class="dot" style="background:#e53935">!</span><br>เสี่ยงโรค<br><span style="font-weight:500">(ไหม้คอรวง)</span></div></div></div>' : '<p class="note" style="margin:6px 0 0">ยังไม่มีข้อมูล · จะแสดงหลังท่านส่งรูปภารกิจและเจ้าหน้าที่ตรวจแล้ว</p>') + '</a>' +
       '</div><a class="askai" href="#/mentor"><img alt="" src="img/mascot.jpg"><span><b>พี่เลี้ยงนาข้าว</b>' + esc(F('typos_as_shown', 'ask2')) + ' ได้ทุกเรื่อง</span><span class="chev" aria-hidden="true">›</span></a>' +
-      '</div></div></div>';
+      '</div></div>' + discLine() + '</div>';
     var b = document.getElementById('shoot'); if (b) b.onclick = function () { capture(m.type); };
     var wx = document.getElementById('wlx'); if (wx) wx.onclick = function () { S.welcomed = true; save(); route(); };
     var wg = document.getElementById('wlgo'); if (wg) wg.onclick = function () { S.welcomed = true; save(); capture('awd_tube_photo'); };
@@ -768,6 +821,8 @@
   }
   R.kratong = function () { params.set('tab', 'kt'); R.plot(); };
 
+  /* same page (hash route kept) with LINE's openExternalBrowser=1: LINE opens it in the phone's default browser */
+  function extUrl() { try { var u = new URL(location.href); u.searchParams.set('openExternalBrowser', '1'); return u.toString(); } catch (e) { return location.href; } }
   /* ---------- capture: scan tube QR, take photo with GPS + time ---------- */
   function capture(missionType) {
     var p = P(); if (!p) return;
@@ -776,8 +831,8 @@
     m.innerHTML = '<div class="capsheet"><span class="grab" aria-hidden="true"></span><button type="button" class="cs-x" aria-label="ปิด" onclick="document.getElementById(\'cl\').click()">✕</button><div class="cs-body"><h2 class="cs-title">' + (needQr ? 'ถ่ายรูปท่อวัดน้ำ' : 'ถ่ายรูปแปลง') + '</h2>' +
       (needQr ? '<div id="vbox"><video id="cv" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video><div class="qrguide" aria-hidden="true"><i></i><span>เล็งกล้องให้เห็น QR บนท่อ</span></div><div id="vok" hidden></div></div><canvas id="cc" hidden></canvas><label for="qrin" class="cs-lab">หรือพิมพ์รหัสบนท่อ (ถ้ามี)</label><input id="qrin" autocomplete="off" placeholder="เช่น RICE-TUBE-' + p.code + '-1">' +
         '<button type="button" class="nocode" id="nocode"><span aria-hidden="true">🙋</span><span><b>ไม่มีรหัส / ยังไม่มีท่อ</b><small>ไม่ต้องสแกน ถ่ายรูปได้เลย เจ้าหน้าที่จะช่วยตรวจให้</small></span></button><div class="cs-seg" role="group" aria-label="สภาพน้ำในท่อ"><button type="button" class="btn sm" data-st="WET" aria-pressed="false">💧 มีน้ำ</button><button type="button" class="btn sm" data-st="DRY" aria-pressed="false">🌾 แห้ง</button></div>' : '') +
-      '<p id="qrok" class="cs-status"></p><p id="camhint" class="note cs-hint" role="status" hidden>ถ้าไม่เห็นภาพกล้องในหน้านี้ ไม่เป็นไร กรุณาแตะปุ่ม "ถ่ายรูป" ด้านล่าง เพื่อเปิดกล้องของเครื่องแล้วถ่ายรูปได้เลย</p>' + (IN_LINE ? '<p id="chromehint" class="note cs-hint">เปิดในแอป LINE: ถ้ากล้องไม่ขึ้น ให้กดเมนู ⋮ แล้วเลือก "เปิดใน Chrome" (หรือ "เปิดด้วยเบราว์เซอร์อื่น") เพื่อเห็นภาพกล้องสด</p>' : '') + '<p id="gps" class="note cs-gps"></p></div>' +
-      '<div class="cs-foot"><button class="btn ghost" id="gpsretry" style="display:none">📍 ลองหาพิกัดใหม่</button><label class="btn" for="ph" id="phl">📷 ถ่ายรูปยืนยัน</label><input id="ph" type="file" accept="image/*" capture="environment" hidden><button class="btn ghost cs-close" id="cl">ปิด</button></div></div>';
+      '<p id="qrok" class="cs-status"></p><p id="camhint" class="note cs-hint" role="status" hidden>ถ้าไม่เห็นภาพกล้องในหน้านี้ ไม่เป็นไร กรุณาแตะปุ่ม "ถ่ายรูป" ด้านล่าง เพื่อเปิดกล้องของเครื่องแล้วถ่ายรูปได้เลย</p>' + (IN_LINE ? '<p id="chromehint" class="note cs-hint">เปิดในแอป LINE: ถ้ากล้องไม่เปิด ให้แตะ "เลือกรูปจากเครื่อง" หรือ <a id="openext" href="' + esc(extUrl()) + '">แตะเพื่อเปิดใน Chrome</a> (อาจต้องเข้าสู่ระบบอีกครั้ง)</p>' : '') + '<p id="gps" class="note cs-gps"></p></div>' +
+      '<div class="cs-foot"><button class="btn ghost" id="gpsretry" style="display:none">📍 ลองหาพิกัดใหม่</button><label class="btn" for="ph" id="phl">📷 ถ่ายรูปยืนยัน</label><input id="ph" type="file" accept="image/*" capture="environment" hidden>' + (IN_LINE ? '<label class="btn ghost" for="ph2" id="phl2">🖼️ เลือกรูปจากเครื่อง</label><input id="ph2" type="file" accept="image/*" hidden>' : '') + '<button class="btn ghost cs-close" id="cl">ปิด</button></div></div>';
     document.body.appendChild(m);
     var st = { code: null, kratong: null, state: null, stream: null, timer: null, closed: false, noCode: false };
     var $ = function (id) { return m.querySelector('#' + id); };
@@ -796,6 +851,7 @@
       var vo = $('vok'), vb = $('vbox'); if (vb && vb.style.display !== 'none') { $('cv').style.display = 'none'; vo.hidden = false; vo.style.display = 'flex'; vb.classList.add('done'); vo.dataset.s = st.state || ''; vo.textContent = '✅ ' + k.label + (st.state ? ' · ' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') : ''); }
       return true;
     }
+    if (IN_LINE && needQr) { $('vbox').style.display = 'none'; $('camhint').hidden = false; } /* no blank viewfinder in LINE (no getUserMedia there) */
     var startCam = function () {}; /* camera (getUserMedia) starts only after the GPS prompt is settled: two native permission prompts at once crash Capacitor's WebChromeClient */
     if (needQr) {
       $('nocode').onclick = function () {
@@ -807,7 +863,7 @@
       $('qrin').onchange = function () { accept(this.value); };
       $('qrin').oninput = function () { if (/^RICE-TUBE-[A-Z0-9]+-\d+(-(WET|DRY))?$/i.test(this.value.trim())) accept(this.value); };
       m.querySelectorAll('[data-st]').forEach(function (b) { b.onclick = function () { st.state = b.dataset.st; m.querySelectorAll('[data-st]').forEach(function (o) { var on = o === b; o.classList.toggle('on', on); o.setAttribute('aria-pressed', on ? 'true' : 'false'); }); if (st.kratong) accept(st.code.replace(/-(WET|DRY)$/, '') + '-' + st.state); else $('qrok').textContent = '✅ เลือก' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') + ' แล้วกดถ่ายรูปได้เลย'; }; });
-      startCam = function () { if (st.closed) return; if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      startCam = function () { if (st.closed) return; if (!IN_LINE && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) { /* LINE's Android WebView gives getUserMedia no camera (LINE itself may lack the CAMERA permission): no live viewfinder there, the system camera via <input capture> instead */
         Promise.resolve().then(function () { return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); }).then(function (s) {
           if (st.closed) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
           st.stream = s; var v = $('cv'); v.srcObject = s; v.play();
@@ -823,7 +879,7 @@
     var gps = null, gpsStatus = 'unavailable';
     var phl = $('phl'), gpsSettled = false;
     function gpsDone() { if (gpsSettled) return; gpsSettled = true; phl.style.pointerEvents = ''; phl.style.opacity = ''; phl.textContent = '📷 ถ่ายรูปยืนยัน'; startCam(); }
-    phl.style.pointerEvents = 'none'; phl.style.opacity = '.55'; phl.textContent = '⏳ กำลังหาพิกัด...'; setTimeout(function () { if (!st.closed) gpsDone(); }, 20000);
+    if (!IN_LINE) { phl.style.pointerEvents = 'none'; phl.style.opacity = '.55'; phl.textContent = '⏳ กำลังหาพิกัด...'; } setTimeout(function () { if (!st.closed) gpsDone(); }, 20000);
     phl.addEventListener('click', function (ev) {
       if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; clearInterval(st.timer); var cv = $('cv'); if (cv) { cv.pause(); cv.srcObject = null; } } /* free the camera for the system camera app */
     });
@@ -832,7 +888,7 @@
       $('gps').textContent = '⏳ กำลังหาพิกัด...'; $('gpsretry').style.display = 'none';
       readGps().then(function (r) {
         if (st.closed) return; gpsDone(); gpsStatus = r.status; gps = r.gps || null;
-        if (gps) { $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)'; return; }
+        if (gps) { $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' ม.)' + (inArea(gps) ? '' : ' · ' + OUTSIDE_NOTE); return; }
         $('gps').innerHTML = esc((r.status === 'denied' ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS (เปิดได้ที่ ตั้งค่า > แอป > RiceOS > สิทธิ์) ' : 'ไม่ได้รับพิกัด GPS ') + '· รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่') + '<br>' + esc(GPS_HELP);
         $('gpsretry').style.display = '';
       });
@@ -843,6 +899,7 @@
       var f = this.files[0]; if (!f) return;
       usePhoto(f, this);
     };
+    if ($('ph2')) $('ph2').onchange = $('ph').onchange; /* LINE: pick from gallery/files when LINE cannot open the camera; same GPS stamp, client_uuid and outbox */
     if (RiceNative.takePhoto) phl.addEventListener('click', function (ev) { /* iOS app: native camera instead of <input capture>; the photo goes through the same path below */
       ev.preventDefault(); if (st.closed || !gpsSettled) return;
       RiceNative.takePhoto().then(function (b) { if (b && !st.closed) usePhoto(b, $('ph')); }, function (e) {
@@ -853,29 +910,29 @@
       var asImage = !f.type || /^image\//i.test(f.type);
       Promise.all([asImage ? thumb(f) : null, asImage ? resizeJpeg(f) : null]).then(function (r) {
         if (!r[0] || !r[1]) { fin.value = ''; toast('ไฟล์นี้ไม่ใช่รูปภาพ กรุณาถ่ายรูปใหม่หรือเลือกไฟล์รูป'); return; } /* fake .jpg / PDF: decode fails, nothing saved, no points */
-        var data = r[0], blob = r[1], now = new Date().toISOString(), uuid = newUuid();
-        S.evidence.push({ id: S.evidence.length + 1, uuid: uuid, mission_type: missionType, plot: p.id, kratong: st.kratong ? st.kratong.seq : null, qr: st.code, state: st.state, captured_at_client: now, gps: gps, thumb: data, review_state: 'pending' });
+        var data = r[0], blob = r[1], now = new Date().toISOString(), uuid = newUuid(), outside = !!gps && !inArea(gps);
+        S.evidence.push({ id: S.evidence.length + 1, uuid: uuid, mission_type: missionType, plot: p.id, kratong: st.kratong ? st.kratong.seq : null, qr: st.code, state: st.state, captured_at_client: now, gps: gps, thumb: data, review_state: 'pending', outside_area: outside || undefined });
         if (st.kratong) { st.kratong.lastRead = now; st.kratong.state = st.state; }
-        var pts = award('mission_completed', { mission_type: missionType, quality: 'pass' }, 'pending');
+        var pts = outside ? 0 : award('mission_completed', { mission_type: missionType, quality: 'pass' }, 'pending');   /* outside the area: no provisional points, staff decide */
         while (S.evidence.length > 30) S.evidence.shift();
         save(); close();
         var meta = { client_uuid: uuid, plot_id: p.pid || null, mission_type: missionType, client_time: now, gps_status: gps ? 'ok' : gpsStatus };
         if (st.kratong) meta.kratong_seq = st.kratong.seq; if (st.code) meta.scanned_code = st.code;
         if (gps) { meta.lat = gps.lat; meta.lon = gps.lon; meta.acc_m = Math.round(gps.acc); }
-        var msg = pts > 0 ? 'บันทึกแล้ว +' + fmt(pts) + ' แต้ม (รอตรวจ)' : 'บันทึกหลักฐานแล้ว (รอตรวจ)';
+        var msg = pts > 0 ? 'บันทึกแล้ว +' + fmt(pts) + ' แต้ม (รอตรวจ)' : 'บันทึกหลักฐานแล้ว (รอตรวจ)' + (outside ? ' · ' + OUTSIDE_NOTE : '');
         if (!API) { toast(msg + ' · ส่งรูปไม่ได้ในเครื่องนี้'); route(); return; }
-        confirmSent('saving', pts);   /* big status card at once: farmers never wonder whether the photo went */
+        confirmSent('saving', pts, null, outside);   /* big status card at once: farmers never wonder whether the photo went */
         API.outbox.add({ client_uuid: uuid, plot_local: p.id, meta: meta, blob: blob, saved_at: now }).then(function () { return flushOutbox(); }).then(function (r) {
-          return API.outbox.count().then(function (c) { confirmSent(c.failed ? 'rejected' : r.left ? 'queued' : 'sent', pts, r.reason); });
+          return API.outbox.count().then(function (c) { confirmSent(c.failed ? 'rejected' : r.left ? 'queued' : 'sent', pts, r.reason, outside); });
         }).then(function () {
           if (document.body.dataset.screen === 'home' || document.body.dataset.screen === 'settings') updateBadge();
-        }, function () { confirmSent('full', pts); });
+        }, function () { confirmSent('full', pts, null, outside); });
         route();
       });
     }
   }
   /* persistent status card after a photo: saving -> sent | queued (no signal) | full. Stays until the farmer taps OK. */
-  function confirmSent(state, pts, reason) {
+  function confirmSent(state, pts, reason, outside) {
     var d = document.getElementById('sentcard');
     if (!d) { d = document.createElement('div'); d.id = 'sentcard'; d.className = 'modal sentm'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-live', 'assertive'); document.body.appendChild(d); }
     var T = {
@@ -885,7 +942,7 @@
       rejected: ['⚠️', 'ส่งรูปไม่ผ่าน', 'ระบบไม่รับรูปนี้ รูปยังอยู่ในเครื่อง แตะ "ส่งไม่ผ่าน" บนหน้าแรกเพื่อดูวิธีแก้', 'bad'],
       full: ['⚠️', 'เก็บรูปไม่ได้', 'พื้นที่ในเครื่องเต็ม ลบรูปหรือแอปที่ไม่ใช้แล้วถ่ายใหม่', 'bad']
     }[state];
-    d.innerHTML = '<div class="sentcard ' + T[3] + '"><div class="sc-ic" aria-hidden="true">' + T[0] + '</div><h2>' + T[1] + '</h2><p>' + esc(T[2]) + '</p>' + (state === 'saving' ? '' : '<button class="btn" id="scok">ตกลง</button>') + '</div>';
+    d.innerHTML = '<div class="sentcard ' + T[3] + '"><div class="sc-ic" aria-hidden="true">' + T[0] + '</div><h2>' + T[1] + '</h2><p>' + esc(T[2]) + '</p>' + (outside && state !== 'full' ? '<p class="note" role="note">⚠️ ' + esc(OUTSIDE_NOTE) + '</p>' : '') + (state === 'saving' ? '' : '<button class="btn" id="scok">ตกลง</button>') + '</div>';
     clearTimeout(confirmSent.t); if (state === 'sent') confirmSent.t = setTimeout(function () { d.remove(); }, 4500); /* good news fades; queued / full stay until OK */
     var ok = d.querySelector('#scok'); if (ok) { ok.onclick = function () { d.remove(); }; try { ok.focus(); } catch (e) {} }
   }
@@ -898,6 +955,9 @@
         function (er) { ok({ status: er && er.code === 1 ? 'denied' : 'unavailable' }); }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }); } catch (e) { ok({ status: 'unavailable' }); }
     });
   }
+  /* project area (same box as backend/src/evidence.mjs inArea): outside it the photo is still accepted, flagged outside_area, and only an officer can approve it */
+  function inArea(g) { return !!g && g.lat >= 5 && g.lat <= 21 && g.lon >= 97 && g.lon <= 106; }
+  var OUTSIDE_NOTE = 'พิกัดอยู่นอกพื้นที่โครงการ — เจ้าหน้าที่จะตรวจสอบ';
   var GPS_CODES = ['bad_gps', 'bad_lat', 'bad_lon', 'bad_gps_status'];
   /* a photo the server permanently rejected: explain, let the farmer retry (GPS re-read for GPS errors) or delete it */
   function failDialog() {
@@ -916,7 +976,7 @@
         var b = this, msg = $('fdm'); b.disabled = true; b.textContent = isGps ? '⏳ กำลังหาพิกัดใหม่...' : 'กำลังส่ง...';
         var go = isGps ? readGps().then(function (r) {
           if (r.status !== 'ok') { msg.textContent = (r.status === 'denied' ? 'ยังไม่ได้อนุญาตตำแหน่ง GPS ' : 'ยังหาพิกัดไม่ได้ ') + '— ' + GPS_HELP; return false; }
-          var g = r.gps; if (!(g.lat >= 5 && g.lat <= 21 && g.lon >= 97 && g.lon <= 106)) { msg.textContent = 'พิกัดที่อ่านได้ (' + g.lat.toFixed(3) + ', ' + g.lon.toFixed(3) + ') อยู่นอกพื้นที่โครงการ กรุณาไปที่แปลงของท่านแล้วกด "ลองใหม่"'; return false; }
+          var g = r.gps; /* outside the area is accepted by the server now (flagged for staff), so no client-side block here */
           return API.outbox.update(it.client_uuid, function (x) { x.meta.gps_status = 'ok'; x.meta.lat = g.lat; x.meta.lon = g.lon; x.meta.acc_m = Math.round(g.acc); delete x.failed; }).then(function () { return true; });
         }) : API.outbox.update(it.client_uuid, function (x) { delete x.failed; }).then(function () { return true; });
         go.then(function (go1) { if (!go1) return; return flushOutbox().then(function (r) { toast(r.left ? 'ยังส่งไม่ครบ ' + (r.reason ? '(' + (API.MSG[r.reason] || r.reason) + ')' : '') : 'ส่งครบแล้ว'); done(); }); })
@@ -953,7 +1013,7 @@
       '<div class="msg ai"><img alt="" src="img/mascot-head.png" style="width:52px"><div class="b"><div style="display:flex;gap:8px"><div style="flex:1">' +
       '<div style="font:800 22px Prompt">🌧️ ยังไม่ควรใส่ปุ๋ยครับ</div><div>🌧 พรุ่งนี้มีฝน 60%</div><div>📅 แนะนำรอ 3 วัน</div><div>🌿 เพื่อลดการสูญเสียปุ๋ย<br>และประหยัดค่าใช้จ่าย</div>' +
       '<div>ประมาณ <b class="pill" style="background:#f8ee45;padding:0 8px;font-size:20px">350 บ./ไร่</b></div></div><img alt="" src="img/chat-rice.jpg" style="width:88px;height:108px;border-radius:14px;object-fit:cover"></div>' +
-      '<div style="font-size:17px">📄 ' + esc(F('ai_advice_figures', 'ref')) + '</div><span class="advice">คำแนะนำประกอบ</span><div class="tm">09:29</div></div></div>' +
+      '<div style="font-size:17px">📄 ' + esc(F('ai_advice_figures', 'ref')) + '</div><span class="advice">' + (STORE ? 'คำแนะนำทั่วไป · ตัวอย่างเพื่อวางแผน' : 'คำแนะนำประกอบ') + '</span><div class="tm">09:29</div></div></div>' +
       '<div class="msg me"><div class="b">แล้วควรทำอะไรต่อครับ<div class="tm">09:30 <em>✓✓</em></div></div></div>' +
       '<div class="msg ai"><img alt="" src="img/mascot-head.png" style="width:52px"><div class="b"><b style="font-size:19px">✅ ลำดับงานแนะนำ (3 วันนี้)</b>' +
       '<ol style="margin:4px 0;padding-left:24px;font-size:17px"><li>ตรวจระดับน้ำ และคงไว้ที่ 5–10 ซม.</li><li>สำรวจโรคใบ (โดยเฉพาะไหม้คอรวง)</li><li>บันทึกสถานะแปลง เพื่อรับแต้ม <b class="pill" style="background:#fbefa0;padding:0 6px">⭐ +20</b></li></ol><span class="advice">คำแนะนำประกอบ</span><div class="tm">09:31</div></div></div>';
@@ -965,10 +1025,10 @@
     var body = best ? esc(best.answer) : 'ไม่พบเรื่องนี้ในคลังความรู้ของแอป: ' + esc(KB.no_data) + ' กรุณาสอบถามเจ้าหน้าที่ในพื้นที่';
     var src = best ? best.source : KB.no_data;
     return '<div class="msg ai"><img alt="" src="img/mascot-head.png" style="width:52px"><div class="b" style="font-size:18px">' + body +
-      '<div class="src">ที่มา: ' + esc(src) + '</div><span class="advice">' + esc(KB.label) + '</span><div class="src">' + esc(KB.disclaimer) + '</div><div class="tm">' + now + '</div></div></div>';
+      '<div class="src">ที่มา: ' + esc(src) + ' · <a href="#/sources">แหล่งข้อมูล</a></div><span class="advice">' + esc(STORE ? 'คำแนะนำทั่วไป' : KB.label) + '</span><div class="src">' + esc(KB.disclaimer) + '</div><div class="tm">' + now + '</div></div></div>';
   }
   R.mentor = function () {
-    var p = P() || {};
+    var p = P() || {}, noMic = !!(window.RiceNative && RiceNative.native);   /* native app (WKWebView): no Web Speech mic; avoids an untested mic/speech permission path (no NSMicrophone/NSSpeechRecognition strings) */
     S.chat = S.chat || [];
     var intro = F('ai_advice_figures', 'use_his_chat') && S.seeded ? hisChat() : answer('awd');
     app.innerHTML = header() + '<div class="sheet">' + titleRow('พี่เลี้ยงนาข้าว', 'ถามเรื่องทำนา ตอบจากคำแนะนำที่เตรียมไว้', '<span style="margin-left:auto;font-size:22px;color:#074810">⋮</span>', '<img alt="" src="img/mascot-title.png" style="width:55px">') +
@@ -977,7 +1037,7 @@
       '<div id="thread">' + intro + S.chat.join('') + '</div>' +
       '<div style="font:700 20px Prompt;color:#0b4a12;margin:8px 2px 4px">ถามเรื่องอื่นได้เลย</div>' +
       '<div class="qchips"><button data-q="ใบเหลือง ทำอย่างไร">🍃 ใบเหลือง<br>ทำอย่างไร?</button><button data-q="ราคาข้าว วันนี้">📈 ราคาข้าว<br>วันนี้</button><button data-q="น้ำ AWD ท่อวัดน้ำ">💧 น้ำจะมา<br>เมื่อไหร่?</button><button data-q="สูตรปุ๋ย กข85">🌾 สูตรปุ๋ย<br>สำหรับ กข85</button></div>' +
-      '<form class="inputbar" id="ask"><span style="color:#5b5a5f">📷</span><input id="q" placeholder="พิมพ์คำถาม หรือกดพูด..." autocomplete="off"><button type="button" class="mic" id="mic" aria-label="พูด">🎤</button><button aria-label="ส่ง" style="color:#3e8e4e;font-size:22px">➤</button></form></div>';
+      '<form class="inputbar" id="ask"><span style="color:#5b5a5f">📷</span><input id="q" placeholder="' + (noMic ? 'พิมพ์คำถาม...' : 'พิมพ์คำถาม หรือกดพูด...') + '" autocomplete="off">' + (noMic ? '' : '<button type="button" class="mic" id="mic" aria-label="พูด">🎤</button>') + '<button aria-label="ส่ง" style="color:#3e8e4e;font-size:22px">➤</button></form></div>';
     function ask(q) {
       if (!q) return;
       var me = '<div class="msg me"><div class="b">' + esc(q) + '<div class="tm">' + new Date().toTimeString().slice(0, 5) + '</div></div></div>';
@@ -987,7 +1047,7 @@
     }
     document.getElementById('ask').onsubmit = function (e) { e.preventDefault(); var i = document.getElementById('q'); ask(i.value.trim()); i.value = ''; };
     app.querySelectorAll('[data-q]').forEach(function (b) { b.onclick = function () { ask(b.dataset.q); }; });
-    document.getElementById('mic').onclick = function () {
+    if (!noMic) document.getElementById('mic').onclick = function () {
       var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) { toast('เครื่องนี้ยังไม่รองรับการพูด กรุณาพิมพ์'); return; }
       var r = new SR(); r.lang = 'th-TH'; r.onresult = function (e) { ask(e.results[0][0].transcript); }; r.start();
@@ -1003,16 +1063,17 @@
       ['🧺 N-P-K', dot(RD) + 'N ต่ำ<br>' + dot(Y) + 'P กลาง<br>' + dot(G) + 'K สูง', 'ปรับสมดุลธาตุ', '🔵 ปุ๋ยสั่งตัด<br>46-0-0 +<br>18-46-0', 'ประหยัด<br>350 บ./ไร่'],
       ['🌾 พันธุ์', dot(G) + 'กข85<br><small>เหมาะสม</small>', 'ให้คงใช้ต่อ', '🟡 ใช้พันธุ์ กข85<br>(เหมาะพื้นที่)', 'ผลผลิตดี<br>สม่ำเสมอ'],
       ['💧 น้ำ', dot(G) + 'AWD<br><small>เหมาะสม</small>', 'จัดการน้ำตาม<br>ช่วงอายุ', '🚿 ปล่อยน้ำแห้งสลับ<br>(AWD)', 'ลดค่าสูบ<br>30%'],
-      ['🐞 โรค', dot(Y) + '<span style="color:#d32f2f">ไหม้คอรวง</span><br><small>(เสี่ยงสูง)</small>', 'เฝ้าระวังและ<br>ป้องกันทันที', '🧴 ใช้สารตามทะเบียน<br>กรมวิชาการเกษตร', 'ลดความเสี่ยง<br>ผลผลิต'],
+      ['🐞 โรค', dot(Y) + '<span style="color:#d32f2f">ไหม้คอรวง</span><br><small>(เสี่ยงสูง)</small>', 'เฝ้าระวังและ<br>ป้องกันทันที', '🧴 ใช้สารที่ขึ้นทะเบียน<br>ตามฉลาก', 'ลดความเสี่ยง<br>ผลผลิต'],
       ['🪙 ต้นทุน', '4,200 บ./ไร่', 'ลดต้นทุนได้', '🪙 ปรับเหลือ<br>3,500 บ./ไร่', 'ลดลง<br>700 บ./ไร่'],
       ['🏪 ตลาด', 'โรงสี A<br>' + esc(F('prices_98_95_110', 'p98')) + ' บ./กก.', 'ตลาดรองรับดี', '📄 ทำสัญญาขาย<br>ล่วงหน้า', 'รายได้มั่นคง']];
     if (!F('ai_advice_figures', 'use_his_chat')) rows.forEach(function (r) { r[4] = KB ? esc(KB.no_data) : '-'; });
-    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตารางวิเคราะห์แปลง', 'ตัวอย่างเพื่อวางแผน · ผลวิเคราะห์จากข้อมูลดิน น้ำ พันธุ์ และสภาพอากาศ') +
+    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตารางวิเคราะห์แปลง', 'ตัวอย่างเพื่อวางแผน · ผลวิเคราะห์จากข้อมูลดิน น้ำ พันธุ์ และสภาพอากาศ') + storeNote() +
+      '<div class="bt-honest" role="note" style="margin:6px 0"><b>ตัวเลขในหน้านี้เป็นค่าอ้างอิงเพื่อวางแผน ไม่ใช่ผลวัดจากแปลงของท่าน</b><span>ใช้ดูวิธีอ่านผลและวางแผน ผลจริงต้องมาจากการตรวจดินและข้อมูลที่เจ้าหน้าที่ยืนยัน</span></div>' +
       '<img class="mascot" alt="" src="img/mascot-top.jpg" style="right:4px;top:-14px;width:76px;border-radius:38px">' +
       profileCard(stdRows(), 'img/map-thumb.jpg') +
-      '<div class="profit"><img alt="" src="img/coins.jpg" style="width:66px;border-radius:10px"><div style="flex:1"><div style="font:600 17px Prompt">กำไรคาด</div><div class="big">3,850 <small>บ./ไร่</small></div></div>' +
+      '<div class="profit"><img alt="" src="img/coins.jpg" style="width:66px;border-radius:10px"><div style="flex:1"><div style="font:600 17px Prompt">กำไรคาด (ค่าอ้างอิง)</div><div class="big">3,850 <small>บ./ไร่</small></div></div>' +
       '<div style="text-align:right;border-left:1px solid rgba(255,255,255,.4);padding-left:8px;font-size:14px">' + esc(F('profit_before_2700', 'before')) + '<br><span class="up">↗ เพิ่มขึ้น <b>' + esc(F('profit_before_2700', 'pct')) + '</b></span></div></div>' +
-      '<div class="card" style="margin-top:6px;overflow:hidden;border-radius:14px"><table class="an"><tr><th>หัวข้อ</th><th>ค่าที่วัด /<br>สถานะ</th><th>วิเคราะห์แปลง</th><th>คำแนะนำ<br>(ปฏิบัติ)</th><th>ผลต่อเงิน</th></tr>' +
+      '<div class="card" style="margin-top:6px;overflow:hidden;border-radius:14px"><table class="an"><tr><th>หัวข้อ</th><th>ค่าอ้างอิง /<br>สถานะ</th><th>วิเคราะห์แปลง</th><th>คำแนะนำ<br>(ปฏิบัติ)</th><th>ผลต่อเงิน</th></tr>' +
       rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</table></div>' +
       '<div class="plan"><b style="color:#023b01;font-size:16px">🎯 สรุปแผนปฏิบัติ (3 ขั้นตอนสำคัญ)</b><div class="steps">' +
       '<div class="st"><i>1</i>🟤<br>ปรับปรุงดิน<br><small>(โดโลไมต์ + ไถกลบฟาง)</small></div><b class="green">›</b><div class="st"><i>2</i>💧<br>จัดการน้ำแบบ<br>AWD</div><b class="green">›</b><div class="st"><i>3</i>🧺<br>ให้ปุ๋ยสั่งตัด<br><small>46-0-0 + 18-46-0</small></div></div></div>' +
@@ -1029,7 +1090,7 @@
         '<div class="foot"><span class="dot" style="background:' + fc + '">✓</span> ' + foot + '</div></div>';
     };
     var segs = function (n, tot, c) { var s = ''; for (var i = 0; i < tot; i++) s += '<i style="' + (i < n ? 'background:' + c : '') + '"></i>'; return s; };
-    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ทางเลือกก่อนปลูก', 'เปรียบเทียบผลตอบแทน ความเสี่ยง และตลาดล่วงหน้า') +
+    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ทางเลือกก่อนปลูก', 'เปรียบเทียบผลตอบแทน ความเสี่ยง และตลาดล่วงหน้า') + storeNote() +
       '<img class="mascot" alt="" src="img/mascot-top.jpg" style="right:4px;top:-14px;width:72px;border-radius:36px">' +
       profileCard(['🌾 แปลง ' + fmt((P() || {}).rai || 0) + ' ไร่', '📅 รอบปลูกใหม่', '🌱 เริ่มปลูก มิ.ย. 2569']) +
       opt(true, 'opt1', 'กข85', 'ปลูก 15 มิ.ย. 2569', 'ขาย โรงสี A', '#1d7a14', '#eaf7e3', '3,850', 'ต่ำ', '#111', segs(6, 6, '#1b8a12'), 'ผลผลิตสูง เหมาะพื้นที่บางระกำ มีตลาดรองรับแน่นอน', '#2e9a2e') +
@@ -1051,7 +1112,7 @@
         '<img class="ph" alt="" src="img/' + img + '.jpg"><div><div class="nm">' + nm + '</div><ul>' + list.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul></div>' +
         '<div class="pr">เสนอราคา<br><b style="color:' + col + '">' + price + ' <small>บ./กก.</small></b><span class="lk" style="background:' + pillbg + '">' + pill + '</span></div></div>';
     };
-    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตลาดนำ – ผู้ซื้อเสนอราคาล่วงหน้า', 'เชื่อมตรงผู้ซื้อ • ล็อกราคาได้ • ลดความเสี่ยง', '<span style="margin-left:auto;color:#0d3d10;font-size:20px">🔗</span>') +
+    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตลาดนำ – ผู้ซื้อเสนอราคาล่วงหน้า', 'เชื่อมตรงผู้ซื้อ • ล็อกราคาได้ • ลดความเสี่ยง', '<span style="margin-left:auto;color:#0d3d10;font-size:20px">🔗</span>') + storeNote('ราคาและผู้ซื้อในหน้านี้เป็นตัวอย่างเพื่อวางแผน ไม่ใช่ราคาจริง ไม่ใช่ข้อมูลจากหน่วยงานรัฐ · ราคาจริงดูที่แหล่งข้อมูล') +
       profileCard(stdRows(), 'img/ears-thumb.jpg') +
       '<div class="banner"><span style="font-size:32px">🤝</span><div><b style="font:700 19px Prompt;color:#0b3d0b">จับคู่ผู้ซื้อสำหรับ “กข85”</b><div style="font-size:13px">ผลผลิตคาด 15,000 กก. (15 ตัน) • เริ่มรับซื้อ ก.ย. – ต.ค.</div></div></div>' +
       buyer(true, 'buyer1', 'โรงสี A', ['ต้องการ: กข85', 'ความชื้น: ≤ 15%', 'รับซื้อ: ก.ย. – ต.ค.'], F('prices_98_95_110', 'p98'), '#13641a', '🤝 ' + esc(F('locked_15_ton', 'locked')).replace(/ (\d+) ตัน/, ' $1\u00a0ตัน'), '#dff2d4') +
@@ -1118,7 +1179,22 @@
   };
 
   R.gov = function () {
-    app.innerHTML = header() + '<div class="sheet">' + titleRow('บริการรัฐ') + '<div class="card" style="padding:14px;font-size:18px">การเชื่อมข้อมูลกับหน่วยงานจะเปิดเมื่อได้รับอนุญาตจากหน่วยงานเจ้าของข้อมูล ตอนนี้ยังไม่มีการส่งข้อมูลออกจากเครื่องนี้</div><a class="lot-entry" href="#/dashboard"><span class="outline-icon">▥</span><span><b>แดชบอร์ดจังหวัด</b><small>RiceOS พิษณุโลก</small></span><span>→</span></a></div>';
+    var srcLink = '<a class="lot-entry" href="#/sources"><span class="outline-icon">' + RiceIco('book') + '</span><span><b>แหล่งข้อมูล</b><small>ลิงก์ไปยังเว็บไซต์ของหน่วยงานต้นทาง</small></span><span>→</span></a>';
+    app.innerHTML = header() + '<div class="sheet">' + titleRow(STORE ? 'บริการ / ข้อมูลอ้างอิง' : 'บริการรัฐ') + '<div class="card" style="padding:14px;font-size:18px">การเชื่อมข้อมูลกับหน่วยงานจะเปิดเมื่อได้รับอนุญาตจากหน่วยงานเจ้าของข้อมูล ตอนนี้ยังไม่มีการส่งข้อมูลออกจากเครื่องนี้</div>' +
+      (STORE ? '' : '<a class="lot-entry" href="#/dashboard"><span class="outline-icon">▥</span><span><b>แดชบอร์ดจังหวัด</b><small>RiceOS พิษณุโลก</small></span><span>→</span></a>') + srcLink + discLine() + '</div>';
+  };
+
+  /* ---------- about + sources (web and store app) ---------- */
+  R.about = function () {
+    app.innerHTML = header() + '<div class="sheet">' + titleRow('เกี่ยวกับแอป', 'About RiceOS') + discBlock() +
+      '<a class="lot-entry" href="#/sources" id="aboutsrc"><span class="outline-icon">' + RiceIco('book') + '</span><span><b>แหล่งข้อมูล / Sources</b><small>เว็บไซต์ทางการของหน่วยงานต้นทาง</small></span><span>→</span></a>' +
+      '<a class="lot-entry" href="#/privacy"><span class="outline-icon">' + RiceIco('clip') + '</span><span><b>ประกาศความเป็นส่วนตัว</b><small>Privacy notice</small></span><span>→</span></a></div>';
+  };
+  R.sources = function () {
+    app.innerHTML = header() + '<div class="sheet">' + titleRow('แหล่งข้อมูล / Sources', 'แตะเพื่อเปิดเว็บไซต์ของหน่วยงานต้นทาง') +
+      '<div class="card src-card"><ul class="src-list" id="srclist">' + GOV_SOURCES.map(function (r) {
+        return '<li data-b="' + r[0] + '"><b>' + r[1] + '</b><span>' + r[2] + '</span>' + extLink(r[3], r[3]) + '</li>';
+      }).join('') + '</ul><p class="note">' + GOV_NOTE[0] + '</p><p class="note" lang="en">' + GOV_NOTE[1] + '</p></div>' + discLine() + '</div>';
   };
 
   /* ---------- wallet, rice lot and provincial overview ---------- */
@@ -1151,11 +1227,12 @@
   }
   // Shared farmer navigation becomes a sidebar on desktop; the phone keeps its five-tab dock.
   function farmerShell(screen) {
-    var links = NAV.concat([['lot', 'ล็อตข้าว Digital ID', 'plot'], ['dashboard', 'แดชบอร์ดจังหวัด', 'chart']]);
+    var links = NAV.concat([['lot', 'ล็อตข้าว Digital ID', 'plot']].concat(STORE ? [] : [['dashboard', 'แดชบอร์ดจังหวัด', 'chart']])); /* A5/B13: no provincial dashboard in the store app */
     return '<div class="farmer-shell"><aside class="farmer-sidebar">' + header() + '<nav class="farmer-nav" aria-label="พื้นที่การทำงาน"><span class="sidebar-caption">พื้นที่การทำงาน</span>' + links.map(function (item) {
       return '<a class="farmer-nav-link' + (screen === item[0] ? ' active' : '') + '" href="#/' + item[0] + '"' + (screen === item[0] ? ' aria-current="page"' : '') + '>' + (item[2] === 'chart' ? ni('chart') : svg(item[2])) + '<span>' + item[1] + '</span>' + (screen === item[0] ? '<span class="sidebar-current">›</span>' : '') + '</a>';
-    }).join('') + '</nav><div class="farmer-foot"><span class="province-monogram">พล</span><div><b>จังหวัดพิษณุโลก</b><small>โครงการนาเดียว หลายรายได้</small></div></div></aside><div class="farmer-main">';
+    }).join('') + '</nav>' + (STORE ? '<div class="farmer-foot"><div><b>RiceOS นาข้าว</b><small><a href="#/about">' + DISC.th + '</a></small></div></div>' : '<div class="farmer-foot"><span class="province-monogram">พล</span><div><b>จังหวัดพิษณุโลก</b><small>โครงการนาเดียว หลายรายได้</small></div></div>') + '</aside><div class="farmer-main">';
   }
+  function walletPhone() { return !!(window.matchMedia && matchMedia('(max-width:1023px)').matches); }
   R.wallet = function () {
     var seeded = !!S.seeded, t = totals();
     var tx = [
@@ -1163,13 +1240,16 @@
       ['เงินชดเชยภัยแล้ง +3,500', 'เงินชดเชยภัยแล้ง', '+3,500', 'relief', 'in'],
       ['ซื้อปุ๋ยกลุ่ม −980', 'ซื้อปุ๋ยกลุ่ม', '−980', 'bag', 'out']
     ];
-    app.innerHTML = farmerShell('wallet') + '<main class="sheet premium-sheet wallet-sheet">' + titleRow('เงินของฉัน', 'รับเงินขายข้าว สินเชื่อ ประกัน ชดเชย') +
+    /* 18 Nov (PingEris "หน้าเงินของฉัน header ไม่เหมือนหน้าอื่น"): on a phone/tablet the wallet uses the same header() + .sheet + titleRow as home/plot;
+       the white premium header and sidebar shell stay for the desktop layout (>=1024px) only. */
+    var phone = walletPhone();
+    app.innerHTML = (phone ? header() + '<div class="sheet wallet-sheet">' : farmerShell('wallet') + '<main class="sheet premium-sheet wallet-sheet">') + titleRow('เงินของฉัน', 'รับเงินขายข้าว สินเชื่อ ประกัน ชดเชย') +
       '<div class="wallet-layout"><div class="wallet-overview"><section class="balance-card" aria-label="ยอด Wallet"><div class="balance-top"><span>ยอด Wallet</span>' + ni('shield') + '</div><div class="balance-number">' + (seeded ? '48,500 บ.' : 'ยังไม่มีข้อมูล') + '</div><div class="balance-foot"><span>' + esc((S.profile || {}).name || 'บัญชีของท่าน') + '</span><span class="credit-chip">✓ ' + (seeded ? 'เครดิตแปลง A' : 'เครดิตแปลง ยังไม่มีข้อมูล') + '</span></div></section>' +
       '<div class="wallet-tools"><div class="money-actions"><button data-service="loan">' + ni('loan') + '<span>ขอสินเชื่อ</span></button><button data-service="insurance">' + ni('shield') + '<span>ประกัน</span></button><button data-service="relief">' + ni('relief') + '<span>ชดเชย</span></button></div>' +
       '<a class="points-link" href="#/points"><span class="points-star">✦</span><span>แต้มของฉัน <b>' + fmt(t.confirmed + t.pending) + '</b></span><span>→</span></a></div></div><div class="wallet-activity"><section class="premium-card transaction-card"><div class="section-heading"><h2>รายการล่าสุด</h2><span class="quiet-label">บาท</span></div>' +
       (seeded ? '<ul class="transactions">' + tx.map(function (r) { return '<li aria-label="' + r[0] + '"><span class="transaction-icon ' + r[4] + '">' + ni(r[3]) + '</span><span class="transaction-name">' + r[1] + '</span><b class="amount ' + r[4] + '">' + r[2] + '</b></li>'; }).join('') + '</ul>' : '<div class="empty-finance">' + svg('money') + '<b>ยังไม่มีรายการ</b><span>รายการรับและจ่ายจะแสดงที่นี่<br>เมื่อเชื่อมต่อระบบกลาง</span></div>') + '</section>' +
       '<section class="premium-card profit-chart"><div class="section-heading"><h2>กำไร/ไร่ 3 ฤดู</h2><span class="quiet-label">บ./ไร่</span></div>' +
-      (seeded ? '<svg viewBox="0 12 440 132" preserveAspectRatio="xMidYMid meet" role="img" aria-label="แนวโน้มกำไรต่อไร่เพิ่มขึ้นใน 3 ฤดู"><path d="M24 124C94 121 152 110 220 92S348 52 416 28V138H24Z" fill="#edf5ef"/><path d="M24 24H416M24 81H416M24 138H416" stroke="#dce6df" stroke-dasharray="3 4"/><path d="M24 124C94 121 152 110 220 92S348 52 416 28" fill="none" stroke="#1D7A3E" stroke-width="3" vector-effect="non-scaling-stroke"/><g fill="#fff" stroke="#1D7A3E" stroke-width="2.5"><circle cx="24" cy="124" r="4"/><circle cx="220" cy="92" r="4"/><circle cx="416" cy="28" r="4"/></g></svg><div class="profit-seasons"><span>ฤดู 1</span><span>ฤดู 2</span><span>ฤดู 3</span></div>' : '<div class="chart-empty">—<span>ยังไม่มีข้อมูลกำไรต่อไร่</span></div>') + '</section></div></div></main></div></div>';
+      (seeded ? '<svg viewBox="0 12 440 132" preserveAspectRatio="xMidYMid meet" role="img" aria-label="แนวโน้มกำไรต่อไร่เพิ่มขึ้นใน 3 ฤดู"><path d="M24 124C94 121 152 110 220 92S348 52 416 28V138H24Z" fill="#edf5ef"/><path d="M24 24H416M24 81H416M24 138H416" stroke="#dce6df" stroke-dasharray="3 4"/><path d="M24 124C94 121 152 110 220 92S348 52 416 28" fill="none" stroke="#1D7A3E" stroke-width="3" vector-effect="non-scaling-stroke"/><g fill="#fff" stroke="#1D7A3E" stroke-width="2.5"><circle cx="24" cy="124" r="4"/><circle cx="220" cy="92" r="4"/><circle cx="416" cy="28" r="4"/></g></svg><div class="profit-seasons"><span>ฤดู 1</span><span>ฤดู 2</span><span>ฤดู 3</span></div>' : '<div class="chart-empty">—<span>ยังไม่มีข้อมูลกำไรต่อไร่</span></div>') + '</section></div></div>' + (phone ? '</div>' : '</main></div></div>');
     app.querySelectorAll('[data-service]').forEach(function (b) { b.onclick = function () { serviceNotice(b.dataset.service, b); }; });
   };
 
@@ -1188,7 +1268,7 @@
   }
   R.lot = function () {
     var chain = ['แปลง', 'เกี่ยว 20 ต.ค.', 'ชั่ง', 'อบ', 'สี โรงสี A', 'คัดเกรด', 'บรรจุ'];
-    app.innerHTML = farmerShell('lot') + '<main class="sheet premium-sheet lot-sheet">' + titleRow('ล็อตข้าว Digital ID', 'ตรวจสอบย้อนกลับล็อตข้าว') +
+    app.innerHTML = farmerShell('lot') + '<main class="sheet premium-sheet lot-sheet">' + titleRow('ล็อตข้าว Digital ID', 'ตรวจสอบย้อนกลับล็อตข้าว') + storeNote() +
       '<div class="lot-layout"><div class="lot-identity"><section class="premium-card lot-passport"><div class="passport-top"><span>RICEOS · DIGITAL ID</span><span>✓ มาตรฐาน Q</span></div><div class="lot-qr" id="lot-qr"></div><div class="lot-code">' + LOT_ID + '</div><p class="lot-summary">LOT-PL-2569-00412 · 15 ตัน · ความชื้น 14.5%</p>' +
       '<div class="lot-badges"><span>' + ni('leaf') + 'คาร์บอนต่ำ -0.8 tCO2e</span><span>' + ni('shield') + 'มาตรฐาน Q</span></div>' +
       '<div class="lot-action"><button class="premium-button" id="share-lot">' + ni('share') + 'แชร์ QR</button><span id="share-status" role="status" aria-live="polite"></span></div></section></div>' +
@@ -1309,6 +1389,7 @@
   }
   var ALERTS = [['บางระกำ', 'high'], ['พรหมพิราม', 'watch'], ['วัดโบสถ์', 'watch']];
   R.dashboard = function () {
+    if (STORE) { location.replace('#/home'); return; } /* A5/B13: province dashboard (sample KPIs, province monogram) not in the store app */
     var kpis = [
       ['พื้นที่เข้าร่วม', '100,000', 'ไร่', 'plot', '100,000 ไร่'],
       ['เกษตรกร', '10,000', 'เกษตรกร', 'people', '10,000 เกษตรกร'],
@@ -1342,7 +1423,7 @@
   (window.RiceModules || []).forEach(function (f) { try { f(window.RiceApp); } catch (e) { console.error(e); } });
 
   /* ---------- router ---------- */
-  var PUBLIC = ['register', 'login', 'reset', 'privacy', 'line', 'wallet', 'lot', 'dashboard', 'regpoint', 'claim'], routeTok = 0;
+  var PUBLIC = ['register', 'login', 'reset', 'privacy', 'about', 'sources', 'line', 'wallet', 'lot', 'dashboard', 'regpoint', 'claim'], routeTok = 0;
   /* screens built on illustrative sample figures (prices, buyers, forecasts, lots, province totals) are not shown to real accounts */
   var DEMO_ROUTES = ['analysis', 'options', 'market', 'lot', 'dashboard'];
   var NODATA = { analysis: ['ตารางวิเคราะห์แปลง', 'ยังไม่มีข้อมูลวิเคราะห์ของแปลงท่าน ระบบจะแสดงเมื่อมีผลดินและข้อมูลที่ตรวจสอบแล้ว'], options: ['ทางเลือกก่อนปลูก', 'ยังไม่มีข้อมูลเปรียบเทียบพันธุ์และราคาที่ตรวจสอบแล้ว'], market: ['ตลาดขายข้าว', 'ยังไม่มีข้อมูลราคาและผู้ซื้อที่ตรวจสอบแล้ว เมื่อโครงการเปิดตลาด จะแจ้งให้ทราบในแอป'], lot: ['ล็อตข้าว Digital ID', 'ยังไม่มีล็อตข้าวของท่าน จะแสดงเมื่อมีการเก็บเกี่ยวและบันทึกล็อตในระบบ'], dashboard: ['ภาพรวมจังหวัด', 'ยังไม่มีข้อมูลภาพรวมที่ตรวจสอบแล้ว'] };
@@ -1371,10 +1452,12 @@
     render(h);
   }
   function render(h) {
+    if (STORE && h === 'dashboard') { location.replace('#/home'); return; } /* A5/B13: no province dashboard in the store app */
     if (S.registered && !S.seeded && DEMO_ROUTES.indexOf(h) >= 0) { R.nodata = function () { nodataScreen(rh); }; var rh = h; h = 'nodata'; }
     document.body.classList.toggle('dashboard-mode', h === 'dashboard');
-    document.body.classList.toggle('farmer-mode', h === 'wallet' || h === 'lot');
-    document.body.classList.toggle('premium-mode', ['wallet', 'lot', 'dashboard'].indexOf(h) >= 0);
+    var wp = h === 'wallet' && walletPhone();
+    document.body.classList.toggle('farmer-mode', (h === 'wallet' && !wp) || h === 'lot');
+    document.body.classList.toggle('premium-mode', !wp && ['wallet', 'lot', 'dashboard'].indexOf(h) >= 0);
     document.body.dataset.screen = h;
     if (lotDockObserver) { lotDockObserver.disconnect(); lotDockObserver = null; }
     app.style.removeProperty('--lot-dock-h');
@@ -1413,8 +1496,29 @@
     FLAGS = r[0].flags; KB = r[1]; LESSONS = r[2]; RULESETS = [r[3]];
     S.ledger = S.ledger || []; S.evidence = S.evidence || [];
     route();
+    showDisclaimerOnce();
     flushOutbox().catch(function () {});
   }).catch(function (e) { console.error(e); app.innerHTML = '<p style="padding:20px;font-size:18px">เปิดข้อมูลไม่ได้ กรุณาเชื่อมอินเทอร์เน็ตครั้งแรก</p>'; });
 
-  if ('serviceWorker' in navigator && location.protocol !== 'file:' && !params.get('shot')) navigator.serviceWorker.register('sw.js').catch(function () {});
+  if ('serviceWorker' in navigator && location.protocol !== 'file:' && !params.get('shot')) (function () {
+    /* 18 Nov (v37): a new SW takes over at once (skipWaiting/claim in sw.js); reload this page once when it does, so the new CSS/JS show without
+       the user clearing anything. No reload on the very first install (nothing old on screen), at most once per 15 s (loop guard; sw.js may
+       already have reloaded the window), and not while the user is typing (then on the next time the page is hidden). Check for a new SW each
+       time the page comes back to the front: LINE's in-app browser can keep one page alive for days without a new navigation. */
+    var SWC = navigator.serviceWorker, had = !!SWC.controller, pending = false;
+    function typing() { var a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); }
+    function reloadOnce() {
+      var last = 0; try { last = +sessionStorage.getItem('riceos.next.swReload') || 0; } catch (e) {}
+      if (Date.now() - last < 15000) return;
+      try { sessionStorage.setItem('riceos.next.swReload', String(Date.now())); } catch (e) {}
+      location.reload();
+    }
+    SWC.addEventListener('controllerchange', function () { if (!had) { had = true; return; } if (typing()) pending = true; else reloadOnce(); });
+    SWC.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') { if (pending) { pending = false; reloadOnce(); } return; }
+        reg.update().catch(function () {});
+      });
+    }).catch(function () {});
+  })();
 })();

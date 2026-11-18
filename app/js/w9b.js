@@ -17,6 +17,7 @@
     var s = String(p.sowDate || '').slice(0, 10), d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Math.floor((Date.now() - Date.parse(s + 'T00:00:00+07:00')) / 864e5) : NaN;
     if (isFinite(d) && d >= 0 && d <= 400) { add('s', s); var g = 0; STAGE_DAYS.forEach(function (x) { if (d >= x) g++; }); add('g', g); }
     var id = String(p.pid || p.id || '').replace(/-/g, ''); if (/^[A-Za-z0-9_-]{1,32}$/.test(id)) add('p', id); /* server plot ids are 36-char UUIDs; the contract allows 32: hyphens dropped */
+    var h = String(location.hash || ''); add('back', /^#\/plot\/[A-Za-z0-9_%-]{1,60}$/.test(h) ? '/next/' + h : '/next/'); /* back button in the game; game accepts only paths starting with /next/ */
     return '/game/' + (q.length ? '?' + q.join('&') : '');
   }
   function gameBtn(p, id) {
@@ -49,10 +50,11 @@
   ];
   var SOURCES = [
     'สถาบันวิจัยข้าวนานาชาติ (IRRI): แนวทางการจัดการน้ำแบบเปียกสลับแห้ง (Alternate Wetting and Drying)',
-    'กรมการข้าว กระทรวงเกษตรและสหกรณ์: ข้อแนะนำการปลูกข้าวและการจัดการน้ำ',
-    'องค์การบริหารจัดการก๊าซเรือนกระจก (องค์การมหาชน) หรือ อบก.: ข้อมูลโครงการคาร์บอนเครดิตภายในประเทศ',
+    'กรมการข้าว กระทรวงเกษตรและสหกรณ์: ข้อแนะนำการปลูกข้าวและการจัดการน้ำ <a class="ext" href="https://rkb.ricethailand.go.th/web/index.php" target="_blank" rel="noopener">https://rkb.ricethailand.go.th/web/index.php</a> <a class="ext" href="https://www.moac.go.th/" target="_blank" rel="noopener">https://www.moac.go.th/</a>',
+    'องค์การบริหารจัดการก๊าซเรือนกระจก (องค์การมหาชน) หรือ อบก.: ข้อมูลโครงการคาร์บอนเครดิตภายในประเทศ <a class="ext" href="https://tver.tgo.or.th/database/public/methodology/90?category_id=28&amp;lang=th" target="_blank" rel="noopener">https://tver.tgo.or.th/database/public/methodology/90?category_id=28&amp;lang=th</a>',
     'IPCC 2019 Refinement to the 2006 Guidelines, ข้อมูลก๊าซมีเทนจากนาข้าว',
-    'ราคาจริง: สอบถามโรงสี สหกรณ์ หรือสำนักงานเกษตรอำเภอในวันที่ท่านจะขาย'
+    'ราคาจริง: สอบถามโรงสี สหกรณ์ หรือสำนักงานเกษตรอำเภอในวันที่ท่านจะขาย ราคาสินค้าเกษตร สำนักงานเศรษฐกิจการเกษตร <a class="ext" href="https://oae.go.th/" target="_blank" rel="noopener">https://oae.go.th/</a>',
+    'ดูแหล่งข้อมูลทั้งหมด: <a href="#/sources">แหล่งข้อมูล</a>'
   ];
   function income() {
     var li = function (a) { return '<li><b>' + a[0] + '</b><span>' + a[1] + '</span></li>'; };

@@ -6,18 +6,17 @@
 body:not(.premium-mode){background:var(--vc-bg);color:var(--vc-ink)}
 body:not(.premium-mode) #app{padding-bottom:calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
 /* header: one compact bar */
-body:not(.premium-mode) .hdr{height:calc(var(--top) + 60px);padding:var(--top) 16px 0;gap:10px;align-items:center;background:linear-gradient(90deg,#0B5A2A 0%,#0B5A2A 52%,rgba(11,90,42,0) 85%),url(../img/header-photo.jpg) right top/auto 100% no-repeat,#0B5A2A}
-body:not(.premium-mode) .hdr.tall{height:calc(var(--top) + 72px)}
+body:not(.premium-mode) .hdr{height:auto;min-height:calc(var(--top) + 60px);padding:calc(var(--top) + 8px) 16px 8px;gap:10px;align-items:center;background:linear-gradient(90deg,#0B5A2A 0%,#0B5A2A 52%,rgba(11,90,42,0) 85%),url(../img/header-photo.jpg) right top/auto 130% no-repeat,#0B5A2A}
+body:not(.premium-mode) .hdr.tall{height:auto;min-height:calc(var(--top) + 72px)}
 body:not(.premium-mode) .hdr::after{display:none}
 body:not(.premium-mode) .hdr .logo{width:40px;height:40px}
 body:not(.premium-mode) .hdr.tall .logo{width:44px;height:44px}
 body:not(.premium-mode) .hdr .brand{font-size:24px}
 body:not(.premium-mode) .hdr .l2{font:600 14px/1.25 Prompt;margin-top:2px}
-body:not(.premium-mode) .hdr .l3{display:none}
-body:not(.premium-mode) .hdr.tall .l3{display:block;font:500 14px/1.25 Prompt}
+body:not(.premium-mode) .hdr .l3{display:block;font:500 14px/1.25 Prompt}
 body:not(.premium-mode) .hdr .bell{width:48px;height:48px;top:calc(var(--top) + 12px);right:12px;color:var(--vc-g9)}
 .hdr .bell .ri{width:24px;height:24px}
-body:not(.premium-mode) .sheet{margin-top:-12px;background:var(--vc-bg);border-radius:20px 20px 0 0;padding:12px 16px 8px}
+body:not(.premium-mode) .sheet{margin-top:0;background:var(--vc-bg);border-radius:0;padding:14px 16px 8px}
 body:not(.premium-mode) .sheet .card,body:not(.premium-mode) .card{background:#fff;border:1px solid var(--vc-line);border-radius:16px;box-shadow:0 1px 3px rgba(11,90,42,.08)}
 .titlerow{min-height:48px;gap:8px;margin-bottom:4px}
 .titlerow .back{width:48px;height:48px;display:grid;place-items:center;font-size:24px;color:var(--vc-g9);flex:none;margin-left:-8px}
@@ -152,7 +151,6 @@ body[data-screen="settings"] .sheet small{font-size:14px}
 .nocode.on{background:#E7F1EA;border-style:solid}
 }
 @media (max-width:700px){
-body:not(.premium-mode) .hdr.tall{height:calc(var(--top) + 80px)}
 .btn.w9b-game{background:var(--vc-gold);color:#14251a;box-shadow:0 2px 0 #9a7208;min-height:56px;font-size:19px}
 .w9b-gi{font-size:24px}
 .w9b-inc{background:#fff;border:1px solid var(--vc-line);box-shadow:0 1px 3px rgba(11,90,42,.08)}.w9b-inc b{font-size:18px;color:var(--vc-g9)}.w9b-inc small{font-size:16px}
@@ -205,5 +203,4 @@ body.farmer-mode .nav{display:flex;position:sticky;top:12px;bottom:auto;left:aut
 body.farmer-mode .nav a{flex:1;flex-direction:row;justify-content:center;gap:10px;margin:6px 4px}
 body.farmer-mode #app{margin:18px auto 48px;width:calc(100% - 48px);max-width:1180px}
 }
-/* 16 Nov: room between the top bar and the first row (PingEris): the sheet still overlaps the bar by 12px, so 28px top padding leaves 16px clear on every header()+.sheet screen */
-@media (max-width:700px){body:not(.premium-mode) .sheet{padding-top:28px}}
+/* 18 Nov (PingEris): the bar sizes to its text (min-height, all 3 lines), the sheet no longer overlaps it, and 14px (sheet padding-top) stays clear between the bar and the first row on every header()+.sheet screen */

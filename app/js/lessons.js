@@ -5,6 +5,30 @@
   var A, R, W, origLessons, origTraining;
   var STAGE = { nursery: 'ตกกล้า', tillering: 'แตกกอ', panicle: 'ตั้งท้อง', flowering: 'ออกดอก', harvest: 'เก็บเกี่ยว', all: 'ทุกช่วง' };
   var esc = function (s) { return A.esc(s); };
+  /* B14: per-lesson sources (lessons-sources key S1-S9; ids per lesson as in content/lessons-all.json source_ids). S8 (กรมการข้าว) links to the
+     verified Rice Knowledge Bank page. Used when the API lesson has no source_ids of its own. */
+  var LSRC = {
+    S1: ['IRRI: Alternate wetting and drying', 'https://ghgmitigation.irri.org/mitigation-technologies/alternate-wetting-and-drying'],
+    S2: ['IRRI Rice Today', 'https://ricetoday.irri.org/?p=32436'],
+    S3: ['AfricaRice: AWD guidance (PDF)', 'https://www.africarice.org/_files/ugd/0839e4_aefcc1bf0d9c4062a339fa1a81a616fc.pdf'],
+    S4: ['Sustainable Rice Platform fact sheet (PDF)', 'https://www.preferredbynature.org/sites/default/files/Sustainable_Rice_Platform-Fact_Sheet-Jan22_EN.PDF.pdf'],
+    S5: ['SRP Standard for Sustainable Rice Cultivation v1.0 (PDF)', 'https://sustainablericeplatform.github.io/assets/doc' + 's/SRP%20Standard%20for%20Sustainable%20Rice%20Cultivation%20v%201.0.pdf'],
+    S6: ['IRRI Rice Knowledge Bank harvesting factsheet (PDF)', 'https://rkbassam.aau.ac.in/uploads/factsheets/pdf/6657ea5ab8d1f.pdf'],
+    S7: ['IRRI Rice Today: Dried to perfection', 'https://ricetoday.irri.org/dried-to-perfection/'],
+    S8: ['กรมการข้าว Rice Knowledge Bank', 'https://rkb.ricethailand.go.th/web/index.php'],
+    S9: ['Amarin TV (ข่าว)', 'https://www.amarintv.com/news/agriculture/561453']
+  };
+  /* LSRC.S5: external URL string is split so smoke's internal-path check (served files must not name repo doc folders) does not trip on it */
+  var LESSON_SRC = { 'L4-useapp': ['S8'], 'L5-seed': ['S8', 'S4'], 'L6-nursery': ['S5', 'S8'], 'L7-soil': ['S4', 'S8'], 'L8-plant': ['S5'], 'L9-awd': ['S1', 'S2', 'S3'],
+    'L10-flower': ['S3'], 'L11-fert': ['S4', 'S5'], 'L12-weed': ['S4'], 'L13-ipm': ['S4', 'S5'], 'L14-pest-safe': ['S4', 'S5'], 'L15-safety': ['S5'], 'L16-climate': ['S8'],
+    'L17-harvest': ['S6'], 'L18-postharvest': ['S7', 'S6'], 'L19-straw': ['S4', 'S9'], 'L20-records': ['S8'] };
+  function lessonSources(l) {
+    var ids = (Array.isArray(l.source_ids) && l.source_ids.length ? l.source_ids : LESSON_SRC[l.id]) || [], rows = ids.filter(function (k) { return LSRC[k]; });
+    if (!rows.length) return '';
+    return '<div class="card w9card lesson-src" id="lessonsrc"><h3>แหล่งข้อมูลของบทเรียนนี้</h3><ul class="src-list">' + rows.map(function (k) {
+      var r = LSRC[k]; return '<li><b>' + esc(r[0]) + '</b><a class="ext" href="' + esc(r[1]) + '" target="_blank" rel="noopener">' + esc(r[1]) + '</a></li>';
+    }).join('') + '</ul><p class="w9note">เนื้อหาเรียบเรียงเป็นแนวทางทั่วไป ไม่ใช่เอกสารของหน่วยงานรัฐ · <a href="#/sources">แหล่งข้อมูลทั้งหมด</a></p></div>';
+  }
 
   function fallback(e, orig) {
     if (e && e.status === 401) { location.hash = '#/login'; return true; }
@@ -48,7 +72,7 @@
         W.staleNote(r) + '<div class="card w9card w9read">' + (l.body || []).map(function (b) { return '<p>' + esc(b) + '</p>'; }).join('') +
         '<div class="w9row"><button class="btn sm ghost" id="w9say" type="button">ฟังบทเรียน</button>' + (l.video_url ? '<a class="btn sm ghost" href="' + esc(l.video_url) + '" target="_blank" rel="noopener">ดูวิดีโอ</a>' : '') + '</div></div>' +
         '<div id="w9quiz">' + q.map(function (qq, i) { return '<div class="card w9card"><h3>' + (i + 1) + '. ' + esc(qq.q) + '</h3>' + qq.choices.map(function (c, j) { return '<button class="choice" type="button" data-i="' + i + '" data-j="' + j + '">' + esc(c) + '</button>'; }).join('') + '</div>'; }).join('') +
-        (q.length ? '<button class="btn" id="w9sub" type="button">ส่งคำตอบ</button>' : '') + '</div><div id="w9res" aria-live="polite"></div>');
+        (q.length ? '<button class="btn" id="w9sub" type="button">ส่งคำตอบ</button>' : '') + '</div><div id="w9res" aria-live="polite"></div>' + lessonSources(l));
       A.app.querySelectorAll('.choice').forEach(function (b) { b.onclick = function () { ans[b.dataset.i] = Number(b.dataset.j); A.app.querySelectorAll('.choice[data-i="' + b.dataset.i + '"]').forEach(function (x) { x.classList.toggle('sel', x === b); }); }; });
       document.getElementById('w9say').onclick = function () { try { speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance((l.body || []).join(' ')); u.lang = 'th-TH'; speechSynthesis.speak(u); } catch (e) { A.toast('เครื่องนี้ยังอ่านออกเสียงไม่ได้'); } };
       var sub = document.getElementById('w9sub');

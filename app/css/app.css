@@ -1,3 +1,4 @@
+:root{--riceos-build:37} /* release marker (sw riceos-next-v37); e2e reads it to prove a client got this build's CSS */
 @font-face{font-family:Prompt;src:url(../fonts/Prompt-SemiBold.ttf) format('truetype');font-weight:500 600;font-display:swap;ascent-override:100%;descent-override:30%;line-gap-override:0%}
 @font-face{font-family:Prompt;src:url(../fonts/Prompt-Bold.ttf) format('truetype');font-weight:700 900;font-display:swap;ascent-override:100%;descent-override:30%;line-gap-override:0%}
 @font-face{font-family:Sarabun;src:url(../fonts/Sarabun-Regular.ttf) format('truetype');font-weight:400;font-display:swap}
@@ -679,7 +680,7 @@ body[data-screen="lot"] .mentor-float{bottom:calc(var(--nav-h) + var(--lot-dock-
 .district-panel{border:0;box-shadow:none}
 .profit-chart>svg{aspect-ratio:440/132}
 @media(max-width:1023px){
- .wallet-sheet .titlerow{margin-bottom:12px}
+ .premium-sheet.wallet-sheet .titlerow{margin-bottom:12px} /* phone wallet (plain .sheet, 18 Nov) keeps the shared titlerow spacing */
  .wallet-sheet .money-actions{padding:6px 0}
  .wallet-sheet .transaction-card{padding-top:10px}
  .wallet-sheet .profit-chart{margin-top:10px}
@@ -1138,3 +1139,18 @@ a.btn,a.btn:visited{text-decoration:none}
 body:not(.premium-mode) .hdr::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(to top,#064623 0,#064623 18px,rgba(6,70,35,0));pointer-events:none}
 body:not(.premium-mode) .hdr>*{position:relative;z-index:1}
 body:not(.premium-mode) .hdr .bell{position:absolute}
+/* not-a-government-app disclaimer + แหล่งข้อมูล (Play Misleading Claims, 18 Nov) */
+.disc-line{margin:14px 4px 6px;font:400 13.5px/1.45 Sarabun,sans-serif;color:#4a5a4c;text-align:center}
+.disc-line a{color:#0b5a2a;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;min-height:48px;min-width:48px;padding:0 4px;vertical-align:middle}
+.disc-block{padding:12px 14px;margin-top:8px;font:400 15px/1.5 Sarabun,sans-serif;color:#1d2b1f}
+.disc-block p{margin:0 0 6px}.disc-block p[lang=en]{color:#4a5a4c;font-size:14px}
+.disc-sheet{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.disc-card{background:#fff;width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.disc-card h2{margin:0 0 4px;font:700 20px Prompt,sans-serif;color:#0b4a12}.disc-card .disc-block{box-shadow:none;border:0;padding:4px 0;margin:0}
+.disc-links{margin:6px 0 10px}.disc-links a{color:#0b5a2a;font-weight:600}
+.src-card{padding:12px 14px}.src-list{list-style:none;margin:0;padding:0}
+.src-list li{padding:10px 0;border-top:1px solid #e6ece5;display:flex;flex-direction:column;gap:2px;font:400 15px/1.4 Sarabun,sans-serif}
+.src-list li:first-child{border-top:0}.src-list b{font:600 15.5px/1.35 Prompt,sans-serif;color:#173d1f}
+a.ext{color:#0b5a2a;overflow-wrap:anywhere;word-break:break-word}
+.gen-note{margin:6px 0;padding:6px 10px;border-radius:10px;background:#fff7dc;border:1px solid #f0dfa0;font:500 14px/1.4 Sarabun,sans-serif;color:#5a4300}
+.tile .tico{display:grid;place-items:center;width:56px;height:40px;color:#0b5a2a}.tile .tico svg{width:32px;height:32px}
