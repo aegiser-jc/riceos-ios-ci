@@ -99,7 +99,7 @@
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[name] + '</svg>'; }
   var NAV = [['home', 'หน้าแรก', 'home'], ['plot', 'แปลง', 'plot'], ['market', 'ตลาด', 'market'], ['wallet', 'เงิน', 'money'], ['missions', 'ภารกิจ', 'mission']];
-  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'missions', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', training: 'missions', league: 'missions', income: '', plotsummary: 'plot', mentor: '', about: '', sources: '' };
+  var NAV_OF = { home: 'home', register: 'home', plot: 'plot', analysis: 'plot', options: 'plot', kratong: 'plot', market: 'market', points: 'missions', wallet: 'wallet', lot: 'plot', dashboard: '', gov: '', missions: 'missions', lessons: 'missions', training: 'missions', league: 'missions', income: '', plotsummary: 'plot', mentor: '', about: '', sources: '', dailycheck: 'home', awd: 'plot' };
   function drawNav(route) {
     var on = NAV_OF[route];
     nav.innerHTML = NAV.map(function (n) { return '<a href="#/' + n[0] + '" class="' + (n[0] === 'home' ? 'home ' : '') + (on === n[0] ? 'on' : '') + '">' + svg(n[2]) + n[1] + '</a>'; }).join('');
@@ -678,13 +678,13 @@
       m.querySelector('#ok').onclick = function () {
         var nopin = ((ME || {}).user || {}).has_pin === false, pin = nopin ? '' : m.querySelector('#dp').value; if (nopin && !m.querySelector('#dc').checked) return showErr('กรุณาติ๊กยืนยันก่อนลบบัญชี'); if (!nopin && !/^\d{6}$/.test(pin)) return showErr('PIN ต้องเป็นตัวเลข 6 หลัก');
         var b = m.querySelector('#ok'); busy(b, true, 'กำลังลบ...');
-        API.deleteMe(pin).then(function () { wipeLocal(); m.remove(); toast('ลบบัญชีแล้ว'); location.hash = '#/register'; location.reload(); }, function (e) { busy(b, false); showErr(e.code === 'bad_credentials' ? 'PIN ไม่ถูกต้อง' : e.message); });
+        API.deleteMe(pin).then(function () { wipeLocal(); m.firstChild.innerHTML = '<div id="deldone" role="status"><h2 style="margin:0 0 8px;font:700 22px Prompt">ลบบัญชีและข้อมูลของคุณเรียบร้อยแล้ว</h2><button class="btn" id="delhome" style="margin-top:8px">กลับหน้าแรก</button></div>'; m.querySelector('#delhome').onclick = function () { location.hash = '#/register'; location.reload(); }; }, function (e) { busy(b, false); showErr(e.code === 'bad_credentials' ? 'PIN ไม่ถูกต้อง' : e.message); });
       };
     };
   };
-  function wipeLocal() { try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0) localStorage.removeItem(k); }); } catch (e) {} S = {}; ME = null; if (API) API.outbox.purgeAll().catch(function () {}).then(function () { return API.setUser(null); }); }
+  function wipeLocal() { try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0 || k.indexOf('riceos.next.dailycheck.') === 0 || k.indexOf('riceos.next.plotplan.') === 0 || k.indexOf('riceos.next.awd.') === 0) localStorage.removeItem(k); }); } catch (e) {} S = {}; ME = null; if (API) API.outbox.purgeAll().catch(function () {}).then(function () { return API.setUser(null); }); }
   function clearPersonal() { /* PDPA: a normal logout also removes plots, thumbnails and evidence from this phone (server copy stays); pending photos stay queued for the same user */
-    try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0) localStorage.removeItem(k); }); } catch (e) {}
+    try { localStorage.removeItem(KEY); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('riceos.w9.') === 0 || k.indexOf('riceos.next.dailycheck.') === 0 || k.indexOf('riceos.next.plotplan.') === 0 || k.indexOf('riceos.next.awd.') === 0) localStorage.removeItem(k); }); } catch (e) {}
     S = { registered: true, consent: S.consent }; save();
   }
   function logout() {
@@ -748,7 +748,7 @@
       '<div class="hgrid"><div class="hc1"><div class="profile"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><h2>สวัสดี ' + esc(pr.name || '') + '</h2>' +
       '<div class="pl"><span class="green">' + RiceIco('pin') + '</span> ' + esc(pr.district || '') + '</div>' +
       '<a class="setlink lbl" id="setlink" href="#/settings" aria-label="ตั้งค่า / ลบบัญชี">' + RiceIco('gear') + '<span>ตั้งค่า / ลบบัญชี</span></a><div id="obx" class="obx" hidden></div>' +
-      (p ? '<div class="pl"><span class="green">' + RiceIco('sprout') + '</span> ' + (p.name ? esc(p.name) + ' · ' : '') + fmt(p.rai) + ' ไร่ · ' + (p.variety ? esc(p.variety) + ' · ' : '') + '<span class="nw">อายุ ' + age(p) + ' วัน</span></div>' : '') + '</div>' +
+      (p ? '<div class="pl"><span class="green">' + RiceIco('sprout') + '</span><span class="pld">' + [p.name ? esc(p.name) : '', fmt(p.rai) + ' ไร่', p.variety ? esc(p.variety) : '', 'อายุ ' + age(p) + ' วัน'].filter(Boolean).map(function (x) { return '<span><i aria-hidden="true">·</i>' + x + '</span>'; }).join('') + '</span></div>' : '') + '</div>' +
       '<div class="duo"><a class="weather" href="#/mentor" style="color:inherit;text-decoration:none">' + (w.t ? RiceIco('rain') + ' <b>' + esc(w.t) + '</b><span class="wt">' + esc(w.rain || '') + (STORE ? ' (ตัวอย่างเพื่อวางแผน)' : '') + '</span>' : RiceIco('sun') + ' <span class="wt nob">ยังไม่มีข้อมูลอากาศ</span>') + '<span aria-hidden="true">›</span></a>' +
       '<a class="ptspill" href="#/points" style="text-decoration:none">' + RiceIco('star') + ' <b>' + fmt(t.confirmed + t.pending) + '</b> แต้ม</a></div>' +
       '<div class="row"><a class="wallet" href="#/wallet" style="flex:0 0 58%;color:inherit;text-decoration:none"><span class="wi">' + RiceIco('wallet') + '</span><span class="wl">ยอด Wallet</span> <b>' + (pr.wallet ? esc(pr.wallet) + ' บ.' : 'รอเชื่อมต่อ') + '</b><span style="margin-left:auto">›</span></a>' +
@@ -802,9 +802,9 @@
   };
   R.plotedit = function () {
     var isNew = /new=1/.test(location.hash), p = isNew ? null : P();
-    app.innerHTML = header() + '<div class="sheet">' + titleRow(isNew ? 'เพิ่มแปลง' : 'แก้ไขแปลง') + '<div class="card" style="padding:12px">' + plotForm(p || {}) + '</div><button class="btn btn-sticky" id="sv" style="margin-top:12px">บันทึก</button></div>';
-    wireDate(app);
-    document.getElementById('sv').onclick = function () { if (this.dataset.busy) return; if (savePlotForm(p)) { this.dataset.busy = '1'; this.disabled = true; this.textContent = 'กำลังบันทึก...'; var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.activePlot = np.id; save(); } locatePlot(np).then(function () { return syncPlot(np); }).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
+    app.innerHTML = header() + '<div class="sheet">' + titleRow(isNew ? 'เพิ่มแปลง' : 'แก้ไขแปลง') + '<div class="card" style="padding:12px">' + plotForm(p || {}) + '</div>' + (window.RicePlan ? RicePlan.html(p) : '') + '<button class="btn btn-sticky" id="sv" style="margin-top:12px">บันทึก</button></div>';
+    wireDate(app); if (window.RicePlan) RicePlan.wire(); /* แผนปุ๋ย / แผนน้ำ / เงื่อนไขผู้ซื้อ: own key only, never in riceos.v1 or the plot body */
+    document.getElementById('sv').onclick = function () { if (this.dataset.busy) return; if (savePlotForm(p)) { this.dataset.busy = '1'; this.disabled = true; this.textContent = 'กำลังบันทึก...'; var np = isNew ? S.plots[S.plots.length - 1] : p; if (isNew) { S.activePlot = np.id; save(); } if (window.RicePlan) RicePlan.save(np); locatePlot(np).then(function () { return syncPlot(np); }).catch(function () { toast('แปลงบันทึกในเครื่องแล้ว จะส่งเข้าระบบเมื่อมีสัญญาณ'); }); location.hash = '#/plot'; } };
   };
   function kratongList(p) {
     var due = sampleToday(p).map(function (k) { return k.seq; });

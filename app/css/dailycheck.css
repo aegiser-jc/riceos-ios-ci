@@ -1,0 +1,344 @@
+/* ตรวจเช็คแปลงรายวัน (20 Nov, v39): home entry (first, most prominent) + #/dailycheck checklist. vc6 palette, targets >= 48px, body >= 16px. */
+.dc-home{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:center;gap:12px 14px;margin:0 0 14px;padding:16px;min-height:96px;border-radius:18px;text-decoration:none;color:#fff;
+  background:linear-gradient(135deg,#0B5A2A 0%,#1D7A3E 100%);box-shadow:0 4px 14px rgba(11,90,42,.28);border:2px solid #0B5A2A}
+.dc-home .dc-ico{flex:0 0 56px;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:#D4A017;color:#14251a}
+.dc-home .dc-ico .ri{width:32px;height:32px;stroke-width:2.4}
+.dc-home .dc-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dc-home b{font:700 22px/1.25 Prompt,sans-serif}
+.dc-home small{display:block;font:500 16px/1.35 Sarabun,sans-serif;color:#E4F3E0;overflow-wrap:anywhere}
+.dc-home .dc-st{font-weight:600;color:#fff}
+.dc-home .dc-go{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;padding:0 16px;border-radius:999px;background:#fff;color:#0B5A2A;font:700 17px Prompt,sans-serif;white-space:nowrap}
+.dc-home .dc-go i{font-style:normal;font-size:24px;line-height:1}
+.dc-home.done{background:#fff;color:#0B5A2A;border:2px solid #1D7A3E;border-left-width:10px;box-shadow:0 4px 14px rgba(11,90,42,.18)}
+.dc-home.done .dc-ico{background:#1D7A3E;color:#fff}
+.dc-home:focus-visible{outline:4px solid #D4A017;outline-offset:3px}
+.dc-home.done b{color:#0B5A2A}.dc-home.done small{color:#2f3d33}.dc-home.done .dc-st{color:#0B5A2A}
+.dc-home.done .dc-go{background:#0B5A2A;color:#fff}
+
+/* checklist */
+.dc-sheet{padding-bottom:48px}
+.dc-hrow{display:flex;align-items:baseline;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:14px 2px 8px}
+.dc-h{margin:0;font:700 20px Prompt,sans-serif;color:#0B5A2A}
+.dc-prog{font:600 16px Prompt,sans-serif;color:#14251a;background:#E4F3E0;border-radius:999px;padding:4px 12px}
+.dc-one{margin-left:auto;font:600 16px Sarabun,sans-serif;color:#2f3d33}
+.dc-numhint{display:none;margin:-2px 12px 14px 54px;font:600 17px/1.6 Sarabun,sans-serif;color:#14251a}.dc-opt.on .dc-numhint{display:block}.dc-numhint span{display:block}
+.dc-sheet .titlerow .sub{color:#2f3d33}
+.dc-g{margin:0 0 12px;padding:6px 14px 10px;min-width:0}
+.dc-g legend{float:left;width:100%;display:flex;align-items:center;gap:10px;padding:8px 0 4px;font:700 20px/1.3 Prompt,sans-serif;color:#14251a}
+.dc-g legend+*{clear:both}
+.dc-n{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#0B5A2A;color:#fff;font:700 16px Prompt,sans-serif}
+.dc-opt{border:1.5px solid #E1E6DD;border-radius:14px;margin:8px 0 0;background:#fff;transition:border-color .15s,background .15s}
+.dc-opt.on{border-color:#1D7A3E;background:#F1FAEE}
+.dc-chk{display:flex;align-items:center;gap:12px;min-height:56px;margin:0;padding:6px 12px;font:500 19px/1.35 Sarabun,sans-serif;cursor:pointer;color:#14251a}
+.dc-chk input{flex:0 0 30px;width:30px!important;height:30px!important;min-height:0!important;margin:0;padding:0;-webkit-appearance:none;appearance:none;border:2.5px solid #4a5a4f;border-radius:7px;background:#fff center/22px no-repeat;cursor:pointer}
+.dc-chk input:checked{border-color:#1D7A3E;background-color:#1D7A3E;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
+.dc-chk input:focus-visible{outline:3px solid #D4A017;outline-offset:2px}
+.dc-opt.hasx .dc-chk{padding-bottom:2px}
+.dc-x{display:block;width:calc(100% - 24px)!important;margin:0 12px 12px;min-height:52px;font-size:19px;padding:10px 14px;border:1.5px solid #cfd8cf;border-radius:12px}
+textarea.dc-x{resize:vertical;line-height:1.4;min-height:76px}
+.dc-x:focus{outline:3px solid rgba(29,122,62,.35);border-color:#1D7A3E}
+.dc-numrow{display:flex;align-items:center;gap:10px;margin:0 12px 12px 54px}
+.dc-numrow .dc-x{margin:0;width:150px!important;flex:0 0 150px;text-align:center;font:700 22px Prompt,sans-serif}
+.dc-unit{font:600 19px Prompt,sans-serif;color:#14251a}
+.dc-opt:not(.on) .dc-x,.dc-opt:not(.on) .dc-numrow{display:none}
+.dc-g,.dc-err,.dc-saved,.dc-x{scroll-margin:110px 0 110px}
+.dc-err{margin:4px 2px 12px;padding:12px 14px;border-radius:12px;background:#FDECEA;color:#9B231B;font:600 17px/1.4 Sarabun,sans-serif;border:1px solid #F3C3BE}
+.dc-save{margin-top:16px;position:sticky;bottom:calc(var(--nav-h) + 12px + env(safe-area-inset-bottom,0px));z-index:15;box-shadow:0 2px 0 rgba(0,0,0,.18),0 -6px 14px var(--vc-bg,#F7F8F5)}
+.dc-note{text-align:center;margin:12px 4px 0;font-size:17px;line-height:1.5;color:#2f3d33}.dc-note span{display:inline-block}
+/* the first-launch card's camera button steps back so the daily check keeps the strongest action */
+.dc-home~.welcome .btn{background:#fff;color:#0B5A2A;border:2px solid #1D7A3E;box-shadow:none}
+.dc-saved{display:flex;align-items:center;gap:10px;margin:12px 0 0;padding:12px 14px;min-height:56px;border-radius:14px;background:#D9EEDD;color:#0B5A2A;border:1.5px solid #1D7A3E;font:500 17px/1.35 Sarabun,sans-serif}
+.dc-saved[hidden]{display:none}
+.dc-saved .ri{flex:0 0 28px;width:28px;height:28px;padding:4px;border-radius:50%;background:#0B5A2A;color:#fff;stroke-width:3}
+.dc-saved b{font:700 19px Prompt,sans-serif}.dc-saved small{display:block;font-size:16px}
+.dc-saved{flex-wrap:wrap}.dc-saved>span{flex:1 1 170px;min-width:0}
+.dc-jump{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:48px;padding:0 18px;border:0;border-radius:999px;background:#8a6400;color:#fff;font:700 17px Prompt,sans-serif;cursor:pointer;white-space:nowrap}
+.dc-jump i{font-style:normal;font-size:20px;line-height:1}.dc-jump:focus-visible{outline:3px solid #0B5A2A;outline-offset:2px}
+.dc-saved.stale{background:#FFF6DC;border-color:#E9B949;color:#5a4300}.dc-saved.stale .ri{background:#8a6400;stroke-width:2}
+.dc-empty{padding:16px}.dc-empty .btn{margin-top:12px}
+.dc-hist{margin-top:18px;padding:12px 14px}
+.dc-hist h2{margin:2px 0 6px;font:700 19px Prompt,sans-serif;color:#0B5A2A}
+.dc-hist ul{list-style:none;margin:0;padding:0}
+.dc-hist li{padding:10px 0;border-top:1px solid #E1E6DD;display:flex;flex-direction:column;gap:6px}
+.dc-hist li:first-child{border-top:0}
+.dc-hist li b{font:700 17px Prompt,sans-serif;color:#14251a}
+.dc-hist li span{display:flex;flex-wrap:wrap;gap:6px}
+.dc-hist li i{font:500 15px/1.3 Sarabun,sans-serif;font-style:normal;padding:4px 10px;border-radius:999px;background:#EEF4EA;color:#14251a}
+.dc-hist li i.bad{background:#FDECEA;color:#9B231B}
+
+/* tablet / PC: entry spans the page; the checklist is a centred column */
+@media (min-width:701px){
+  .dc-home{grid-template-columns:68px minmax(0,1fr) auto;min-height:112px;padding:18px 24px;margin-bottom:22px;gap:12px 20px}
+  .dc-home .dc-go{grid-column:auto;padding:0 22px 0 26px}
+  .dc-home b{font-size:28px}.dc-home small{font-size:18px}
+  .dc-home .dc-ico{flex-basis:68px;width:68px;height:68px}.dc-home .dc-ico .ri{width:38px;height:38px}
+  .dc-home .dc-go{min-height:56px;font-size:20px}
+  .dc-sheet>*{max-width:760px;margin-left:auto;margin-right:auto}
+  .dc-sheet .dc-form{display:block}
+}
+@media (min-width:1024px){
+  .dc-chk{font-size:20px;min-height:60px}
+  .dc-g legend{font-size:22px}
+  .dc-sheet>*{max-width:1040px}
+  .dc-sheet .dc-form{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;align-items:start}
+  .dc-sheet .titlerow .sub{font-size:18px;color:#2f3d33}
+  .dc-g,.dc-err,.dc-saved,.dc-x{scroll-margin:150px 0 40px}
+  .dc-form>:not(.dc-g){grid-column:1/-1}
+  .dc-save{max-width:420px;margin:8px auto 0;bottom:16px}
+  .dc-home~.welcome .btn{width:auto;display:inline-flex;padding:0 28px;min-height:52px;font-size:18px}
+}
+
+/* r5: the tabs get their own space on the checklist. Phone/tablet: the page scrolls inside #app above the bottom tabs (same pattern as
+   the premium screens), so no option or text box ever sits under the tabs. PC: the top tabs stay in place above the page instead of
+   floating over the checklist, and the masthead is 40px lower on home and the checklist so the daily check starts higher. */
+@media (max-width:1023px){
+  body:is([data-screen="dailycheck"],[data-screen="awd"]){overflow:hidden}
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) #app{height:calc(100svh - var(--nav-h) - env(safe-area-inset-bottom,0px));height:calc(100dvh - var(--nav-h) - env(safe-area-inset-bottom,0px));min-height:0;padding-bottom:24px;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;scroll-padding:16px 0 96px}
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) .dc-save{bottom:-14px} /* sticky offset counts from inside #app padding-bottom (24px) */
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) .nav{box-shadow:0 -4px 16px rgba(0,0,0,.12)}
+}
+@media (min-width:1024px){
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .nav{position:relative;top:auto}
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr,body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr.tall,
+  body:not(.premium-mode)[data-screen="home"] .hdr,body:not(.premium-mode)[data-screen="home"] .hdr.tall{height:144px;padding-top:12px}
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .sheet,body:not(.premium-mode)[data-screen="home"] .sheet{margin-top:-20px}
+  .dc-g,.dc-err,.dc-saved,.dc-x{scroll-margin:24px 0 96px}
+}
+
+/* r6 (Sol r5 fixes). 1/2: Save lives in its own always-visible row: above the bottom tabs on phone/tablet, a footer on PC.
+   3: no jump button (Save is always in view), the status is one compact block. 4: PC water hint beside the number box.
+   5: home first-launch card: disclosure chevron; on PC the photo action sits beside the collapsed row. 6: PC masthead text clear of the panel.
+   7: home plot details: each separator stays with its detail and is clipped at the start of a wrapped line. */
+.dc-bar{position:fixed;left:0;right:0;z-index:30;padding:10px 16px;background:#fff;border-top:1px solid #DDE5DA;box-shadow:0 -4px 14px rgba(11,90,42,.10)}
+.dc-bar .dc-save{position:static;display:flex;margin:0 auto;width:100%;max-width:760px;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.dc-saved.stale{min-height:0;padding:10px 14px}.dc-saved.stale small{display:inline;margin-left:6px}
+.dc-jump{display:none!important}
+@media (max-width:1023px){
+  body:is([data-screen="dailycheck"],[data-screen="awd"]){--dc-bar:77px}
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) #app{height:calc(100svh - var(--nav-h) - var(--dc-bar) - env(safe-area-inset-bottom,0px));height:calc(100dvh - var(--nav-h) - var(--dc-bar) - env(safe-area-inset-bottom,0px));scroll-padding:16px 0 16px}
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) .dc-bar{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) .nav{box-shadow:none}
+}
+@media (min-width:1024px){
+  .dc-bar{bottom:0;padding:12px 24px}
+  .dc-bar .dc-save{max-width:420px;margin:0 auto}
+  .dc-sheet{padding-bottom:120px}
+  .dc-g,.dc-err,.dc-saved,.dc-x{scroll-margin:24px 0 110px}
+  .dc-opt.isnum.on{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center}
+  .dc-opt.isnum .dc-chk{grid-column:1/-1}
+  .dc-opt.isnum .dc-numrow{margin:0 12px 12px 54px}
+  .dc-opt.isnum .dc-numhint{margin:0 12px 12px 4px;font-size:16px;line-height:1.5}
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr,body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr.tall,
+  body:not(.premium-mode)[data-screen="home"] .hdr,body:not(.premium-mode)[data-screen="home"] .hdr.tall{padding-bottom:36px}
+}
+.dc-home~.welcome .wl-more summary{display:flex;align-items:center;min-height:48px;gap:10px;list-style:none;cursor:pointer}.dc-home~.welcome .wl-more summary::-webkit-details-marker{display:none}
+.dc-home~.welcome .wl-more summary::after{content:'';display:inline-block;flex:0 0 auto;width:9px;height:9px;margin:-4px 0 0 2px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);transition:transform .15s}
+.dc-home~.welcome .wl-more[open] summary::after{margin-top:4px;transform:rotate(-135deg)}
+@media (min-width:1024px){
+  .dc-home~.welcome{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:center}
+  .dc-home~.welcome>h2,.dc-home~.welcome>p{grid-column:1/-1}
+  .dc-home~.welcome .wl-more{grid-column:1;margin:0}
+  .dc-home~.welcome>.btn{grid-column:2;grid-row:3;margin:0}
+}
+.profile .pl{display:flex!important;align-items:flex-start;gap:6px}
+.profile .pl .green{flex:0 0 auto}
+.profile .pld{flex:1;min-width:0;display:flex;flex-wrap:wrap;margin-left:-18px;clip-path:inset(-6px -6px -6px 18px)} /* every detail starts with its separator; the one at the start of each line falls in the clipped 18px */
+.profile .pld>span{white-space:nowrap}
+.profile .pld>span i{font-style:normal;display:inline-block;width:18px;text-align:center}
+
+/* หน้าเพิ่มแปลง: แผนปุ๋ย / แผนน้ำ / เงื่อนไขผู้ซื้อ (plotplan.js). Same check rows as the daily check; the two answers sit side by side. */
+.pp{margin-top:12px}
+.pp .pp-g{margin:0 0 12px;padding:6px 14px 14px}
+.pp .pp-g legend{font-size:20px}
+.pp-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pp-opts .dc-opt{margin:6px 0 0}
+.pp .pp-x{width:100%!important;margin:12px 0 0;min-height:76px}
+@media (min-width:701px){.pp-opts .dc-chk{font-size:20px}}
+.pp-opts .dc-chk{gap:10px;padding:6px 8px 6px 10px}
+@media (min-width:1024px){
+  .dc-opt.isnum .dc-numrow{margin-left:46px}.dc-opt.isnum .dc-numrow .dc-x{width:118px!important;flex-basis:118px}
+  .dc-opt.isnum .dc-numhint{font-size:15px;line-height:1.5}.dc-opt.isnum .dc-numhint span{white-space:nowrap}
+}
+@media (min-width:1024px){body:not(.premium-mode)[data-screen="plotedit"] .nav{position:relative;top:auto}} /* add-plot: top tabs stay above the page, not over the form */
+
+/* r7 (Sol r6 fixes 1-6). Fixed Save row: state beside Save, Save inactive when there is nothing to save. Water hint: examples emphasised,
+   below the box on PC too, larger. PC checklist only: lower header, less gap above the form. Add-plot: room under the last text box,
+   focus scrolling clears the sticky Save; each plan text box is the bottom band of its section card. */
+.dc-bar{display:flex;flex-direction:column;align-items:center;gap:6px}
+.dc-bst{display:block;text-align:center;font:600 16px/1.35 Prompt,sans-serif;color:#2f3d33}
+.dc-bst[data-k="stale"]{color:#5a4300}.dc-bst[data-k="stale"]::before{content:'';display:inline-block;width:10px;height:10px;margin:0 8px 1px 0;border-radius:50%;background:#C98A00}
+.dc-bst[data-k="ok"]{color:#0B5A2A}.dc-bst[data-k="ok"]::before{content:'';display:inline-block;width:6px;height:12px;margin:0 10px 3px 2px;border-right:3px solid currentColor;border-bottom:3px solid currentColor;transform:rotate(45deg)}
+.dc-bar .dc-save.idle{background:#E4EAE2;color:#4a5a4f;box-shadow:none;border:1.5px solid #cfd8cf}
+.dc-bar .dc-save.idle .ri{opacity:.7}
+.dc-numhint .dc-ex{display:inline-block;min-width:30px;margin-left:2px;padding:0 8px;border-radius:8px;background:#fff;border:1.5px solid #1D7A3E;color:#0B5A2A;font:700 19px/1.35 Prompt,sans-serif;text-align:center}
+.dc-numhint span+span{margin-top:4px}
+@media (max-width:1023px){.dc-numhint{margin-left:46px;margin-right:6px}.dc-numhint .dc-ex{min-width:26px;padding:0 6px;font-size:18px}}
+@media (max-width:1023px){body:is([data-screen="dailycheck"],[data-screen="awd"]){--dc-bar:105px}}
+@media (min-width:1024px){
+  .dc-bar{flex-direction:row;justify-content:center;gap:20px}
+  .dc-bar .dc-bst{flex:none;white-space:nowrap;text-align:right;font-size:18px}
+  .dc-bar .dc-save{flex:0 0 360px;margin:0}
+  .dc-opt.isnum.on{display:block}
+  .dc-opt.isnum .dc-numrow{margin:0 12px 10px 54px}.dc-opt.isnum .dc-numrow .dc-x{width:150px!important;flex-basis:150px}
+  .dc-opt.isnum .dc-numhint{margin:0 12px 14px 54px;font-size:18px;line-height:1.6}.dc-opt.isnum .dc-numhint span{white-space:normal}
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr,body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .hdr.tall{height:118px;padding-top:0;padding-bottom:26px;background-size:auto,auto 144px;background-position:0 0,right center}
+  body:not(.premium-mode):is([data-screen="dailycheck"],[data-screen="awd"]) .sheet{padding-top:14px}
+  .dc-sheet .dc-hrow{margin-top:6px}
+}
+.pp .pp-g{overflow:hidden}
+.pp-xw{margin:14px -14px -14px;padding:12px 14px 14px;background:#F1F6EE;border-top:1.5px solid #DDE7D8}
+.pp .pp-xw .pp-x{margin:0;background:#fff;border-color:#b9c7b8}
+.pp .pp-x::placeholder{color:#5f6f63;opacity:1}
+.pp{margin-bottom:28px}
+.pp .pp-x,.pp .dc-chk input{scroll-margin:24px 0 calc(var(--nav-h) + 96px)}
+@media (min-width:1024px){.pp .pp-x,.pp .dc-chk input{scroll-margin:24px 0 120px}body:not(.premium-mode)[data-screen="plotedit"] #sv{bottom:16px}} /* PC tabs sit at the top here, so Save keeps 16px from the window edge */
+
+/* r8 (Sol r7). Phone: Save row is one line (state beside Save), the saved time is shown only there (banner keeps "บันทึกแล้ว").
+   PC: water topic is a full-width first row (hint beside the box), Save keeps its place whatever the state text. -10 example is
+   styled like 5 and 0. Add-plot: the plan text box sits inside its section card under the choices (no tinted band). Home: tighter
+   first-launch card on phone, done card accent drawn inside the card (no padding shift). */
+.dc-home.done{border-left-width:2px;box-shadow:inset 8px 0 0 #1D7A3E,0 4px 14px rgba(11,90,42,.18)}
+.pp-xw{margin:12px 0 0;padding:0;background:none;border:0}
+@media (max-width:1023px){
+  body:is([data-screen="dailycheck"],[data-screen="awd"]){--dc-bar:65px}
+  .dc-bar{flex-direction:row;justify-content:space-between;gap:10px;padding:6px 12px}
+  .dc-bar .dc-bst{flex:1 1 auto;min-width:0;text-align:left;font-size:15px;line-height:1.25;text-wrap:balance}
+  .dc-bar .dc-save{flex:0 0 auto;width:auto;min-width:164px;max-width:none;margin:0;padding:0 18px;min-height:52px;font-size:19px;gap:8px}
+  .dc-saved .dc-tm{display:none}
+}
+@media (max-width:700px){
+  .dc-home~.welcome{padding-bottom:14px}
+  .dc-home~.welcome>p{margin-bottom:2px}
+  .dc-home~.welcome .wl-more{margin:0 0 4px}
+}
+@media (min-width:1024px){
+  .dc-sheet .dc-form .dc-g[data-g="water"]{grid-column:1/-1}
+  .dc-g[data-g="water"] .dc-opt.isnum.on{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;column-gap:8px}
+  .dc-g[data-g="water"] .dc-opt.isnum .dc-chk{grid-column:1/-1}
+  .dc-g[data-g="water"] .dc-opt.isnum .dc-numrow{margin:0 12px 14px 54px}
+  .dc-g[data-g="water"] .dc-opt.isnum .dc-numhint{margin:0 12px 14px 12px}
+  .dc-bar .dc-bst{flex:0 0 360px;white-space:normal}
+}
+
+/* r9 (Sol r8). PC tab labels use the app-wide size again (app.css #nav a) on every screen. Status beside Save: each phrase is a span that
+   never breaks inside. Edited banner: the instruction is its own line on phone; the saved time is shown only in the Save row (phone and PC),
+   PC banner is one line. Water: lighter, tighter hint on phone; a chevron on the choice that opens the number box; on PC the two choices sit
+   side by side while the box is closed. Add-plot: the text box hangs under its choices, indented with a connector line. */
+.dc-bst span{display:inline-block;white-space:nowrap}
+.dc-saved .dc-tm{display:none}
+@media (max-width:1023px){
+  .dc-saved.stale small{display:block;margin-left:0}
+  .dc-numhint{margin-top:-4px;margin-bottom:10px;font-weight:500;line-height:1.45}
+  .dc-numhint span+span{margin-top:2px}
+  .dc-numhint .dc-ex{font-size:17px;line-height:1.25;padding:0 5px}
+  .dc-opt.isnum .dc-numrow{margin-bottom:8px}
+  .dc-opt.isnum .dc-numrow .dc-x{min-height:48px;padding-top:6px;padding-bottom:6px}
+}
+.dc-opt.isnum .dc-chk>span{flex:1 1 auto;min-width:0}
+.dc-opt.isnum .dc-chk::after{content:'';flex:0 0 auto;width:10px;height:10px;margin:-6px 6px 0 0;border-right:2.5px solid #4a5a4f;border-bottom:2.5px solid #4a5a4f;transform:rotate(45deg);transition:transform .15s}
+.dc-opt.isnum.on .dc-chk::after{margin-top:6px;border-color:#1D7A3E;transform:rotate(-135deg)}
+@media (min-width:1024px){
+  .dc-saved small{display:inline;margin-left:8px}
+  .dc-form .dc-g[data-g="water"]{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;align-items:start}
+  .dc-form .dc-g[data-g="water"] legend{grid-column:1/-1}
+  .dc-form .dc-g[data-g="water"]:has(.dc-opt.isnum.on) .dc-opt{grid-column:1/-1}
+}
+.pp-xw{margin:10px 0 0 22px;padding-left:16px;border-left:3px solid #B9D3B5}
+
+/* r10 (Sol r9). PC: the fixed Save row lines up with the form edges (same max-width, centred), not the whole window; the water choices
+   keep their own columns when the number box is open (box and examples stack under the ticked choice); the draft banner drops the
+   status already shown beside Save. Phone: a wrapped Save-row status hangs under its text, not under the dot. Add-plot: the plan text
+   box uses the full card width, tied to its choices by a line above it. */
+.pp-xw{margin:12px 0 0;padding:12px 0 0;border-left:0;border-top:2px solid #B9D3B5}
+@media (max-width:1023px){
+  .dc-bar .dc-bst[data-k="stale"],.dc-bar .dc-bst[data-k="ok"]{padding-left:20px;text-indent:-20px}
+  .dc-bar .dc-bst[data-k] span{text-indent:0}
+  .dc-bar .dc-bst[data-k="stale"]::before{margin-right:10px}
+  .dc-bar .dc-bst[data-k="ok"]::before{margin-left:2px;margin-right:9px}
+}
+@media (min-width:1024px){
+  .dc-bar{max-width:1040px;margin:0 auto;border:1px solid #DDE5DA;border-bottom:0;border-radius:16px 16px 0 0}
+  .dc-form .dc-g[data-g="water"]:has(.dc-opt.isnum.on) .dc-opt{grid-column:auto}
+  .dc-form .dc-g[data-g="water"] .dc-opt.isnum.on{display:block}
+  .dc-form .dc-g[data-g="water"] .dc-opt.isnum .dc-numrow{margin:0 12px 10px 54px}
+  .dc-form .dc-g[data-g="water"] .dc-opt.isnum .dc-numhint{margin:0 12px 14px 54px;font-size:17px;line-height:1.55}
+  .dc-form .dc-g[data-g="water"] .dc-opt.isnum .dc-numhint span{white-space:nowrap}
+  .dc-saved.stale b{display:none}
+  .dc-saved.stale small{margin-left:0;font-size:17px}
+}
+
+/* ตรวจเช็คแปลงเมื่อถึงกำหนดตามแผน เปียกสลับแห้ง (awd.js): plot-page menu (the white daily-check card) + #/awd form in the checklist's
+   layout (same Save row, banner, cards and check rows; several ticks allowed). PC: ทำอะไร on the left, ใช้เท่าไร / จ่ายเท่าไร on the right. */
+.aw-menu{margin:12px 0 14px}
+.aw-menu b{font-size:20px}
+.aw-menu .dc-st{font-weight:500}
+.aw-menu .dc-st span{display:inline-block}
+.aw-sheet .titlerow h1{font-size:22px;line-height:1.3}
+.aw-when{display:flex;align-items:flex-start;gap:10px;margin-top:10px;margin-bottom:0;padding:10px 14px;border-radius:14px;background:#EEF4EA;color:#14251a;font:500 17px/1.45 Sarabun,sans-serif}
+.aw-when .ri{flex:0 0 22px;width:22px;height:22px;margin-top:2px;color:#0B5A2A}
+.aw-form .dc-hrow{margin-top:16px}
+.aw-item{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px 10px;margin:10px 0 0;padding:12px;border:1.5px solid #E1E6DD;border-radius:14px;background:#fff}
+.aw-f{display:flex;flex-direction:column;gap:4px;min-width:0;margin:0;font:600 17px Prompt,sans-serif;color:#14251a}
+.aw-f .dc-x{width:100%!important;margin:0;min-height:52px}
+.aw-fn{grid-column:1/-1}
+.aw-fn>span{min-height:44px;display:flex;align-items:center;padding-right:88px}
+.aw-q{text-align:center;font:700 20px Prompt,sans-serif}
+.aw-del{position:absolute;top:12px;right:12px;min-height:44px;padding:0 18px;border:1.5px solid #cfd8cf;border-radius:999px;background:#fff;color:#9B231B;font:600 17px Prompt,sans-serif;cursor:pointer}
+.aw-del[hidden]{display:none}
+.aw-del:focus-visible{outline:3px solid #D4A017;outline-offset:2px}
+.aw-add{margin:12px 0 4px;min-height:52px;font-size:18px}
+.aw-add[hidden]{display:none}
+.aw-fc .dc-numrow{margin:2px 0 6px}
+.aw-fc .dc-numrow .dc-x{width:190px!important;flex:0 0 190px;margin:0;text-align:center;font:700 22px Prompt,sans-serif}
+.aw-g .dc-x{scroll-margin:110px 0 110px}
+.aw-hist li i.aw-hi{background:#fff;border:1px solid #cfd8cf}
+.aw-hist li i.aw-hc{background:#FFF6DC;color:#5a4300;font-weight:600}
+@media (min-width:1024px){
+  .aw-menu{margin:14px 0 18px}
+  .aw-menu b{font-size:24px}
+  .aw-sheet>*{max-width:1040px}
+  .aw-sheet .titlerow h1{font-size:26px}
+  .dc-sheet .aw-form{grid-template-rows:auto auto 1fr}
+  .dc-sheet .aw-form .aw-g[data-g="do"]{grid-row:span 2}
+  .aw-g .dc-x{scroll-margin:24px 0 110px}
+}
+
+/* r12 (Sol r11). 1: the Save row never covers a field: --dc-bar is the measured bar height (dailycheck.js / awd.js fitBar); phone/tablet
+   #app already ends at the bar top, PC keeps bar height + room free under the form; every field scrolls clear of the bar when focused.
+   2: PC draft banner shows the bold unsaved status again with the instruction under it; the PC Save row then shows other facts
+   (last save time / answered count), not the same words. 3: AWD menu leads with เปียกสลับแห้ง (text order unchanged), button เริ่มบันทึก.
+   4: AWD ลบ beside the item-name box. 5: "บันทึกไว้ในเครื่องนี้" under the status beside Save; saved time in bold. */
+.dc-form :is(input,textarea,button:not(.dc-save)){scroll-margin:24px 0 24px}
+.dc-bst i{font-style:normal}
+.dc-bst .dc-pc{display:none}
+.dc-bst .dc-dev{display:block;margin-top:2px;text-indent:0;font:500 14px/1.3 Sarabun,sans-serif;color:#4a5a4f}
+.dc-bst .dc-tmv{font-weight:700}
+.dc-bst[data-k="ok"]>span:first-child{font-weight:700}
+@media (max-width:1023px){
+  body:is([data-screen="dailycheck"],[data-screen="awd"]) #app{scroll-padding:16px 0 24px}
+  .dc-bar .dc-bst[data-k="ok"]{font-size:17px}
+  .dc-bar .dc-save.idle{min-width:0;font-size:17px;padding:0 14px}
+}
+@media (min-width:1024px){
+  .dc-sheet{padding-bottom:calc(var(--dc-bar,80px) + 40px)}
+  .dc-form :is(input,textarea,button:not(.dc-save)){scroll-margin:24px 0 calc(var(--dc-bar,80px) + 24px)}
+  .dc-bst .dc-ph{display:none}.dc-bst .dc-pc{display:inline}
+  .dc-bar .dc-bst .dc-dev{font-size:15px}
+  .dc-bar .dc-bst[data-k="ok"]{font-size:20px}
+  .dc-saved.stale b{display:block}
+  .dc-saved.stale small{display:block;margin:2px 0 0;font-size:17px}
+}
+.aw-mt{display:flex;flex-direction:column-reverse;gap:2px}
+.aw-mt .aw-m2{font:700 26px/1.2 Prompt,sans-serif;color:#0B5A2A}
+.aw-mt .aw-m1{font:600 16px/1.35 Prompt,sans-serif;color:#2f3d33}
+.aw-item{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}
+.aw-fn{grid-column:1/3;grid-row:1}
+.aw-fn>span{min-height:0;padding-right:0}
+.aw-fq{grid-column:1;grid-row:2}.aw-fu{grid-column:2/-1;grid-row:2}
+.aw-del{position:static;grid-column:3;grid-row:1;align-self:end;min-height:52px;padding:0 16px}
+.aw-item:has(>.aw-del[hidden]) .aw-fn{grid-column:1/-1}
+@media (min-width:1024px){
+  .aw-mt .aw-m2{font-size:32px}
+  .aw-mt .aw-m1{font-size:18px}
+}
+.aw-mt .aw-m1>span{display:inline-block}

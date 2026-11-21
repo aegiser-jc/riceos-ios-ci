@@ -1,18 +1,19 @@
 /* RiceOS service worker: the app opens offline. Page, CSS, JS and JSON are network-first (cache when offline or slow), so a deploy shows on the
    first open; images and fonts are cache-first. Bump VERSION on every release.
-   18 Nov (v37, kept in v38): CSS/JS are linked with ?v=<n> from index.html and precached under those exact URLs; when a new version replaces an older one,
+   18 Nov (v37, kept in v38, v39, v40): CSS/JS are linked with ?v=<n> from index.html and precached under those exact URLs; when a new version replaces an older one,
    activate reloads every open /next/ window once, so a page that an older cache-first SW (v35 and before) answered from its cache shows the
    new CSS without the user clearing anything. Keep these ?v= in step with index.html. */
-const VERSION = 'riceos-next-v38';
+const VERSION = 'riceos-next-v40';
 const ASSETS = [
   './',
   './content/flags.json',
   './content/privacy.json',
-  './css/app.css?v=38',
-  './css/w8.css?v=38',
-  './css/w9.css?v=38',
-  './css/w9b.css?v=38',
-  './css/vc6.css?v=38',
+  './css/app.css?v=40',
+  './css/w8.css?v=40',
+  './css/w9.css?v=40',
+  './css/w9b.css?v=40',
+  './css/vc6.css?v=40',
+  './css/dailycheck.css?v=40',
   './data/knowledge.json',
   './data/lessons.json',
   './data/ruleset_v2.json',
@@ -59,24 +60,27 @@ const ASSETS = [
   './img/opt3.jpg',
   './img/trend-chart.jpg',
   './index.html',
-  './js/api.js?v=38',
-  './js/app.js?v=38',
-  './js/enrol.js?v=38',
-  './js/idreader.js?v=38',
-  './js/league.js?v=38',
-  './js/w9b.js?v=38',
-  './js/vc6.js?v=38',
-  './js/booth.js?v=38',
+  './js/api.js?v=40',
+  './js/app.js?v=40',
+  './js/enrol.js?v=40',
+  './js/idreader.js?v=40',
+  './js/league.js?v=40',
+  './js/w9b.js?v=40',
+  './js/vc6.js?v=40',
+  './js/booth.js?v=40',
+  './js/dailycheck.js?v=40',
+  './js/plotplan.js?v=40',
+  './js/awd.js?v=40',
   './content/rewards.json',
-  './js/lessons.js?v=38',
-  './js/native.js?v=38',
-  './js/plots2.js?v=38',
-  './js/points.js?v=38',
-  './js/points2.js?v=38',
-  './js/regpoint.js?v=38',
+  './js/lessons.js?v=40',
+  './js/native.js?v=40',
+  './js/plots2.js?v=40',
+  './js/points.js?v=40',
+  './js/points2.js?v=40',
+  './js/regpoint.js?v=40',
   './manifest.webmanifest',
-  './vendor/jsqr.js?v=38',
-  './vendor/qrcode.js?v=38'
+  './vendor/jsqr.js?v=40',
+  './vendor/qrcode.js?v=40'
 ];
 const OWN = new Set(ASSETS.map(a => new URL(a, self.registration.scope).pathname));
 self.addEventListener('install', e => {
