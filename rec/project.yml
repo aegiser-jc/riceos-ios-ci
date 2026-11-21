@@ -1,0 +1,36 @@
+# XcodeGen spec: a throwaway host app + a UI-test bundle that drives the installed RiceOS app (com.donaus.riceos).
+# Used only by .github/workflows/sim-record.yml (simulator, ad-hoc "-" signing, no Apple account).
+name: RecUI
+options:
+  bundleIdPrefix: com.donaus.recui
+  deploymentTarget: { iOS: "17.0" }
+settings:
+  base:
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    GENERATE_INFOPLIST_FILE: YES
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+targets:
+  RecHost:
+    type: application
+    platform: iOS
+    sources: [Host]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.donaus.recui.host
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+  RecUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [RecUITests]
+    dependencies: [{ target: RecHost }]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.donaus.recui.tests
+        TEST_TARGET_NAME: RecHost
+schemes:
+  RecUITests:
+    build: { targets: { RecHost: all, RecUITests: [test] } }
+    test: { targets: [RecUITests] }
