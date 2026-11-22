@@ -106,6 +106,32 @@ final class RecordDeleteTests: XCTestCase {
         }
         tapEl(e, label)
     }
+    // Run 45010310882: one XCUITest tap on the WebView "ถัดไป →" never reached the DOM (button never showed
+    // "กำลังส่ง...", no error, 60 s unchanged). Tap, then confirm the page reacted (busy label or an expected
+    // result); if not, settle and re-tap (element, then coordinate), at most 4 taps, then wait for the result.
+    func tapConfirmed(_ label: String, _ until: [String], _ timeout: Double) -> String? {
+        let reacted = ["กำลังส่ง..."] + until
+        for attempt in 0..<4 {
+            hideKeyboard()
+            let b = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+            if !b.exists { if let r = waitAnyText(until, 2) { return r } }
+            if b.exists {
+                let end = Date().addingTimeInterval(5)
+                while !(b.isHittable && b.isEnabled) && Date() < end { pause(0.3) }
+            }
+            if attempt % 2 == 0 && b.exists && b.isHittable { b.tap() }
+            else if b.exists { b.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
+            else { tapLabel(label) }
+            if let r = waitAnyText(reacted, 5) {
+                if attempt > 0 { out("DIAG \(label) reacted after tap \(attempt + 1)") }
+                if r != "กำลังส่ง..." { return r }
+                return waitAnyText(until, timeout)
+            }
+            out("DIAG \(label) tap \(attempt + 1) not received, retry")
+            pause(1.0)
+        }
+        return waitAnyText(until, timeout)
+    }
     func field(_ labels: [String], secure: Bool, last: Bool = false) -> XCUIElement {
         let q = secure ? app.secureTextFields : app.textFields
         for l in labels {
@@ -178,7 +204,7 @@ final class RecordDeleteTests: XCTestCase {
         let env = ProcessInfo.processInfo.environment
         let pin = env["REC_PIN"] ?? ""
         XCTAssertEqual(pin.count, 6, "REC_PIN must be 6 digits")
-        let phones = (env["REC_PHONES"] ?? "0899123408").split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let phones = (env["REC_PHONES"] ?? "0899123409").split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
 
         addUIInterruptionMonitor(withDescription: "system alerts") { alert in
             for b in ["Allow While Using App", "Allow Once", "Allow", "OK", "อนุญาตขณะใช้แอป", "อนุญาต", "ตกลง", "Not Now"] {
@@ -243,8 +269,7 @@ final class RecordDeleteTests: XCTestCase {
             hideKeyboard()
             pause(0.5); mark("register_filled"); pause(1.0)
             out("TRY_PHONE \(ph)")
-            tapLabel("ถัดไป →")
-            let r = waitAnyText(["พื้นที่ (ไร่)", "ลงทะเบียนแล้ว", "มีผู้ใช้แล้ว", "PIN เดาง่าย", "PIN สองช่อง"], 25)
+            let r = tapConfirmed("ถัดไป →", ["พื้นที่ (ไร่)", "ลงทะเบียนแล้ว", "มีผู้ใช้แล้ว", "PIN เดาง่าย", "PIN สองช่อง", "ระบบยังไม่พร้อม", "เชื่อมต่อ", "ลองใหม่"], 45)
             out("DIAG register result=\(r ?? "timeout")")
             if r == "พื้นที่ (ไร่)" { out("USED_PHONE \(ph)"); registered = true; break }
             if r == "ลงทะเบียนแล้ว" || r == "มีผู้ใช้แล้ว" { out("TAKEN_PHONE \(ph)"); pause(1.0); continue }
@@ -259,18 +284,17 @@ final class RecordDeleteTests: XCTestCase {
         pickDate()
         hideKeyboard()
         mark("plot_filled")
-        tapLabel("ถัดไป →")
-        var r2 = waitAnyText(["เริ่มใช้งาน ✓", "กรุณาเลือกวันปลูก", "กรุณากรอกพื้นที่"], 40)
+        var r2 = tapConfirmed("ถัดไป →", ["เริ่มใช้งาน ✓", "กรุณาเลือกวันปลูก", "กรุณากรอกพื้นที่"], 40)
         if r2 == "กรุณาเลือกวันปลูก" {
             out("DIAG date retry")
-            pickDate(); hideKeyboard(); tapLabel("ถัดไป →")
-            r2 = waitAnyText(["เริ่มใช้งาน ✓"], 40)
+            pickDate(); hideKeyboard()
+            r2 = tapConfirmed("ถัดไป →", ["เริ่มใช้งาน ✓"], 40)
         }
         if r2 != "เริ่มใช้งาน ✓" { diag("plot step stuck \(r2 ?? "timeout")"); XCTFail("plot step"); return }
 
         // step 3/3 voice
         pause(1.0); mark("voice")
-        tapLabel("เริ่มใช้งาน ✓")
+        _ = tapConfirmed("เริ่มใช้งาน ✓", ["ข้ามไปก่อน", "ตั้งค่า / ลบบัญชี"], 10)
         let r3 = must(["ข้ามไปก่อน", "ตั้งค่า / ลบบัญชี"], 30, "after voice")
         if r3 == "ข้ามไปก่อน" && !anyContains("ตั้งค่า / ลบบัญชี").firstMatch.exists {
             pause(1.0)

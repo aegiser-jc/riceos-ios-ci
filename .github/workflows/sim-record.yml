@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       phones:
-        description: test phones tried in order (only 0899123401 / 07-10)
-        default: '0899123408,0899123409,0899123410,0899123407,0899123401'
+        description: test phones tried in order (only 0899123409,10,07,01)
+        default: '0899123409,0899123410,0899123407,0899123401'
   push:
     branches: [sim-record]
 permissions:
@@ -20,7 +20,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 50
     env:
-      REC_PHONES: ${{ inputs.phones || '0899123408,0899123409,0899123410,0899123407,0899123401' }}
+      REC_PHONES: ${{ inputs.phones || '0899123409,0899123410,0899123407,0899123401' }}
     steps:
       - name: Run-time PIN (masked)
         run: |
