@@ -107,25 +107,28 @@ final class RecordDeleteTests: XCTestCase {
         tapEl(e, label)
     }
     // Run 45010310882: one XCUITest tap on the WebView "ถัดไป →" never reached the DOM (button never showed
-    // "กำลังส่ง...", no error, 60 s unchanged). Tap, then confirm the page reacted (busy label or an expected
-    // result); if not, settle and re-tap (element, then coordinate), at most 4 taps, then wait for the result.
-    func tapConfirmed(_ label: String, _ until: [String], _ timeout: Double) -> String? {
-        let reacted = ["กำลังส่ง..."] + until
+    // "กำลังส่ง...", no error, 60 s unchanged). Run 45012145622: plot "ถัดไป →" is below the fold (y 1054 of 874),
+    // so every try must scroll it into view (tapEl) before tapping. Tap, then confirm the page reacted (busy label
+    // or an expected result) within 5 s; else re-tap (up to 4), then wait for the result.
+    func tapConfirmed(_ label: String, _ until: [String], _ timeout: Double,
+                      types: [XCUIElement.ElementType] = [.button, .link]) -> String? {
+        let reacted = ["กำลังส่ง...", "กำลังลบ..."] + until
         for attempt in 0..<4 {
             hideKeyboard()
-            let b = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
-            if !b.exists { if let r = waitAnyText(until, 2) { return r } }
-            if b.exists {
-                let end = Date().addingTimeInterval(5)
-                while !(b.isHittable && b.isEnabled) && Date() < end { pause(0.3) }
+            var el: XCUIElement? = nil
+            for t in types {
+                let e = app.descendants(matching: t).matching(NSPredicate(format: "label == %@", label)).firstMatch
+                if e.exists { el = e; break }
             }
-            if attempt % 2 == 0 && b.exists && b.isHittable { b.tap() }
-            else if b.exists { b.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
-            else { tapLabel(label) }
+            guard let b = el else {
+                if let r = waitAnyText(until, 3) { return r }
+                out("DIAG \(label) not found (try \(attempt + 1))"); pause(1.0); continue
+            }
+            tapEl(b, label)   // hides keyboard, scrolls until hittable, taps
             if let r = waitAnyText(reacted, 5) {
                 if attempt > 0 { out("DIAG \(label) reacted after tap \(attempt + 1)") }
-                if r != "กำลังส่ง..." { return r }
-                return waitAnyText(until, timeout)
+                if r.hasPrefix("กำลัง") { return waitAnyText(until, timeout) }
+                return r
             }
             out("DIAG \(label) tap \(attempt + 1) not received, retry")
             pause(1.0)
@@ -304,18 +307,18 @@ final class RecordDeleteTests: XCTestCase {
         // 05 home
         _ = must(["ตั้งค่า / ลบบัญชี"], 30, "home")
         pause(1.5); mark("home"); pause(2.0)
-        tapLabel("ตั้งค่า / ลบบัญชี", types: [.link, .button])
+        _ = tapConfirmed("ตั้งค่า / ลบบัญชี", ["ลบบัญชีของฉัน"], 20, types: [.link, .button])
 
         // settings -> delete
         _ = must(["ลบบัญชีของฉัน"], 20, "settings")
         pause(1.0); mark("settings"); pause(1.0)
-        tapLabel("ลบบัญชีของฉัน", types: [.button])
+        _ = tapConfirmed("ลบบัญชีของฉัน", ["ลบบัญชีถาวร?"], 15, types: [.button])
         _ = must(["ลบบัญชีถาวร?"], 15, "delete dialog")
         pause(0.8); mark("delete_dialog")
         typeInto(field(["PIN 6 หลัก"], secure: true, last: true), pin, "delete pin")
         hideKeyboard()
         pause(0.8); mark("delete_pin"); pause(0.8)
-        tapLabel("ลบบัญชีของฉันถาวร", types: [.button])
+        _ = tapConfirmed("ลบบัญชีของฉันถาวร", ["ลบบัญชีและข้อมูลของคุณเรียบร้อยแล้ว", "PIN ไม่ถูกต้อง"], 30, types: [.button])
 
         // 06/07 confirmation stays on screen
         _ = must(["ลบบัญชีและข้อมูลของคุณเรียบร้อยแล้ว"], 30, "delete confirmation")
@@ -323,7 +326,7 @@ final class RecordDeleteTests: XCTestCase {
         mark("deleted")
         pause(6.0)
         mark("deleted_6s")
-        tapLabel("กลับหน้าแรก", types: [.button])
+        _ = tapConfirmed("กลับหน้าแรก", ["ลงทะเบียนใช้งาน", "ความยินยอม (PDPA)"], 30, types: [.button])
 
         // 08 register page again
         _ = must(["ลงทะเบียนใช้งาน", "ความยินยอม (PDPA)"], 30, "register after")
