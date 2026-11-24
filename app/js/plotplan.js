@@ -58,7 +58,7 @@
       if (!any && !had) return true; /* nothing filled and nothing stored before: write nothing */
       if (any) { if (p.pid) ent.pid = p.pid; ent.at = new Date().toISOString(); o[String(p.id)] = ent; }
       if (!Object.keys(o).length) delete d.o[ow];
-      if (!writeAll(d)) { if (A) A.toast('บันทึกแผนปุ๋ย แผนน้ำ เงื่อนไขผู้ซื้อ ในเครื่องนี้ไม่ได้'); return false; }
+      if (!writeAll(d)) { if (A) A.toast('บันทึกแผนปุ๋ย แผนน้ำ และเงื่อนไขผู้ซื้อ ในเครื่องนี้ไม่ได้'); return false; }
       return true;
     } catch (e) { return false; }
   }

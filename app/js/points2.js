@@ -17,7 +17,7 @@
       });
     },
     alive: function (h) { return document.body.dataset.screen === h; },
-    staleNote: function (r) { return r.stale ? '<p class="w9stale" role="status">ไม่มีสัญญาณ แสดงข้อมูลที่บันทึกไว้เมื่อ ' + new Date(r.at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) + '</p>' : ''; },
+    staleNote: function (r) { return r.stale ? '<p class="w9stale" role="status">ไม่มีสัญญาณอินเทอร์เน็ต แสดงข้อมูลที่บันทึกไว้เมื่อ ' + new Date(r.at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) + '</p>' : ''; },
     hrs: function (n) { return (Math.round(Number(n || 0) * 10) / 10).toLocaleString('en-US', { maximumFractionDigits: 1 }); },
     bar: function (pct, label) { pct = Math.max(0, Math.min(100, Math.round(pct))); return '<div class="w9bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '" aria-label="' + A.esc(label) + '"><i style="width:' + pct + '%"></i></div>'; },
     shell: function (title, sub, inner) { A.app.innerHTML = A.header() + '<div class="sheet w9">' + A.titleRow(title, sub) + inner + '</div>'; },
@@ -28,10 +28,10 @@
   var origPoints, more = null;
   function histRow(r) {
     var d = Number(r.delta) || 0, nm = NAMES[r.reason] || r.reason;
-    return '<li><span>' + A.esc(nm) + '<small>' + W.date(r.event_at || r.created_at) + (r.note ? ' · ' + A.esc(r.note) : '') + '</small></span><b class="' + (d < 0 ? 'neg' : '') + '">' + (d > 0 ? '+' : '') + A.fmt(d) + '</b></li>';
+    return '<li><span>' + A.esc(nm) + '<small>' + W.date(r.event_at || r.created_at) + (r.note ? ' (' + A.esc(r.note) + ')' : '') + '</small></span><b class="' + (d < 0 ? 'neg' : '') + '">' + (d > 0 ? '+' : '') + A.fmt(d) + '</b></li>';
   }
   function evRow(ev, approvedIds) {
-    var done = approvedIds[ev.id], t = ev.mission_type || ev.type || '', nm = /burn/.test(t) ? 'หลักฐานไม่เผาฟาง' : /awd|water|tube/.test(t) ? 'ถ่ายท่อวัดน้ำ AWD' : 'หลักฐานจากแปลง';
+    var done = approvedIds[ev.id], t = ev.mission_type || ev.type || '', nm = /burn/.test(t) ? 'หลักฐานไม่เผาฟาง' : /awd|water|tube/.test(t) ? 'ถ่ายรูปท่อวัดน้ำ (เปียกสลับแห้ง)' : 'หลักฐานจากแปลง';
     return '<li><span>' + A.esc(nm) + '<small>' + W.date(ev.captured_at_client || ev.server_time) + '</small></span>' + (done ? '<b class="ok">ได้แต้มแล้ว</b>' : '<b class="wait">รอเจ้าหน้าที่ตรวจ</b>') + '</li>';
   }
   function rankLine(rk, nm) { return rk ? '<a class="w9rank" href="#/league?level=' + nm[0] + '"><span>' + nm[1] + '</span><b>อันดับ ' + A.fmt(rk.rank) + ' จาก ' + A.fmt(rk.of) + '</b></a>' : ''; }
@@ -39,7 +39,7 @@
   function pointsPage() {
     var uid = A.me() && A.me().user && A.me().user.public_id;
     if (!uid && !(A.S().account && A.S().account.id)) { return origPoints(); }
-    W.shell('แต้มของฉัน', '', '<div class="card w9card"><p class="w9p">กำลังโหลดแต้ม...</p></div>');
+    W.shell('แต้มของฉัน', '', '<div class="card w9card"><p class="w9p">กำลังเปิดข้อมูลแต้ม...</p></div>');
     Promise.all([W.load('points', '/api/me/points?limit=20'), W.load('weekly', '/api/me/weekly-summary'), A.api.req('GET', '/api/evidence').then(function (j) { W.put('evidence', j); return j; }, function () { var c = W.get('evidence'); return c ? c.d : { evidence: [] }; })]).then(function (rs) {
       if (!W.alive('points')) return;
       var p = rs[0].data, wk = rs[1].data, evs = (rs[2].evidence || []).filter(function (e) { return e.status === 'complete' || e.status === 'approved'; });
@@ -51,11 +51,11 @@
         '<div class="card w9card"><h3>สัปดาห์นี้</h3><div class="w9grid"><div><b>' + A.fmt(wk.points_week || 0) + '</b><small>แต้มสัปดาห์นี้</small></div><div><b>' + A.fmt(wk.points_prev_week || 0) + '</b><small>สัปดาห์ก่อน</small></div><div><b>' + A.fmt(wk.evidence_approved || 0) + '</b><small>หลักฐานที่ตรวจแล้ว</small></div><div><b>' + A.fmt(wk.lessons_passed || 0) + '</b><small>บทเรียนที่ผ่าน</small></div></div>' +
         '<a class="w9rank" href="#/training"><span>ชั่วโมงอบรม</span><b>' + W.hrs(th.done) + ' จาก ' + W.hrs(th.target || 30) + ' ชม.</b></a>' + W.bar((th.done || 0) * 100 / (th.target || 30), 'ชั่วโมงอบรม') + '</div>' +
         ((rk.tambon || rk.amphoe || rk.province) ? '<div class="card w9card"><h3>อันดับของฉัน</h3>' + rankLine(rk.tambon, ['tambon', 'ในตำบล']) + rankLine(rk.amphoe, ['amphoe', 'ในอำเภอ']) + rankLine(rk.province, ['province', 'ในจังหวัด']) + '</div>' : '') +
-        '<a class="btn w9btn" href="#/league">ดูลีกของพื้นที่</a>' +
+        '<a class="btn w9btn" href="#/league">ดูอันดับคะแนนของพื้นที่</a>' +
         '<div class="card w9card"><h3>หลักฐานที่ส่งแล้ว</h3><p class="w9note">แต้มจากรูปหลักฐานจะได้เมื่อเจ้าหน้าที่ตรวจและอนุมัติแล้วเท่านั้น</p>' + (evs.length ? '<ul class="w9list">' + evs.slice(0, 8).map(function (e) { return evRow(e, approved); }).join('') + '</ul>' : '<p class="w9p">ยังไม่มีหลักฐานที่ส่ง</p>') + '</div>' +
         '<div class="card w9card"><h3>ประวัติแต้ม</h3>' + ((p.history || []).length ? '<ul class="w9list" id="w9hist">' + p.history.map(histRow).join('') + '</ul>' : '<p class="w9p">ยังไม่มีแต้ม เริ่มจากทำบทเรียนหรือถ่ายรูปหลักฐาน</p>') + (more ? '<button class="btn ghost" id="w9more">ดูรายการเก่ากว่านี้</button>' : '') +
-        '<p class="w9note">กติกาแต้มเวอร์ชัน ' + A.esc(p.rules_version || '-') + ' ยอดแต้มคำนวณที่เซิร์ฟเวอร์ ไม่ใช่ในเครื่อง</p></div>' +
-        '<a class="btn ghost w9btn" href="#/settings">ตั้งค่าบัญชี / ถอนความยินยอม / ลบบัญชี</a>';
+        '<p class="w9note">กติกาแต้มฉบับที่ ' + A.esc(String(p.rules_version || '-').replace(/^[a-z]+(?=\d+$)/i, '')) + ' ยอดแต้มคิดที่ระบบกลางของโครงการ ไม่ได้คิดในเครื่องนี้</p></div>' +
+        '<a class="btn ghost w9btn" href="#/settings">ตั้งค่าบัญชี ถอนความยินยอม หรือลบบัญชี</a>';
       W.shell('แต้มของฉัน', 'ยอดจากระบบกลางของโครงการ', inner);
       var mb = document.getElementById('w9more');
       if (mb) mb.onclick = function () { mb.disabled = true; A.api.req('GET', '/api/me/points?limit=20&before=' + encodeURIComponent(more)).then(function (j) { document.getElementById('w9hist').insertAdjacentHTML('beforeend', (j.history || []).map(histRow).join('')); more = j.next_before || null; if (!more) mb.remove(); else mb.disabled = false; }, function (e) { mb.disabled = false; A.toast(e.message); }); };
@@ -72,7 +72,14 @@
     if (h === 'home' && S.registered && !S.seeded) {
       W.load('points', '/api/me/points?limit=20').then(function (r) { if (!W.alive('home')) return; var b = A.app.querySelector('.ptspill b'); if (b) b.textContent = A.fmt(r.data.balance); }, function () {});
     }
-    if (h === 'missions') { var g = document.getElementById('go'); if (g) g.innerHTML = g.innerHTML.replace(/\(\+([\d.,]+) แต้ม\)/, function (m, n) { return /^[0.,]+$/.test(n) ? '<span class="sub2">(แต้มเมื่อเจ้าหน้าที่ตรวจ)</span>' : '(+' + n + ' แต้ม เมื่อเจ้าหน้าที่ตรวจ)'; }); }
+    if (h === 'home') { /* PingEris 23 Nov r2: home points = the same star state line as on the missions card, above the button */
+      var pl = A.app.querySelector('.today .plus'), sh = pl && A.app.querySelector('.today .shoot');
+      if (pl && sh && !pl.classList.contains('dc-tst')) { var lb = pl.textContent.trim(); pl.classList.add('dc-tst', 'tk-pts'); pl.innerHTML = RiceIco('star') + '<span><b>' + A.esc(lb) + '</b>' + (/^\+[0.,]+ /.test(lb) ? '' : '<span>เมื่อเจ้าหน้าที่ตรวจ</span>') + '</span>'; sh.parentNode.insertBefore(pl, sh); }
+    }
+    if (h === 'missions') { /* PingEris 23 Nov: points as a state line above the button (same form as the daily-check lines); the button keeps only the action */
+      var g = document.getElementById('go'), pm = g && /\s*\(\+([\d.,]+) แต้ม\)/.exec(g.innerHTML);
+      if (pm) { g.innerHTML = g.innerHTML.replace(pm[0], ''); g.insertAdjacentHTML('beforebegin', '<span class="dc-tst tk-pts">' + RiceIco('star') + '<span>' + (/^[0.,]+$/.test(pm[1]) ? '<b>แต้มเมื่อเจ้าหน้าที่ตรวจ</b>' : '<b>+' + pm[1] + ' แต้ม</b><span>เมื่อเจ้าหน้าที่ตรวจ</span>') + '</span></span>'); }
+    }
   }
   (window.RiceModules = window.RiceModules || []).push(function (app) {
     A = app; R = app.R; origPoints = R.points; R.points = pointsPage; app.after(decorate);

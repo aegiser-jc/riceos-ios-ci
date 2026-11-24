@@ -31,7 +31,7 @@
     return o;
   }
   R_enrol = function () {
-    page('เข้าร่วมโครงการ', 'เลือกรอบและบอกที่อยู่ของแปลงนา', '<div id="w8body"><p class="big" style="padding:18px">กำลังโหลดรอบการเข้าร่วม...</p></div>');
+    page('เข้าร่วมโครงการ', 'เลือกรอบและบอกที่อยู่ของแปลงนา', '<div id="w8body"><p class="big" style="padding:18px">กำลังเปิดรอบการเข้าร่วม...</p></div>');
     Promise.all([A.api.req('GET', '/api/cycles'), A.api.req('GET', '/api/me/enrolments')]).then(function (r) {
       var cycles = r[0].cycles || [], en = r[1].enrolments || [], by = {}; en.forEach(function (x) { by[x.cycle.code] = x; });
       en.forEach(function (x) { if (!cycles.some(function (c) { return c.code === x.cycle.code; })) cycles.push({ code: x.cycle.code, name: x.cycle.name, starts_on: '', ends_on: '', status: 'closed' }); });
@@ -41,7 +41,7 @@
         var e = by[c.code], st = e ? STATUS[e.status] || [e.status, 'wait'] : null, id = 'c' + i;
         return '<section class="card w8card" data-cy="' + esc(c.code) + '"><div class="w8head"><h3>' + esc(c.name) + '</h3>' + (st ? '<span class="w8pill ' + st[1] + '">' + st[0] + '</span>' : c.status === 'open' ? '<span class="w8pill wait">เปิดรับสมัคร</span>' : '') + '</div>' +
           (c.starts_on ? '<p class="w8dates">ช่วงเวลา ' + thDate(c.starts_on) + (c.ends_on ? ' ถึง ' + thDate(c.ends_on) : '') + '</p>' : '') +
-          (e ? '<p class="w8line">ที่อยู่แปลงที่แจ้ง: ' + esc([e.village && 'หมู่บ้าน ' + e.village, e.tambon && 'ต.' + e.tambon, e.amphoe && 'อ.' + e.amphoe, e.province && 'จ.' + e.province].filter(Boolean).join(' ') || 'ยังไม่ได้ระบุ') + '</p>' +
+          (e ? '<p class="w8line">ที่อยู่แปลงที่แจ้งไว้: ' + esc([e.village && 'หมู่บ้าน ' + e.village, e.tambon && 'ต.' + e.tambon, e.amphoe && 'อ.' + e.amphoe, e.province && 'จ.' + e.province].filter(Boolean).join(' ') || 'ยังไม่ได้ระบุ') + '</p>' +
             (e.registered_by === 'staff' ? '<p class="w8line">ลงทะเบียนโดยเจ้าหน้าที่ที่จุดลงทะเบียน</p>' : '') + (e.joined_at ? '<p class="w8line">เข้าร่วมเมื่อ ' + thDate(e.joined_at) + '</p>' : '') : '') +
           (e && e.status === 'withdrawn' ? '' : '<details class="w8det"' + (e ? '' : ' open') + '><summary>' + (e ? 'แก้ไขที่อยู่ของแปลง' : 'กรอกที่อยู่แล้วเข้าร่วม') + '</summary>' + areaForm(e, id) + '</details>' +
             '<p class="err" id="e' + id + '" role="alert" hidden></p><div class="w8btns"><button class="btn" data-' + (e ? 'save' : 'join') + '="' + esc(c.code) + '" data-id="' + id + '">' + (e ? 'บันทึกที่อยู่' : 'เข้าร่วมรอบนี้') + '</button>' +
@@ -67,21 +67,21 @@
   function claimPage() {
     var pre = (location.hash.match(/code=([A-Za-z0-9-]+)/) || [])[1] || '';
     page('รับบัญชีที่ลงทะเบียนไว้', 'ใช้รหัสที่เจ้าหน้าที่ให้', '<div class="card w8card"><label for="cc">รหัสรับบัญชี (8 ตัวอักษร)</label><input id="cc" class="w8code" maxlength="9" autocapitalize="characters" autocomplete="off" value="' + esc(pre) + '">' +
-      '<p class="hint">ตั้งเบอร์มือถือและ PIN เพื่อเข้าใช้ครั้งต่อไป (ถ้ายังไม่ตั้ง ภายหลังตั้งได้ที่เมนู ข้อมูลของฉัน)</p>' +
+      '<p class="hint">ตั้งเบอร์มือถือและรหัส PIN ไว้ใช้เข้าแอปครั้งต่อไป (ถ้ายังไม่ตั้งตอนนี้ ตั้งภายหลังได้ที่เมนู ตั้งค่า / ลบบัญชี)</p>' +
       '<label for="cph">เบอร์มือถือ</label><input id="cph" inputmode="tel" maxlength="10" autocomplete="tel">' +
-      '<label for="cpn">PIN 6 หลัก</label><input id="cpn" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">' +
-      '<label for="cpn2">ใส่ PIN อีกครั้ง</label><input id="cpn2" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">' +
+      '<label for="cpn">รหัส PIN 6 หลัก</label><input id="cpn" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">' +
+      '<label for="cpn2">ใส่รหัส PIN อีกครั้ง</label><input id="cpn2" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">' +
       '<p class="err" id="err" role="alert" hidden></p><button class="btn" id="cgo" style="margin-top:10px">รับบัญชี</button></div>');
     A.wireForm(A.app);
     var say = function (m) { var e = document.getElementById('err'); e.hidden = false; e.textContent = m; };
     document.getElementById('cgo').onclick = function () {
       var code = document.getElementById('cc').value.replace(/[^A-Za-z0-9]/g, '').toUpperCase(), ph = document.getElementById('cph').value.replace(/\D/g, ''), pn = document.getElementById('cpn').value, pn2 = document.getElementById('cpn2').value;
-      if (code.length !== 8) return say('รหัสต้องมี 8 ตัวอักษร กรุณาตรวจรหัสที่เจ้าหน้าที่ให้');
+      if (code.length !== 8) return say('รหัสต้องมี 8 ตัวอักษร กรุณาดูรหัสที่เจ้าหน้าที่ให้อีกครั้ง');
       var body = { code: code, client: A.api.native ? 'native' : 'web' };
       if (ph || pn || pn2) {
         if (!/^0\d{9}$/.test(ph)) return say('เบอร์มือถือต้องเป็นตัวเลข 10 หลัก เช่น 0812345678');
-        if (!/^\d{6}$/.test(pn)) return say('PIN ต้องเป็นตัวเลข 6 หลัก');
-        if (pn !== pn2) return say('PIN สองครั้งไม่ตรงกัน');
+        if (!/^\d{6}$/.test(pn)) return say('รหัส PIN ต้องเป็นตัวเลข 6 หลัก');
+        if (pn !== pn2) return say('รหัส PIN ที่ใส่สองครั้งไม่ตรงกัน');
         body.phone = ph; body.pin = pn;
       }
       var b = document.getElementById('cgo'); A.busy(b, true, 'กำลังตรวจรหัส...');
@@ -100,7 +100,7 @@
     ['id', 'บัตรประจำตัวประชาชนตัวจริง', 'ใช้ยืนยันตัวตนที่สาขา'],
     ['house', 'สำเนาทะเบียนบ้าน', 'ถ้าสาขากำหนด'],
     ['book', 'สมุดบัญชีเงินฝากหรือเลขที่บัญชี ธ.ก.ส.', 'ถ้ามีบัญชีอยู่แล้ว'],
-    ['farmer', 'เอกสารทะเบียนเกษตรกร (ทบก.) หรือหลักฐานที่หน่วยงานเกษตรออกให้', 'ตรวจกับเกษตรตำบลว่าข้อมูลเป็นปัจจุบัน'],
+    ['farmer', 'เอกสารทะเบียนเกษตรกร (ทบก.) หรือหลักฐานที่หน่วยงานเกษตรออกให้', 'ถามเกษตรตำบลว่าข้อมูลยังเป็นปัจจุบันหรือไม่'],
     ['land', 'เอกสารสิทธิ์ที่ดินหรือสัญญาเช่า', 'ถ้าเช่า ให้เตรียมสัญญาเช่าหรือหนังสือยินยอมจากเจ้าของ'],
     ['plot', 'ข้อมูลแปลงนา: ชื่อแปลง จำนวนไร่ พันธุ์ข้าว วันปลูก ตำแหน่ง', 'ดูสรุปจากแอปด้านล่าง'],
     ['phone', 'โทรศัพท์มือถือที่ใช้เบอร์เดียวกับที่แจ้งไว้', 'เผื่อสาขาติดต่อกลับ']
@@ -113,7 +113,7 @@
     page('เอกสารที่ควรเตรียมก่อนไปสาขา', 'รายการเตรียมตัวเท่านั้น', '<div class="card w8card"><p class="w8note"><b>โปรดทราบ</b> หน้านี้เป็นเพียงรายการช่วยจำ แอปไม่ได้เชื่อมต่อกับ ธ.ก.ส. ไม่ตรวจและไม่ตัดสินสิทธิ์ใด ๆ สาขา ธ.ก.ส. เป็นผู้กำหนดเอกสารและตรวจสอบสิทธิ์ โปรดสอบถามสาขาก่อนเดินทาง</p></div>' +
       '<div class="card w8card"><h3>เตรียมให้ครบ</h3><ul class="w8chk">' + BAAC.map(function (r) { return '<li><label class="chk"><input type="checkbox" data-bk="' + r[0] + '"' + (done[r[0]] ? ' checked' : '') + '><span><b>' + r[1] + '</b><small>' + r[2] + '</small></span></label></li>'; }).join('') + '</ul>' +
       '<div class="w8prog" id="bprog"></div></div>' +
-      '<div class="card w8card"><h3>ข้อมูลแปลงของท่านในแอป</h3><div class="w8scroll"><table class="t w8t"><tr><th>แปลง</th><th>พื้นที่</th><th>พันธุ์</th><th>รหัสแปลง</th><th>GPS</th></tr>' + rows + '</table></div></div>' +
+      '<div class="card w8card"><h3>ข้อมูลแปลงของท่านในแอป</h3><div class="w8scroll"><table class="t w8t"><tr><th>แปลง</th><th>พื้นที่</th><th>พันธุ์</th><th>รหัสแปลง</th><th>พิกัด GPS</th></tr>' + rows + '</table></div></div>' +
       '<button class="btn ghost" onclick="window.print()" style="margin-top:6px">พิมพ์รายการนี้</button>');
     var upd = function () { var n = Object.keys(done).filter(function (k) { return done[k]; }).length; document.getElementById('bprog').textContent = 'เตรียมแล้ว ' + n + ' จาก ' + BAAC.length + ' รายการ'; };
     A.app.querySelectorAll('[data-bk]').forEach(function (c) { c.onchange = function () { done[c.dataset.bk] = c.checked; A.save(); upd(); }; }); upd();
@@ -129,16 +129,16 @@
   function trainingPage() {
     var rows = trainingRows(), tot = rows.reduce(function (a, r) { return a + (r.e.min || 0); }, 0);
     page('ชั่วโมงอบรมของฉัน', 'นับจากบทเรียนที่ผ่านแบบทดสอบ', '<div class="card w8card"><div class="w8big">' + Math.floor(tot / 60) + ' ชม. ' + (tot % 60) + ' นาที</div><p class="w8line">รวมจาก ' + rows.length + ' บทเรียนที่ผ่าน</p></div>' +
-      '<div class="card w8card"><h3>บันทึกการเรียน</h3>' + (rows.length ? '<ul class="w8log">' + rows.map(function (r) { return '<li><b>' + esc(r.l.title) + '</b><small>' + thDate(r.e.at) + ' · ' + (r.e.min || 0) + ' นาที' + (r.l.srp ? ' · หัวข้อ SRP: ' + esc(r.l.srp) : '') + '</small></li>'; }).join('') + '</ul>' : '<p>ยังไม่มีบทเรียนที่ผ่าน ลองเรียนบทแรกได้ที่เมนู บทเรียน</p>') + '<a class="btn ghost" href="#/lessons" style="margin-top:8px">ไปที่บทเรียน</a></div>' +
-      '<div class="card w8card"><p class="w8note">หัวข้อ SRP คือหัวข้อของหลักสูตรข้าวยั่งยืนที่บทเรียนนี้เกี่ยวข้อง ไม่ใช่หลักสูตรที่ได้รับรองจาก SRP และชั่วโมงที่นับเป็นเวลาเรียนโดยประมาณในแอป ไม่ใช่ใบรับรอง</p></div>');
+      '<div class="card w8card"><h3>บันทึกการเรียน</h3>' + (rows.length ? '<ul class="w8log">' + rows.map(function (r) { return '<li><b>' + esc(r.l.title) + '</b><small>' + thDate(r.e.at) + ' (' + (r.e.min || 0) + ' นาที)' + (r.l.srp ? ' หัวข้อข้าวยั่งยืน (SRP): ' + esc(r.l.srp) : '') + '</small></li>'; }).join('') + '</ul>' : '<p>ยังไม่มีบทเรียนที่ผ่าน ลองเรียนบทแรกได้ที่เมนู บทเรียน</p>') + '<a class="btn ghost" href="#/lessons" style="margin-top:8px">ไปที่บทเรียน</a></div>' +
+      '<div class="card w8card"><p class="w8note">หัวข้อข้าวยั่งยืน (SRP) บอกว่าบทเรียนนี้เกี่ยวกับหัวข้อไหนของหลักสูตรข้าวยั่งยืน บทเรียนนี้ไม่ใช่หลักสูตรที่ได้รับรองจาก SRP และชั่วโมงที่นับเป็นเวลาเรียนโดยประมาณในแอป ไม่ใช่ใบรับรอง</p></div>');
   }
   function decorate(h) {
     var app = A.app, S = A.S();
     if (h === 'lessons' && !/id=/.test(location.hash) && A.lessons()) {
       var L = A.lessons().lessons, cards = app.querySelectorAll('a.lesson');
-      cards.forEach(function (c, i) { var l = L[i]; if (l && l.srp && !c.querySelector('.srp')) c.insertAdjacentHTML('beforeend', '<span class="srp">หัวข้อ SRP (ข้าวยั่งยืน): ' + esc(l.srp) + '</span>'); });
+      cards.forEach(function (c, i) { var l = L[i]; if (l && l.srp && !c.querySelector('.srp')) c.insertAdjacentHTML('beforeend', '<span class="srp">หัวข้อข้าวยั่งยืน (SRP): ' + esc(l.srp) + '</span>'); });
       var tot = trainingRows().reduce(function (a, r) { return a + (r.e.min || 0); }, 0), sh = app.querySelector('.sheet');
-      if (sh && !sh.querySelector('.w8hours')) sh.insertAdjacentHTML('beforeend', '<a class="card w8hours" href="#/training"><span><b>ชั่วโมงอบรมของฉัน</b><small>' + Math.floor(tot / 60) + ' ชม. ' + (tot % 60) + ' นาที · ดูบันทึกการเรียน</small></span><span aria-hidden="true">→</span></a>');
+      if (sh && !sh.querySelector('.w8hours')) sh.insertAdjacentHTML('beforeend', '<a class="card w8hours" href="#/training"><span><b>ชั่วโมงอบรมของฉัน</b><small>' + Math.floor(tot / 60) + ' ชม. ' + (tot % 60) + ' นาที ดูบันทึกการเรียน</small></span><span aria-hidden="true">' + RiceIco('chev') + '</span></a>');
     }
     if ((h === 'home' || h === 'settings') && S.registered) {
       var sh2 = app.querySelector('.sheet') || app;

@@ -23,15 +23,15 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>RiceOS ใช้กล้องเพื่อถ่ายรูปหลักฐานกิจกรรมในแปลงนาของคุณ เช่น รูประดับน้ำในท่อวัดน้ำ และสแกน QR บนท่อ เพื่อส่งให้เจ้าหน้าที่ตรวจ</string>
+	<string>RiceOS ใช้กล้องเพื่อถ่ายรูปหลักฐานงานในแปลงนาของท่าน เช่น ระดับน้ำในท่อวัดน้ำ และสแกนรหัส QR บนท่อ เพื่อส่งให้เจ้าหน้าที่ตรวจ</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>RiceOS ใช้ตำแหน่งขณะใช้แอปเพื่อบันทึกพิกัดแปลงนาของคุณ และแนบพิกัดกับรูปหลักฐานกิจกรรม ให้เจ้าหน้าที่ตรวจได้ว่าถ่ายในแปลงจริง</string>
+	<string>RiceOS ใช้ตำแหน่งขณะท่านใช้แอป เพื่อบันทึกพิกัด GPS ของแปลงนาของท่าน และแนบพิกัด GPS กับรูปหลักฐานงาน ให้เจ้าหน้าที่ตรวจได้ว่าถ่ายในแปลงจริง</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>RiceOS ใช้ตำแหน่งขณะใช้แอปเพื่อบันทึกพิกัดแปลงนาของคุณ และแนบพิกัดกับรูปหลักฐานกิจกรรม ให้เจ้าหน้าที่ตรวจได้ว่าถ่ายในแปลงจริง</string>
+	<string>RiceOS ใช้ตำแหน่งขณะท่านใช้แอป เพื่อบันทึกพิกัด GPS ของแปลงนาของท่าน และแนบพิกัด GPS กับรูปหลักฐานงาน ให้เจ้าหน้าที่ตรวจได้ว่าถ่ายในแปลงจริง</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>RiceOS บันทึกรูปหลักฐานกิจกรรมในแปลงนาลงคลังภาพเฉพาะเมื่อคุณสั่งบันทึกเท่านั้น</string>
+	<string>RiceOS บันทึกรูปหลักฐานงานในแปลงนาลงคลังรูปในเครื่อง เฉพาะเมื่อท่านกดบันทึกเท่านั้น</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>RiceOS ขอเข้าถึงคลังภาพเพื่อให้คุณเลือกรูปหลักฐานกิจกรรมในแปลงนา</string>
+	<string>RiceOS ขอเปิดคลังรูปในเครื่อง เพื่อให้ท่านเลือกรูปหลักฐานงานในแปลงนา</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

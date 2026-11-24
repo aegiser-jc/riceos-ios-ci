@@ -9,19 +9,21 @@
   var STATUS = { approved: 'ผ่านการตรวจ', complete: 'ส่งแล้ว รอเจ้าหน้าที่ตรวจ', pending_photo: 'รอส่งรูป', rejected: 'ไม่ผ่านการตรวจ' };
 
   /* ---------- game link (contract: game-dev2/PLOT-LINK.md). Keys that are not known or not valid are left out. ---------- */
+  /* store app (Capacitor, https://localhost origin) has no /game/ of its own: a relative link hung the game button (Play 1.5). Native -> absolute site URL. */
+  function gameBase() { var c = window.Capacitor; return (c && c.isNativePlatform && c.isNativePlatform()) ? 'https://riceos.donaus.com' : ''; }
   function gameUrl(p) {
     var q = [], add = function (k, v) { q.push(k + '=' + encodeURIComponent(v)); };
-    if (!p) return '/game/';
+    if (!p) return gameBase() + '/game/';
     var v = String(p.variety || '').replace(/[^0-9A-Za-z฀-๿ .\-_]/g, '').trim().slice(0, 24); if (v) add('v', v);
     var a = Number(p.rai); if (isFinite(a) && a >= 0.1 && a <= 1000) add('a', Math.round(a * 100) / 100);
     var s = String(p.sowDate || '').slice(0, 10), d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Math.floor((Date.now() - Date.parse(s + 'T00:00:00+07:00')) / 864e5) : NaN;
     if (isFinite(d) && d >= 0 && d <= 400) { add('s', s); var g = 0; STAGE_DAYS.forEach(function (x) { if (d >= x) g++; }); add('g', g); }
     var id = String(p.pid || p.id || '').replace(/-/g, ''); if (/^[A-Za-z0-9_-]{1,32}$/.test(id)) add('p', id); /* server plot ids are 36-char UUIDs; the contract allows 32: hyphens dropped */
     var h = String(location.hash || ''); add('back', /^#\/plot\/[A-Za-z0-9_%-]{1,60}$/.test(h) ? '/next/' + h : '/next/'); /* back button in the game; game accepts only paths starting with /next/ */
-    return '/game/' + (q.length ? '?' + q.join('&') : '');
+    return gameBase() + '/game/' + (q.length ? '?' + q.join('&') : '');
   }
   function gameBtn(p, id) {
-    return '<a class="btn w9b-game" id="' + id + '" href="' + esc(gameUrl(p)) + '"><span class="w9b-gi" aria-hidden="true">&#127806;</span><span>เล่นเกมนาข้าวของแปลงนี้</span></a>';
+    return '<a class="btn w9b-game" id="' + id + '" href="' + esc(gameUrl(p)) + '"><span class="w9b-gi" aria-hidden="true">' + RiceIco('sprout') + '</span><span>เล่นเกมนาข้าวของแปลงนี้</span></a>';
   }
 
   /* ---------- decorate home + plot screens ---------- */
@@ -40,19 +42,19 @@
   }
 
   /* ---------- #/income ---------- */
-  var PRICES = [['ราคาข้าวเปลือกหอมมะลิ', 'บาท/ตัน'], ['ราคาข้าวเปลือกเจ้า', 'บาท/ตัน'], ['ราคาฟางก้อน', 'บาท/ก้อน'], ['ราคาคาร์บอนเครดิตจาก<span class="nw">นาข้าว</span>', 'บาท/ตัน CO&#8322;']];
+  var PRICES = [['ราคาข้าวเปลือกหอมมะลิ', 'บาท/ตัน'], ['ราคาข้าวเปลือกเจ้า', 'บาท/ตัน'], ['ราคาฟางก้อน', 'บาท/ก้อน'], ['ราคาคาร์บอนเครดิตจาก<span class="nw">นาข้าว</span>', 'บาท/ตันคาร์บอนไดออกไซด์']];
   var IDEAS = [
-    ['ข้าวคุณภาพและข้าวพันธุ์พิเศษ', 'ข้าวที่ดูแลตามมาตรฐานและมีบันทึกย้อนกลับ อาจขายได้ในช่องทางที่ผู้ซื้อต้องการหลักฐาน ควรสอบถามราคาจากผู้ซื้อก่อนตัดสินใจ'],
+    ['ข้าวคุณภาพและข้าวพันธุ์พิเศษ', 'ข้าวที่ดูแลตามมาตรฐานและมีบันทึกที่ตรวจย้อนหลังได้ อาจขายได้ในช่องทางที่ผู้ซื้อต้องการหลักฐาน ควรสอบถามราคาจากผู้ซื้อก่อนตัดสินใจ'],
     ['จัดการฟางและตอซัง', 'ไม่เผาฟาง นำไปทำปุ๋ยหมัก คลุมดิน หรือขายเป็นฟางก้อน ช่วยลดควันและลดค่าปุ๋ยบางส่วน'],
     ['ปลาและผักในพื้นที่นา', 'ปลูกผักบนคันนา หรือเลี้ยงปลาในร่องน้ำตามความเหมาะสมของพื้นที่ ใช้เป็นอาหารในครัวเรือนและขายส่วนเกิน'],
     ['รวมกลุ่มแปรรูปและขายตรง', 'รวมกลุ่มกับเพื่อนบ้านเพื่อสีข้าว บรรจุถุง หรือขายตรง ควรปรึกษาเกษตรอำเภอเรื่องทะเบียนและมาตรฐาน'],
-    ['ลดต้นทุนน้ำ แรงงาน และปุ๋ย', 'การขังน้ำสลับแห้งอาจช่วยลดค่าน้ำมัน<span class="nw">สูบน้ำ</span> เงินที่ประหยัดได้ก็นับเป็นรายได้ที่เพิ่มขึ้นเช่นกัน']
+    ['ลดต้นทุนน้ำ แรงงาน และปุ๋ย', 'การทำนาแบบเปียกสลับแห้งอาจช่วยลดค่าน้ำมัน<span class="nw">สูบน้ำ</span> เงินที่ประหยัดได้ก็นับเป็นรายได้ที่เพิ่มขึ้นเช่นกัน']
   ];
   var SOURCES = [
-    'สถาบันวิจัยข้าวนานาชาติ (IRRI): แนวทางการจัดการน้ำแบบเปียกสลับแห้ง (Alternate Wetting and Drying)',
+    'สถาบันวิจัยข้าวนานาชาติ (IRRI): แนวทางการจัดการน้ำแบบเปียกสลับแห้ง',
     'กรมการข้าว กระทรวงเกษตรและสหกรณ์: ข้อแนะนำการปลูกข้าวและการจัดการน้ำ <a class="ext" href="https://rkb.ricethailand.go.th/web/index.php" target="_blank" rel="noopener">https://rkb.ricethailand.go.th/web/index.php</a> <a class="ext" href="https://www.moac.go.th/" target="_blank" rel="noopener">https://www.moac.go.th/</a>',
     'องค์การบริหารจัดการก๊าซเรือนกระจก (องค์การมหาชน) หรือ อบก.: ข้อมูลโครงการคาร์บอนเครดิตภายในประเทศ <a class="ext" href="https://tver.tgo.or.th/database/public/methodology/90?category_id=28&amp;lang=th" target="_blank" rel="noopener">https://tver.tgo.or.th/database/public/methodology/90?category_id=28&amp;lang=th</a>',
-    'IPCC 2019 Refinement to the 2006 Guidelines, ข้อมูลก๊าซมีเทนจากนาข้าว',
+    'คู่มือของคณะกรรมการระหว่างรัฐบาลว่าด้วยการเปลี่ยนแปลงสภาพภูมิอากาศ (IPCC) ฉบับปรับปรุงปี 2019 ของแนวทางปี 2006: ข้อมูลก๊าซมีเทนจากนาข้าว',
     'ราคาจริง: สอบถามโรงสี สหกรณ์ หรือสำนักงานเกษตรอำเภอในวันที่ท่านจะขาย ราคาสินค้าเกษตร สำนักงานเศรษฐกิจการเกษตร <a class="ext" href="https://oae.go.th/" target="_blank" rel="noopener">https://oae.go.th/</a>',
     'ดูแหล่งข้อมูลทั้งหมด: <a href="#/sources">แหล่งข้อมูล</a>'
   ];
@@ -60,12 +62,12 @@
     var li = function (a) { return '<li><b>' + a[0] + '</b><span>' + a[1] + '</span></li>'; };
     A.app.innerHTML = A.header() + '<div class="sheet w9 w9b">' + A.titleRow('นาข้าวหนึ่งแปลง หลายรายได้', 'ความรู้เพื่อวางแผน ยังไม่ใช่การรับรองรายได้') +
       '<div class="card w9card w9hero"><span>นาแปลงเดียว มีหลายทางสร้างรายได้</span><small>หน้านี้เป็นข้อมูลให้ท่านคิดและวางแผนเท่านั้น ไม่ใช่คำสัญญาว่าจะได้เงิน</small></div>' +
-      '<div class="card w9card" id="inc-awd"><h3>คาร์บอนเครดิตจากการทำนาแบบเปียกสลับแห้ง (AWD)</h3>' +
-      '<p class="w9p">AWD คือการปล่อยให้น้ำในนาแห้งลงเป็นช่วง ๆ แทนการขังน้ำตลอด ใช้ท่อวัดระดับน้ำช่วยดู ช่วยให้นาปล่อยก๊าซมีเทนน้อยลง</p>' +
+      '<div class="card w9card" id="inc-awd"><h3>คาร์บอนเครดิตจากการทำนาแบบเปียกสลับแห้ง</h3>' +
+      '<p class="w9p">เปียกสลับแห้ง คือการปล่อยให้น้ำในนาแห้งลงเป็นช่วง ๆ แทนการขังน้ำไว้ตลอด ใช้ท่อวัดน้ำช่วยดูระดับน้ำ ช่วยให้นาปล่อยก๊าซมีเทนน้อยลง</p>' +
       '<p class="w9p">เมื่อมีโครงการที่ตรวจวัดและรับรองผลได้ การลดก๊าซนี้อาจนำไปแลกเป็นคาร์บอนเครดิต และอาจมีส่วนแบ่งกลับมาถึงเกษตรกร</p>' +
       '<p class="w9note"><b>โปรดทราบ</b> ยังไม่มีการรับรองว่าแปลงของท่านจะได้คาร์บอนเครดิตหรือได้เงินเท่าใด ขึ้นอยู่กับเงื่อนไขโครงการ การตรวจสอบ และราคาในตลาดขณะนั้น</p>' +
       '<a class="btn w9btn" href="#/kratong">ดูท่อวัดน้ำและ QR ของแปลง</a></div>' +
-      '<div class="card w9card" id="inc-ideas"><h3>ไอเดียรายได้อื่นจากนาและครัวเรือน</h3><ul class="w9list w9b-ideas">' + IDEAS.map(li).join('') + '</ul></div>' +
+      '<div class="card w9card" id="inc-ideas"><h3>แนวทางหารายได้อื่นจากนาและครัวเรือน</h3><ul class="w9list w9b-ideas">' + IDEAS.map(li).join('') + '</ul></div>' +
       '<div class="card w9card" id="inc-prices"><h3>ราคาอ้างอิง</h3><span class="w9b-tag">ตัวอย่างเพื่อวางแผน</span>' +
       '<p class="w9note">ตัวเลข x,xxx ด้านล่างเป็นที่ว่างสำหรับจดราคา ตัวอย่างเพื่อวางแผน ยังไม่ใช่ราคาจริง กรุณาสอบถามราคาปัจจุบันก่อนตัดสินใจ</p><ul class="w9list">' +
       PRICES.map(function (r) { return '<li><span>' + r[0] + '<small>' + r[1] + '</small></span><b class="w9b-ph">x,xxx</b></li>'; }).join('') + '</ul></div>' +
@@ -87,7 +89,7 @@
       if (summary.tok !== tok) return;
       var has = p.lat && p.lon, code = p.plotCode;
       var tl = evs.length ? '<ol class="w9b-tl">' + evs.slice(0, 40).map(function (e) {
-        return '<li><b>' + esc(MISSIONS[e.mission_type] || 'หลักฐานภารกิจ') + (e.kratong_seq ? ' · กระทง ' + esc(e.kratong_seq) : '') + '</b><span>' + esc(thTime(e.client_time || e.server_time)) + '</span><em>' + esc(STATUS[e.status] || 'ส่งแล้ว') + '</em></li>';
+        return '<li><b>' + esc(MISSIONS[e.mission_type] || 'หลักฐานภารกิจ') + (e.kratong_seq ? ' กระทง ' + esc(e.kratong_seq) : '') + '</b><span>' + esc(thTime(e.client_time || e.server_time)) + '</span><em>' + esc(STATUS[e.status] || 'ส่งแล้ว') + '</em></li>';
       }).join('') + '</ol>' + (evs.length > 40 ? '<p class="w9note">แสดง 40 รายการล่าสุด จากทั้งหมด ' + A.fmt(evs.length) + ' รายการ</p>' : '') : '<p class="w9p">ยังไม่มีหลักฐานของแปลงนี้</p>';
       A.app.innerHTML = A.header() + '<div class="sheet w9 w9b w9b-sum">' + A.titleRow('สรุปแปลง', esc(p.name || 'แปลงของฉัน')) +
         '<div class="w9b-actions"><button class="btn w9btn" id="w9bprint" type="button">พิมพ์ / บันทึก PDF</button><a class="btn ghost w9btn" href="#/plot">กลับไปหน้าแปลง</a></div>' +
@@ -97,12 +99,12 @@
         '<div class="card w9card"><h3>ข้อมูลแปลง</h3><dl class="w9b-dl"><dt>ชื่อแปลง</dt><dd>' + esc(p.name || '-') + '</dd><dt>พื้นที่</dt><dd>' + (p.rai ? A.fmt(p.rai) + ' ไร่' : '-') + '</dd><dt>พันธุ์ข้าว</dt><dd>' + esc(p.variety || '-') + '</dd><dt>วันปลูก</dt><dd>' + (p.sowDate ? esc(thDate(p.sowDate + 'T00:00:00+07:00')) : '-') + '</dd>' +
         '<dt>ตำแหน่ง GPS</dt><dd>' + (has ? Number(p.lat).toFixed(5) + ', ' + Number(p.lon).toFixed(5) + (p.acc ? '<small>คลาดเคลื่อน<span class="nw">ประมาณ ' + esc(p.acc) + '&nbsp;เมตร</span></small>' : '') : 'ยังไม่มีตำแหน่ง') + '</dd>' +
         (p.polygon && p.polygon.length >= 3 ? '<dt>แนวเขตแปลง</dt><dd>' + p.polygon.length + ' จุด</dd>' : '') + '</dl></div>' +
-        '<div class="card w9card"><h3>แต้ม</h3>' + (bal === null ? '<p class="w9p">ดูแต้มได้เมื่อมีสัญญาณและเข้าสู่ระบบ</p>' : '<dl class="w9b-dl"><dt>แต้มจากแปลงนี้</dt><dd>' + A.fmt(plotPts) + ' แต้ม</dd><dt>แต้มสะสมทั้งหมดของท่าน</dt><dd>' + A.fmt(bal) + ' แต้ม</dd></dl>') + '</div>' +
+        '<div class="card w9card"><h3>แต้ม</h3>' + (bal === null ? '<p class="w9p">ดูแต้มได้เมื่อมีสัญญาณอินเทอร์เน็ตและเข้าสู่ระบบแล้ว</p>' : '<dl class="w9b-dl"><dt>แต้มจากแปลงนี้</dt><dd>' + A.fmt(plotPts) + ' แต้ม</dd><dt>แต้มสะสมทั้งหมดของท่าน</dt><dd>' + A.fmt(bal) + ' แต้ม</dd></dl>') + '</div>' +
         '<div class="card w9card"><h3>หลักฐานที่ส่ง</h3>' + (note || '') + tl + '</div>' +
-        '<p class="w9note w9b-foot">พิมพ์เมื่อ ' + esc(thDate(new Date().toISOString())) + ' · ข้อมูลจากแอป RiceOS</p></div></div>';
+        '<p class="w9note w9b-foot">พิมพ์เมื่อ ' + esc(thDate(new Date().toISOString())) + ' ข้อมูลจากแอป RiceOS</p></div></div>';
       var q = document.getElementById('w9bqr');
       if (code && q && window.qrcode) { try { var z = qrcode(0, 'M'); z.addData(code); z.make(); q.innerHTML = z.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { q.textContent = code; } }
-      else if (q) q.textContent = 'ไม่มี QR';
+      else if (q) q.textContent = 'ไม่มีรหัส QR';
       document.getElementById('w9bprint').onclick = function () { window.print(); };
     };
     draw(local, null, 0, '');
@@ -114,7 +116,7 @@
       var evs = (rs[0].j.evidence || []).filter(function (e) { return e.plot_id === p.pid; }).sort(function (a, b) { return Date.parse(b.client_time || b.server_time) - Date.parse(a.client_time || a.server_time); });
       var ids = {}; evs.forEach(function (e) { ids[e.id] = 1; });
       var pts = rs[1] ? (rs[1].history || []).reduce(function (a, r) { return a + (r.reason === 'evidence_approved' && ids[r.ref_id] ? Number(r.delta) || 0 : 0); }, 0) : 0;
-      draw(evs, rs[1] ? rs[1].balance : null, pts, rs[0].stale ? '<p class="w9stale">แสดงข้อมูลที่บันทึกไว้ในเครื่อง ไม่มีสัญญาณล่าสุด</p>' : '');
+      draw(evs, rs[1] ? rs[1].balance : null, pts, rs[0].stale ? '<p class="w9stale">ตอนนี้ไม่มีสัญญาณอินเทอร์เน็ต จึงแสดงข้อมูลที่บันทึกไว้ในเครื่อง</p>' : '');
     });
   }
 

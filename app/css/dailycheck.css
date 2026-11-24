@@ -342,3 +342,94 @@ textarea.dc-x{resize:vertical;line-height:1.4;min-height:76px}
   .aw-mt .aw-m1{font-size:18px}
 }
 .aw-mt .aw-m1>span{display:inline-block}
+
+/* PingEris 23 Nov (v41): ตรวจเช็คแปลงรายวัน inside "วันนี้ต้องทำ" (full-bleed bottom band of .today) and on top of #/missions; staff review
+   state lines (fieldreview.js). Every state = its own icon shape + words; body text 18px / 1.6; no box inside a box; colours from tokens. */
+:root{--fr-band:var(--vc-g9);--fr-band-line:rgba(255,255,255,.45);--fr-ink:var(--vc-ink);--fr-sub:var(--vc-sub);--fr-ok:var(--vc-g9);--fr-wait:#5a4300;--fr-fix:#9B231B;--fr-fix-bg:#FCEBE8;--fr-focus:var(--vc-gold)}
+.today .dc-tday{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:16px -16px -12px;padding:14px 16px 16px;background:var(--fr-band);border-top:1px solid var(--fr-band-line);color:#fff;font:500 18px/1.6 Sarabun,sans-serif}
+@media (min-width:701px){.today .dc-tday{margin:18px -20px -16px;padding:16px 20px 18px}}
+.dc-tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 12px}
+.dc-tdh b{font:700 21px/1.4 Prompt,sans-serif}
+.dc-tdd{font:500 18px/1.6 Sarabun,sans-serif}
+.dc-tst{display:flex;align-items:flex-start;gap:10px;font:500 18px/1.6 Sarabun,sans-serif}
+.dc-tst>.ri{flex:0 0 24px;width:24px;height:24px;margin-top:3px}
+.dc-tst>span{display:flex;flex-wrap:wrap;gap:0 10px;min-width:0}
+.dc-tst b{font:700 18px/1.6 Sarabun,sans-serif}
+.dc-tgo{justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:48px;padding:0 20px;border-radius:999px;background:#fff;color:var(--vc-g9);font:700 18px/1.2 Prompt,sans-serif;text-decoration:none;white-space:nowrap}
+.dc-tgo i{font-style:normal;font-size:24px;line-height:1}
+.dc-tgo:focus-visible{outline:3px solid var(--fr-focus);outline-offset:3px}
+.dc-mis{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:0 0 12px;padding:14px 16px 16px;color:var(--fr-ink)}
+.dc-mis .dc-tdh b{color:var(--vc-g9)}
+.dc-mis .dc-tst>.ri{color:var(--vc-g9)}
+.dc-mis .dc-tgo{background:var(--vc-g9);color:#fff}
+.fr-st{display:flex;align-items:flex-start;gap:10px;color:var(--fr-sub);font:500 18px/1.6 Sarabun,sans-serif;text-align:left}
+.fr-st[hidden]{display:none}
+.fr-st .fr-i{flex:0 0 24px;width:24px;height:24px;margin-top:3px}
+.fr-st .fr-t{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.fr-st .fr-t b{font:700 18px/1.6 Sarabun,sans-serif;color:inherit}
+.fr-st .fr-note{display:block;padding-left:10px;border-left:3px solid currentColor;font-weight:600;color:var(--fr-ink);white-space:pre-line}
+.fr-st .fr-do{display:block;color:var(--fr-ink)}
+.fr-st[data-k="waiting"]{color:var(--fr-wait)}.fr-st[data-k="checked"]{color:var(--fr-ok)}.fr-st[data-k="fix"]{color:var(--fr-fix)}
+.fr-today.fr-st,.fr-today.fr-st[data-k]{color:#fff}
+.fr-today .fr-note,.fr-today .fr-do{color:#fff}.fr-today .fr-note{border-left-color:var(--fr-focus)}
+.fr-wrap{margin:10px 2px 0}.fr-wrap:empty{display:none}
+.dc-hist li .fr-st{display:flex;flex-wrap:nowrap;gap:10px}
+.dc-hist li .fr-st .fr-t{display:flex;flex-direction:column;flex-wrap:nowrap;gap:2px}
+.dc-hist li .fr-st b{font:700 18px/1.6 Sarabun,sans-serif;color:inherit}
+.dc-home .fr-card{margin-top:4px}
+/* r2 (Sol r1): a staff fix request under the saved banner is its own tinted block with a larger heading, so it reads as work still to do */
+.fr-form.fr-st[data-k="fix"]{padding:12px 14px 14px;border-left:4px solid var(--fr-fix);border-radius:0 12px 12px 0;background:var(--fr-fix-bg)}
+.fr-form.fr-st[data-k="fix"] .fr-t>b{font:700 21px/1.6 Prompt,sans-serif}
+.fr-form.fr-st[data-k="fix"] .fr-note{padding-left:0;border-left:0;font:700 20px/1.6 Sarabun,sans-serif}
+.fr-form.fr-st[data-k="fix"] .fr-do{font-weight:600}
+
+/* PingEris 23 Nov 16:20 "แก้ไขเมนูให้อยู่ในรูปเดียวกัน": one form for the task items.
+   A) inside "วันนี้ต้องทำ": the mission (ถ่ายรูปยืนยัน) and ตรวจเช็คแปลงรายวัน share title / text / button / spacing.
+   B) cards on #/missions (ตรวจเช็คแปลงรายวัน, mission, บทเรียน) and the AWD card on the plot page: same card, icon + title row,
+      18px text, one full-width button with the icon first. Tokens only; no box inside a box; no chevron that moves. */
+:root{--tk-title:700 21px/1.6 Prompt,sans-serif;--tk-text:500 18px/1.6 Sarabun,sans-serif;--tk-btn:700 18px/1.25 Prompt,sans-serif;--tk-gap:8px;--tk-pad:16px}
+@media (min-width:701px){:root{--tk-title:700 24px/1.6 Prompt,sans-serif;--tk-pad:20px}}
+/* A (r2): the two items inside "วันนี้ต้องทำ" use the card grammar of B: 24px line icon + title (1.6), lines 18px,
+   points as a star state line, one full-width 52px pill button with the icon first (white = the inverse of the green card button).
+   PC (>=1024): zoom 1.25 like the missions and plot sheets. */
+body .today{display:grid;grid-template-columns:minmax(0,1fr);row-gap:var(--tk-gap);padding-left:var(--tk-pad);padding-right:var(--tk-pad);padding-bottom:var(--tk-pad);background:linear-gradient(90deg,rgba(11,90,42,.97),rgba(11,90,42,.9) 60%,rgba(11,90,42,.62)),url(../img/mission-card.jpg) center/cover}
+body .today>*{margin:0}
+body .today h3,body .today .dc-tdh{display:grid;grid-template-columns:24px minmax(0,1fr);gap:0 10px;align-items:start}
+body .today h3,body .today .dc-tdh b{font:var(--tk-title);color:#fff}
+body .today h3>.ri,body .today .dc-tdh>.ri{grid-column:1;width:24px;height:24px;margin-top:5px;color:#fff}
+body .today .dc-tdh>b{grid-column:2}
+body .today .dc-tdh>.dc-tdd{grid-column:1/-1;font:var(--tk-text)}
+body .today p,body .today>.note{font:var(--tk-text);color:#fff;margin:0}
+body .today .plus{display:flex;align-items:flex-start;gap:10px;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;color:#fff;font:var(--tk-text)}
+body .today .plus>.ri{flex:0 0 24px;width:24px;height:24px;margin-top:3px}
+body .today .shoot,body .today .dc-tgo{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;justify-self:stretch;width:100%;min-height:52px;margin:4px 0 0;padding:8px 20px;border:0;border-radius:999px;background:#fff;color:var(--vc-g9);font:var(--tk-btn);text-align:center;text-decoration:none;white-space:normal;box-shadow:none}
+body .today .shoot i,body .today .dc-tgo i{display:contents;color:inherit}
+body .today .shoot .ri,body .today .dc-tgo .ri{flex:0 0 24px;width:24px;height:24px}
+body .today .shoot:focus-visible{outline:3px solid var(--fr-focus);outline-offset:3px}
+body .today .dc-tday{gap:var(--tk-gap);margin:8px calc(-1 * var(--tk-pad)) calc(-1 * var(--tk-pad));padding:var(--tk-pad)}
+@media (min-width:1024px){body[data-screen="home"] .today{zoom:1.25}}
+/* B */
+body[data-screen="missions"] .sheet>.card,body a.dc-home.aw-menu{display:grid;grid-template-columns:24px minmax(0,1fr);align-items:start;gap:var(--tk-gap) 10px;margin-top:0!important;margin-bottom:12px!important;padding:var(--tk-pad)!important;min-height:0;border-radius:16px;background:#fff;color:var(--fr-ink);border:1px solid var(--vc-line);box-shadow:0 1px 3px rgba(11,90,42,.08);text-decoration:none}
+body[data-screen="missions"] .sheet>.card>*,body a.dc-home.aw-menu>.dc-txt>*{grid-column:1/-1;margin:0!important}
+body[data-screen="missions"] .sheet>.card>.mh,body[data-screen="missions"] .sheet>.card>.dc-tdh{display:contents}
+body[data-screen="missions"] .sheet>.card>.mh .ri,body[data-screen="missions"] .sheet>.card>.dc-tdh>.ri,body a.dc-home.aw-menu>.dc-ico{grid-column:1;width:24px;height:24px;margin-top:5px;color:var(--vc-g7)}
+body[data-screen="missions"] .sheet>.card>.mh,body[data-screen="missions"] .sheet>.card>.dc-tdh>b,body a.dc-home.aw-menu .aw-mt .aw-m2{font:var(--tk-title);color:var(--vc-g9)}
+body[data-screen="missions"] .sheet>.card>.dc-tdh>b{grid-column:2}
+body[data-screen="missions"] .sheet>.card>.dc-tdh>.dc-tdd{grid-column:1/-1}
+body[data-screen="missions"] .sheet>.card>p,body[data-screen="missions"] .sheet>.card .dc-tdd,body a.dc-home.aw-menu .aw-mt .aw-m1,body a.dc-home.aw-menu .dc-st{font:var(--tk-text);color:var(--fr-ink)}
+body[data-screen="missions"] .sheet>.card>.btn,body[data-screen="missions"] .sheet>.card>.dc-tgo,body a.dc-home.aw-menu .dc-go{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;justify-content:center;flex-wrap:nowrap;gap:10px;width:100%;min-height:52px;margin:4px 0 0!important;padding:8px 20px;border-radius:999px;background:var(--vc-g9);color:#fff;font:var(--tk-btn);text-align:center;text-decoration:none;white-space:normal;box-shadow:none}
+body[data-screen="missions"] .sheet>.card>.btn .ri,body[data-screen="missions"] .sheet>.card>.dc-tgo .ri,body a.dc-home.aw-menu .dc-go .ri{flex:0 0 24px;width:24px;height:24px}
+body[data-screen="missions"] .sheet>.card>.dc-tgo i{display:contents}
+body[data-screen="missions"] .sheet>.card>p{font-size:18px!important;line-height:1.6!important} /* inline 16px in app.js */
+body[data-screen="missions"] #go:not(:has(.sub2)){flex-wrap:nowrap} /* icon beside the words, as on the other buttons */
+/* AWD card on the plot page: the title column carries icon + title, the lines and the button run full width */
+body a.dc-home.aw-menu>.dc-ico{display:block;background:none;border-radius:0}
+body a.dc-home.aw-menu>.dc-ico .ri{width:24px;height:24px;stroke-width:2}
+body a.dc-home.aw-menu>.dc-txt{display:contents}
+body a.dc-home.aw-menu .aw-mt{display:contents}
+body a.dc-home.aw-menu>.dc-ico{grid-row:1}
+body a.dc-home.aw-menu .aw-mt .aw-m2{grid-column:2;grid-row:1}
+body a.dc-home.aw-menu .aw-mt .aw-m1{grid-column:1/-1;grid-row:2}
+body a.dc-home.aw-menu.done{border:1px solid var(--vc-line);box-shadow:0 1px 3px rgba(11,90,42,.08)}
+body a.dc-home.aw-menu:focus-visible{outline:3px solid var(--fr-focus);outline-offset:3px}
+body[data-screen="missions"] .sheet>.card>.dc-tst>.ri{color:var(--vc-g9)}

@@ -131,3 +131,16 @@ body.rp-mode .hdr{display:none}
 .sheet.w8{padding-bottom:120px}
 .p2card .p2btns .btn{flex:1 1 100%}
 .hint{color:#4a4a4a}
+
+/* own dropdown in the plot form (Assist 23 Nov: no native select). Same height and border as the inputs; the menu floats, so opening moves nothing. */
+.p2dd{position:relative}
+.p2dd-b{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:10px 14px;border:1px solid var(--vc-line);border-radius:12px;background:#fff;color:var(--vc-ink);font:500 18px/1.6 Sarabun,sans-serif;text-align:left;cursor:pointer}
+.p2dd-b .p2ic{flex:0 0 24px;width:24px;height:24px;color:var(--vc-g9);transition:transform .2s}
+.p2dd-b[aria-expanded=true] .p2ic{transform:rotate(180deg)}
+.p2dd-b:focus-visible,.p2dd-m [role=option]:focus-visible{outline:3px solid var(--fr-focus,#E0A800);outline-offset:2px}
+.p2dd-m{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;max-height:min(60vh,360px);overflow-y:auto;padding:4px;border:1px solid var(--vc-line);border-radius:12px;background:#fff;box-shadow:0 8px 24px rgba(11,90,42,.18)}
+.p2dd-m[hidden]{display:none}
+.p2dd-m [role=option]{display:block;width:100%;min-height:48px;padding:8px 12px;border:0;border-radius:8px;background:none;color:var(--vc-ink);font:500 18px/1.6 Sarabun,sans-serif;text-align:left;cursor:pointer}
+.p2dd-m [role=option]:hover,.p2dd-m [role=option]:focus{background:var(--vc-g0,#EAF4EC)}
+.p2dd-m [role=option][aria-selected=true]{font-weight:700;color:var(--vc-g9)}
+@media (prefers-reduced-motion:reduce){.p2dd-b .p2ic{transition:none}}

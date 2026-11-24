@@ -45,7 +45,7 @@
   function recentHtml() {
     var rows = st.recent.map(function (r) {
       return '<li><div><b>' + esc(r.name) + '</b><small>ต.' + esc(r.tambon) + ' อ.' + esc(r.amphoe) + ' จ.' + esc(r.province) + '</small></div><div class="rp-r2">' +
-        (r.national_id && r.national_id.last4 ? '<small>เลขบัตร ...' + esc(r.national_id.last4) + '</small>' : '<small>ไม่ได้เก็บเลขบัตร</small>') +
+        (r.national_id && r.national_id.last4 ? '<small>เลขบัตรลงท้าย ' + esc(r.national_id.last4) + '</small>' : '<small>ไม่ได้เก็บเลขบัตร</small>') +
         (r.claimed ? '<span class="rp-pill ok">รับบัญชีแล้ว</span>' : '<button class="rp-link" data-reissue="' + esc(r.public_id) + '">ออกรหัสใหม่</button>') + '</div></li>';
     }).join('');
     return '<aside class="rp-side"><h2>ลงทะเบียนล่าสุด</h2><p class="rp-sub">วันนี้ ' + st.today + ' คน</p>' + (rows ? '<ul class="rp-list" id="rplist">' + rows + '</ul>' : '<p class="rp-empty">ยังไม่มีรายการ</p>') + '</aside>';
@@ -67,10 +67,10 @@
     return '<div class="rp-panel rp-wide rp-consent"><div class="rp-hand">ส่งแท็บเล็ตให้เกษตรกรอ่านและกดเอง</div><h1>ขอความยินยอมใช้ข้อมูลของท่าน</h1>' +
       '<div class="rp-2col"><div>' + 
       '<h2>เราจะเก็บ</h2><ul><li>ชื่อและนามสกุล</li><li>ตำบล อำเภอ จังหวัด ที่อยู่ในบัตร</li><li>เลขบัตรประชาชน (ถ้าท่านยินยอม) เก็บแบบเข้ารหัส เจ้าหน้าที่มองไม่เห็นเลขเต็ม</li></ul><h2>เราจะไม่เก็บ</h2><ul><li>รูปบนบัตร</li><li>วันเดือนปีเกิด</li><li>เลขที่บ้านและหมู่</li></ul>' +
-      '<h2>ใช้เพื่ออะไร</h2><p class="rp-p">ใช้ลงทะเบียนเข้าร่วมโครงการนาข้าว ติดตามแปลงนาและภารกิจ และยืนยันว่าท่านเป็นเกษตรกรตัวจริง ท่านถอนความยินยอมและขอลบข้อมูลได้ทุกเมื่อที่เมนู ข้อมูลของฉัน</p>' +
+      '<h2>ใช้เพื่ออะไร</h2><p class="rp-p">ใช้ลงทะเบียนเข้าร่วมโครงการนาข้าว ติดตามแปลงนาและภารกิจ และยืนยันว่าท่านเป็นเกษตรกรตัวจริง ท่านถอนความยินยอมและขอลบข้อมูลได้ทุกเมื่อที่เมนู ตั้งค่า / ลบบัญชี</p>' +
       '</div><div>' +
       '<label class="rp-chk"><input type="checkbox" id="rpage"' + (st.age ? ' checked' : '') + '><span>ข้าพเจ้าอายุ 20 ปีขึ้นไป หรือมีผู้ปกครองยินยอมแล้ว <small>(จำเป็น)</small></span></label>' +
-      '<label class="rp-chk"><input type="checkbox" id="rppub"' + (st.pub ? ' checked' : '') + '><span>แสดงชื่อที่ใช้แสดงตนในอันดับลีกของหมู่บ้าน <small>(ไม่บังคับ)</small></span></label>' +
+      '<label class="rp-chk"><input type="checkbox" id="rppub"' + (st.pub ? ' checked' : '') + '><span>ให้เกษตรกรในพื้นที่เดียวกันเห็นชื่อและคะแนนของฉันในอันดับคะแนน <small>(ไม่บังคับ)</small></span></label>' +
       '<label class="rp-chk"><input type="checkbox" id="rpbaac"' + (st.baac ? ' checked' : '') + '><span>บันทึกความสนใจเรื่อง ธ.ก.ส. ไว้สำหรับอนาคต <small>(ไม่บังคับ)</small></span></label>' +
       '<h2>เลขบัตรประชาชน</h2><div class="rp-choice"><button class="rp-opt" id="rpidy">ยินยอมให้อ่านและเก็บเลขบัตร<small>เสียบบัตรเข้าเครื่องอ่าน ระบบอ่านเฉพาะชื่อ เลขบัตร และตำบล อำเภอ จังหวัด</small></button>' +
       '<button class="rp-opt alt" id="rpidn">ไม่ยินยอม ลงทะเบียนโดยไม่เก็บเลขบัตร<small>พิมพ์ชื่อและที่อยู่เอง ยังเข้าร่วมโครงการได้เหมือนกัน</small></button></div>' + errBox() +
@@ -100,8 +100,8 @@
     var r = st.result || {};
     return '<div class="rp-panel rp-wide rp-center"><div class="rp-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h1>' + (r.name ? 'ลงทะเบียนแล้ว: ' + esc(r.name) : 'ออกรหัสใหม่แล้ว') + '</h1>' +
       (r.last4 ? '<p class="rp-sub">เลขบัตรบันทึกแล้ว ลงท้าย ' + esc(r.last4) + '</p>' : '') +
-      '<p class="rp-sub">ให้เกษตรกรใช้รหัสนี้เพื่อตั้ง PIN หรือผูก LINE ในแอป RiceOS</p><div class="rp-codewrap"><div class="rp-code" id="rpcode" aria-label="รหัสรับบัญชี">' + esc(fmtCode(r.code)) + '</div>' +
-      '<div class="rp-qr" id="rpqr" aria-label="QR รหัสรับบัญชี"></div></div><p class="rp-sub">ใช้ได้ครั้งเดียว หมดอายุ ' + esc((r.exp || '').slice(0, 10)) + ' ให้จดรหัสหรือถ่ายรูปก่อนกดปุ่มด้านล่าง รหัสจะไม่แสดงอีก</p>' +
+      '<p class="rp-sub">ให้เกษตรกรใช้รหัสนี้เพื่อตั้งรหัส PIN หรือเชื่อม LINE ในแอป RiceOS</p><div class="rp-codewrap"><div class="rp-code" id="rpcode" aria-label="รหัสรับบัญชี">' + esc(fmtCode(r.code)) + '</div>' +
+      '<div class="rp-qr" id="rpqr" aria-label="รหัส QR สำหรับรับบัญชี"></div></div><p class="rp-sub">ใช้ได้ครั้งเดียว หมดอายุวันที่ ' + esc((function (d) { return isNaN(d) ? (r.exp || '').slice(0, 10) : d.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric' }); })(new Date(r.exp || ''))) + ' ให้จดรหัสหรือถ่ายรูปก่อนกดปุ่มด้านล่าง รหัสจะไม่แสดงอีก</p>' +
       '<button class="rp-btn big" id="rpnext">เสร็จแล้ว คนถัดไป</button></div>';
   }
 
@@ -132,7 +132,7 @@
       }; });
     } else if (step === 'consent') {
       var pick = function (idc) {
-        if (!$('rpage').checked) return setErr('กรุณาติ๊กยืนยันอายุก่อน');
+        if (!$('rpage').checked) return setErr('กรุณากดเลือกช่องยืนยันอายุก่อน');
         st.age = true; st.pub = $('rppub').checked; st.baac = $('rpbaac').checked; st.idc = idc; setErr('');
         if (idc) enterCard(); else go('manual');
       };
@@ -140,7 +140,7 @@
     } else if (step === 'card') {
       on('rpread', readNow); on('rpmanual', function () { go('manual'); });
       if (window.RICEOS_DEBUG === true && window.RiceIdReader) window.RiceIdReader.enableSimulator(true).catch(function () {});
-      if (window.RiceIdReader) window.RiceIdReader.isAvailable().then(function (ok) { var e = $('rpcs'); if (e && !ok) e.textContent = 'ยังไม่พบเครื่องอ่านบัตรที่ต่อกับแท็บเล็ต ต่อสาย USB แล้วกดอ่านบัตร หรือเลือกกรอกข้อมูลเอง'; });
+      if (window.RiceIdReader) window.RiceIdReader.isAvailable().then(function (ok) { var e = $('rpcs'); if (e && !ok) e.textContent = 'ยังไม่พบเครื่องอ่านบัตรที่ต่อกับแท็บเล็ต ต่อเครื่องอ่านบัตรเข้ากับแท็บเล็ตด้วยสาย USB แล้วกดอ่านบัตร หรือเลือกกรอกข้อมูลเอง'; });
     } else if (step === 'manual') {
       on('rpmnext', function () {
         var nm = $('rpnm').value.trim().replace(/\s+/g, ' '), tb = $('rptb').value.trim(), am = $('rpam').value.trim(), pv = $('rppv').value.trim(), idv = $('rpid') ? $('rpid').value.replace(/\D/g, '') : '';
@@ -173,7 +173,7 @@
     var ph = root.querySelector('#rpph').value.replace(/\D/g, ''), vl = root.querySelector('#rpvl').value.trim();
     if (ph && !/^0\d{9}$/.test(ph)) return setErr('เบอร์มือถือต้องเป็นตัวเลข 10 หลัก หรือเว้นว่างไว้');
     var body = { name: c.name, source: c.source, cycle: st.cycle || undefined, province: c.province, amphoe: c.amphoe, tambon: c.tambon,
-      consent: { version: (A.api && A.api.consentVer ? A.api.consentVer() : 'c3'), core: true, age_guardian: true, public_rank: st.pub, baac: st.baac } };
+      consent: { version: (A.api && A.api.consentVer ? A.api.consentVer() : 'c4'), core: true, age_guardian: true, public_rank: st.pub, baac: st.baac } };
     if (vl) body.village = vl; if (ph) body.phone = ph;
     if (st.idc && c.id) { body.national_id = c.id; body.consent.national_id = true; }
     b.disabled = true; b.textContent = 'กำลังลงทะเบียน...'; setErr('');

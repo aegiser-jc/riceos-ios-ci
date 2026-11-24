@@ -9,7 +9,7 @@
   var TH_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
   var TITLE = 'ตรวจเช็คแปลงเมื่อถึงกำหนดตามแผน เปียกสลับแห้ง';
   /* wording verbatim from the request; several may be ticked */
-  var DO = [['water', 'ให้น้ำ'], ['drain', 'ระบายน้ำ'], ['fert', 'ใส่ปุ๋ย'], ['microbe', 'ใช้จุลินทรีย์ตามแผน'], ['pest', 'จัดการโรค แมลง หรือวัชพืช'], ['levee', 'ซ่อมคันนา'], ['straw', 'จัดการฟางไม่เผา']];
+  var DO = [['water', 'ให้น้ำ'], ['drain', 'ระบายน้ำ'], ['fert', 'ใส่ปุ๋ย'], ['microbe', 'ใช้จุลินทรีย์ตามแผน'], ['pest', 'จัดการโรค แมลง หรือวัชพืช'], ['levee', 'ซ่อมคันนา'], ['straw', 'จัดการฟางโดยไม่เผา']];
 
   /* ---------- storage (own key only, every access guarded) ---------- */
   function readAll() { try { var j = JSON.parse(localStorage.getItem(KEY) || 'null'); return j && j.v === 1 && j.o && typeof j.o === 'object' ? j : { v: 1, o: {} }; } catch (e) { return { v: 1, o: {} }; } }
@@ -45,11 +45,11 @@
     var app = A.app, sh = app.querySelector('.sheet'), p = A.P(); if (!sh || !p || app.querySelector('.aw-menu')) return;
     var at = sh.querySelector(':scope>.plotsw') || sh.querySelector(':scope>.titlerow'); if (!at) return;
     var days = plotDays(p), last = Object.keys(days).sort().pop(), e = last ? days[last] : null, done = last === today();
-    var st = e ? 'บันทึกล่าสุด ' + thDay(last) + ((e.do || []).length ? ' · ' + (e.do || []).map(doLabel).filter(Boolean).join(', ') : '') : 'ยังไม่มีบันทึก'; /* r12: the schedule wording is already in the title line above */
+    var st = e ? 'บันทึกล่าสุด ' + thDay(last) + ((e.do || []).length ? '\nทำ: ' + (e.do || []).map(doLabel).filter(Boolean).join(', ') : '') : 'ยังไม่มีบันทึก'; /* r12: the schedule wording is already in the title line above */
     at.insertAdjacentHTML('afterend', '<a class="dc-home done aw-menu" id="awmenu" href="#/awd?plot=' + encodeURIComponent(p.id) + '">' +
       '<span class="dc-ico" aria-hidden="true">' + RiceIco('drop') + '</span>' +
-      '<span class="dc-txt"><b class="aw-mt">' + TITLE.replace(/^(ตรวจเช็คแปลง)(.*) (\S+)$/, '<span class="aw-m1"><span>$1</span><span>$2</span></span> <span class="aw-m2">$3</span>') + '</b><small class="dc-st">' + st.split(' · ').map(function (x) { return '<span>' + esc(x) + '</span>'; }).join(' · ') + '</small></span>' +
-      '<span class="dc-go">' + (done ? 'ดู / แก้ไข' : 'เริ่มบันทึก') + '<i aria-hidden="true">›</i></span></a>');
+      '<span class="dc-txt"><b class="aw-mt">' + TITLE.replace(/^(ตรวจเช็คแปลง)(.*) (\S+)$/, '<span class="aw-m1"><span>$1</span><span>$2</span></span> <span class="aw-m2">$3</span>') + '</b><small class="dc-st">' + st.split('\n').map(function (x) { return '<span>' + esc(x) + '</span>'; }).join(' ') + '</small>' + (window.RiceFieldReview && e ? RiceFieldReview.line('awd', p, last, e, 'card') : '') + '</span>' +
+      '<span class="dc-go">' + RiceIco('clip') + (done ? 'ดู / แก้ไข' : 'เริ่มบันทึก') + '</span></a>');
   }
 
   /* ---------- #/awd ---------- */
@@ -68,14 +68,14 @@
       var e = days[k] || {};
       return '<li><b>' + thDay(k) + '</b><span>' + (e.do || []).map(function (c) { var l = doLabel(c); return l ? '<i>' + esc(l) + '</i>' : ''; }).join('') +
         (e.items || []).map(function (it) { return '<i class="aw-hi">' + esc(it.n) + (it.q ? ' ' + esc(it.q) : '') + (it.u ? ' ' + esc(it.u) : '') + '</i>'; }).join('') +
-        (e.cost ? '<i class="aw-hc">รวม ' + money(e.cost) + ' บาท</i>' : '') + '</span></li>';
+        (e.cost ? '<i class="aw-hc">รวม ' + money(e.cost) + ' บาท</i>' : '') + '</span>' + (window.RiceFieldReview ? RiceFieldReview.line('awd', p, k, e, 'hist') : '') + '</li>';
     }).join('') + '</ul></section>';
   }
   function savedLine(e) { return e && e.at ? RiceIco('check') + '<span><b>บันทึกแล้ว</b><small>แก้ไขได้ตลอดวันนี้</small></span>' : ''; }
   function screen() {
     var S = A.S(), plots = S.plots || [], want = (/[?&]plot=([^&]+)/.exec(location.hash) || [])[1], day = today();
     var p = plots.filter(function (x) { return want && String(x.id) === decodeURIComponent(want); })[0] || A.P(); /* chosen plot lives in the URL only */
-    var head = A.header() + '<div class="sheet dc-sheet aw-sheet">' + A.titleRow(TITLE, 'วันนี้ ' + thDay(day) + (p ? ' · ' + esc(p.name || ('แปลง ' + (p.code || ''))) : ''));
+    var head = A.header() + '<div class="sheet dc-sheet aw-sheet">' + A.titleRow(TITLE, 'วันนี้ ' + thDay(day) + (p ? ' แปลง: ' + esc(p.name || p.code || '') : ''));
     if (!p) { A.app.innerHTML = head + '<div class="card dc-empty"><p class="big">ยังไม่มีแปลง เพิ่มแปลงก่อน แล้วกลับมาบันทึกได้</p><a class="btn" href="#/plotedit?new=1">เพิ่มแปลง</a></div></div>'; return; }
     var e = plotDays(p)[day] || {}, items = (e.items || []).length ? e.items : [{}], has = {};
     (e.do || []).forEach(function (c) { has[c] = 1; });
@@ -83,6 +83,7 @@
     A.app.innerHTML = head + sw +
       '<p class="aw-when">' + RiceIco('clip') + '<span>ทำเมื่อถึงกำหนดตามแผน ไม่มีจำนวนวันตายตัว ไม่จำเป็นต้องทำทุกวัน</span></p>' +
       '<div class="dc-saved" id="awsaved" role="status" aria-live="polite"' + (e.at ? '' : ' hidden') + '>' + savedLine(e) + '</div>' +
+      '<div class="fr-wrap" id="awreview" aria-live="polite">' + (window.RiceFieldReview ? RiceFieldReview.line('awd', p, day, e, 'form') : '') + '</div>' +
       '<form class="dc-form aw-form" id="awform" novalidate><div class="dc-hrow"><h2 class="dc-h">วันนี้ทำอะไร ใช้เท่าไร จ่ายเท่าไร</h2></div>' +
       '<fieldset class="card dc-g aw-g" data-g="do"><legend><span class="dc-n">1</span>วันนี้ทำอะไร<small class="dc-one">เลือกได้หลายข้อ</small></legend>' +
         DO.map(function (o) { var id = 'aw-do-' + o[0], c = !!has[o[0]]; return '<div class="dc-opt' + (c ? ' on' : '') + '"><label class="dc-chk" for="' + id + '"><input type="checkbox" id="' + id + '" name="aw-do" value="' + o[0] + '"' + (c ? ' checked' : '') + '><span>' + esc(o[1]) + '</span></label></div>'; }).join('') + '</fieldset>' +
@@ -104,7 +105,7 @@
       var tm = last ? hhmm(last.at) + '\u00a0น.' : '';
       st.innerHTML = (k === 'need' ? '<span>เลือกหรือกรอก</span> <span>อย่างน้อย 1 ข้อ</span><span>ก่อนบันทึก</span>' : k === 'ok' ? '<span>บันทึกแล้ว</span> <span class="dc-tmv">เวลา ' + tm + '</span>' :
         '<i class="dc-ph">' + (last ? '<span>มีการแก้ไข</span> <span>ยังไม่ได้บันทึก</span>' : '<span>ยังไม่ได้บันทึก</span>') + '</i><i class="dc-pc">' + (last ? '<span>บันทึกล่าสุด</span> <span>เวลา ' + tm + '</span>' : '<span>ยังไม่มีบันทึกวันนี้</span>') + '</i>') +
-        '<small class="dc-dev">บันทึกไว้ในเครื่องนี้</small>';
+        (window.RiceFieldReview && last ? RiceFieldReview.dev('awd', p, day, last) : '<small class="dc-dev">บันทึกไว้ในเครื่องนี้</small>');
       b.classList.toggle('idle', k !== 'stale');
     }
     function dels() { var n = box.children.length; box.querySelectorAll('.aw-del').forEach(function (b) { b.hidden = n < 2; }); document.getElementById('awadd').hidden = n >= MAXI; }
@@ -147,6 +148,7 @@
       if (!putEntry(p, day, e)) return showErr('บันทึกไม่ได้: พื้นที่ในเครื่องเต็ม หรือเครื่องไม่อนุญาตให้บันทึก');
       saved.innerHTML = savedLine(e); saved.hidden = false; saved.classList.remove('stale'); last = e; dirty = false; bar();
       document.getElementById('awsave').innerHTML = RiceIco('check') + ' บันทึกการแก้ไข';
+      if (window.RiceFieldReview) { document.getElementById('awreview').innerHTML = RiceFieldReview.line('awd', p, day, e, 'form'); RiceFieldReview.submit(); } /* staff copy after the local save */
       A.toast('บันทึกแล้ว');
       saved.scrollIntoView({ block: 'center', behavior: 'smooth' });
     });

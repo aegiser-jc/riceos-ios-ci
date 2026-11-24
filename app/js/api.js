@@ -3,18 +3,18 @@
 (function () {
   'use strict';
   var MSG = {
-    consent_required: 'ต้องยินยอมการใช้ข้อมูลหลักก่อน', consent_version: 'ข้อความความยินยอมมีการปรับปรุง กรุณาเปิดแอปใหม่',
-    bad_phone: 'เบอร์มือถือไม่ถูกต้อง ต้องเป็นตัวเลข 10 หลัก', weak_pin: 'PIN เดาง่ายเกินไป เช่น 123456 หรือเลขซ้ำ กรุณาเลือกใหม่',
-    bad_name: 'กรุณากรอกชื่อ', phone_taken: 'เบอร์นี้ลงทะเบียนแล้ว เข้าสู่ระบบ หรือ ติดต่อเจ้าหน้าที่',
-    bad_credentials: 'เบอร์หรือ PIN ไม่ถูกต้อง', locked: 'ใส่ PIN ผิดหลายครั้ง ถูกล็อกชั่วคราว', disabled: 'บัญชีนี้ถูกปิดใช้งาน กรุณาติดต่อเจ้าหน้าที่',
-    no_session: 'กรุณาเข้าสู่ระบบอีกครั้ง', csrf: 'ส่งข้อมูลไม่สำเร็จ กรุณาเปิดแอปใหม่', daily_cap: 'ส่งรูปครบ 20 รูปแล้ววันนี้ จะส่งต่อพรุ่งนี้',
+    consent_required: 'ต้องยินยอมให้ใช้ข้อมูลเพื่อการใช้งานหลักของแอปก่อน', consent_version: 'ข้อความขอความยินยอมเปลี่ยนใหม่แล้ว กรุณาเปิดแอปใหม่',
+    bad_phone: 'เบอร์มือถือไม่ถูกต้อง ต้องเป็นตัวเลข 10 หลัก', weak_pin: 'รหัส PIN นี้เดาง่ายเกินไป เช่น 123456 หรือเลขซ้ำกัน กรุณาตั้งใหม่',
+    bad_name: 'กรุณากรอกชื่อ', phone_taken: 'เบอร์นี้ลงทะเบียนแล้ว กรุณาเข้าสู่ระบบ หรือติดต่อเจ้าหน้าที่',
+    bad_credentials: 'เบอร์มือถือหรือรหัส PIN ไม่ถูกต้อง', locked: 'ใส่รหัส PIN ผิดหลายครั้ง ระบบปิดการเข้าใช้ไว้ชั่วคราว', disabled: 'บัญชีนี้ถูกปิดใช้งาน กรุณาติดต่อเจ้าหน้าที่',
+    no_session: 'กรุณาเข้าสู่ระบบอีกครั้ง', csrf: 'ส่งข้อมูลไม่สำเร็จ กรุณาเปิดแอปใหม่', daily_cap: 'วันนี้ส่งรูปครบ 20 รูปแล้ว รูปที่เหลือจะส่งต่อพรุ่งนี้',
     storage_full: 'พื้นที่เก็บรูปของระบบเต็ม กรุณาติดต่อเจ้าหน้าที่', bad_code: 'รหัสจากเจ้าหน้าที่ไม่ถูกต้องหรือหมดอายุ',
-    network: 'ติดต่อระบบไม่ได้ (ไม่มีสัญญาณอินเทอร์เน็ต) กรุณาลองใหม่', server: 'ระบบขัดข้อง กรุณาลองใหม่ภายหลัง'
+    network: 'ไม่มีสัญญาณอินเทอร์เน็ต ติดต่อระบบไม่ได้ กรุณาลองใหม่', server: 'ระบบขัดข้อง กรุณาลองใหม่ภายหลัง'
   };
-  MSG.bad_gps = 'ตำแหน่ง GPS ของรูปนี้ไม่ถูกต้อง'; MSG.bad_lat = MSG.bad_gps; MSG.bad_lon = MSG.bad_gps; MSG.bad_gps_status = MSG.bad_gps;
+  MSG.bad_gps = 'พิกัด GPS ของรูปนี้ไม่ถูกต้อง'; MSG.bad_lat = MSG.bad_gps; MSG.bad_lon = MSG.bad_gps; MSG.bad_gps_status = MSG.bad_gps;
   MSG.unreachable = 'เชื่อมต่อระบบของโครงการไม่ได้ในขณะนี้ ข้อมูลของท่านยังอยู่ในเครื่อง กรุณาลองอีกครั้งภายหลัง';
-  MSG.line_disabled = 'ยังไม่เปิดใช้การเข้าสู่ระบบด้วย LINE'; MSG.bad_ticket = 'ลิงก์เข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่'; MSG.line_taken = 'บัญชี LINE นี้ผูกกับบัญชีอื่นแล้ว';
-  MSG.last_login_method = 'ต้องตั้งเบอร์มือถือและ PIN ก่อน จึงจะยกเลิกการผูก LINE ได้'; MSG.has_pin = 'บัญชีนี้มีเบอร์และ PIN อยู่แล้ว'; MSG.no_pin = 'บัญชีนี้ยังไม่ได้ตั้งเบอร์มือถือและ PIN';
+  MSG.line_disabled = 'ตอนนี้ยังไม่เปิดให้เข้าสู่ระบบด้วย LINE'; MSG.bad_ticket = 'ลิงก์เข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่'; MSG.line_taken = 'บัญชี LINE นี้เชื่อมกับบัญชีอื่นในแอปแล้ว';
+  MSG.last_login_method = 'ต้องตั้งเบอร์มือถือและรหัส PIN ก่อน จึงจะยกเลิกการเชื่อม LINE ได้'; MSG.has_pin = 'บัญชีนี้ตั้งเบอร์มือถือและรหัส PIN ไว้แล้ว'; MSG.no_pin = 'บัญชีนี้ยังไม่ได้ตั้งเบอร์มือถือและรหัส PIN';
   MSG.bad_national_id = 'เลขบัตรประชาชนไม่ถูกต้อง กรุณาตรวจสอบเลข 13 หลัก'; MSG.national_id_taken = 'เลขบัตรนี้ถูกใช้กับบัญชีอื่นแล้ว กรุณาติดต่อเจ้าหน้าที่'; MSG.already_verified = 'เลขบัตรของท่านผ่านการยืนยันแล้ว';
   MSG.national_id_disabled = 'ขณะนี้ยังไม่เปิดให้ยืนยันด้วยเลขบัตรประชาชน'; MSG.confirm_required = 'กรุณากดยืนยันการลบบัญชี';
   var base = ''; try { base = window.RICEOS_API_BASE || localStorage.getItem('riceos.api') || ''; } catch (e) { base = window.RICEOS_API_BASE || ''; }
@@ -39,7 +39,7 @@
   function fail(status, j, network) {
     var code = network ? (typeof navigator !== 'undefined' && navigator.onLine === false ? 'network' : 'unreachable') : (j && j.error) || (status >= 500 ? 'server' : 'http_' + status);
     var e = new Error((j && j.message_th) || MSG[code] || MSG.server); e.code = code; e.status = status || 0; e.network = !!network; e.data = j || {};
-    if (code === 'locked' && j && j.retry_after_s) e.message = 'ใส่ PIN ผิดหลายครั้ง ลองใหม่อีก ' + Math.max(1, Math.ceil(j.retry_after_s / 60)) + ' นาที หรือขอรหัสจากเจ้าหน้าที่';
+    if (code === 'locked' && j && j.retry_after_s) e.message = 'ใส่รหัส PIN ผิดหลายครั้ง ลองใหม่ได้ในอีก ' + Math.max(1, Math.ceil(j.retry_after_s / 60)) + ' นาที หรือขอรหัสจากเจ้าหน้าที่';
     else if (MSG[code] && code !== 'phone_taken' && !(j && j.message_th)) e.message = MSG[code];
     return e;
   }
@@ -74,6 +74,9 @@
   API.evidenceSince = function (iso) { return req('GET', '/api/evidence' + (iso ? '?since=' + encodeURIComponent(iso) : '')); };
   API.createPlot = function (b) { return req('POST', '/api/plots', b); };
   API.config = function () { return req('GET', '/api/config'); };
+  /* field checks for staff review (PingEris 23 Nov): day = Bangkok YYYY-MM-DD, answers = the saved entry without "at" */
+  API.fieldChecks = function (from) { return req('GET', '/api/me/field-checks' + (from ? '?from=' + encodeURIComponent(from) : '')); };
+  API.putFieldCheck = function (kind, plotPid, day, answers) { return req('PUT', '/api/me/field-checks/' + encodeURIComponent(kind) + '/' + encodeURIComponent(plotPid) + '/' + encodeURIComponent(day), { answers: answers }); };
   API.lineStart = function () { return req('POST', '/api/auth/line/start', {}); };
   API.lineFinish = function (ticket, shared) { return req('POST', '/api/auth/line/finish', { ticket: ticket, client: native ? 'native' : 'web', shared_device: !!shared }).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
   API.lineRegister = function (b) { b.client = native ? 'native' : 'web'; return req('POST', '/api/auth/line/register', b).then(function (j) { if (j.token) setToken(j.token); return seeUser(j); }); };
@@ -82,8 +85,8 @@
   API.addCredentials = function (phone, pin) { return req('POST', '/api/me/credentials', { phone: phone, pin: pin }); };
   API.putNationalId = function (number) { return req('PUT', '/api/me/national-id', { number: number, consent: true, version: 'id1' }); };
   API.deleteNationalId = function () { return req('DELETE', '/api/me/national-id'); };
-  /* consent version comes from the server (GET /api/consent/current {current, accepted_versions}); fallback c3, never hard-coded elsewhere */
-  var CV = 'c3', CACC = null; /* null until the server has answered: any stored version is kept */
+  /* consent version comes from the server (GET /api/consent/current {current, accepted_versions}); fallback c4, never hard-coded elsewhere */
+  var CV = 'c4', CACC = null; /* null until the server has answered: any stored version is kept */
   API.consentVer = function () { return CV; };
   API.consentAccepted = function () { return CACC; };
   API.consentCurrent = function () { return req('GET', '/api/consent/current').then(function (j) { var v = j && (j.current || j.version); if (/^c\d+$/.test(v || '')) { CV = v; CACC = j.accepted_versions && j.accepted_versions.length ? j.accepted_versions.slice() : [v]; } return j; }); };
@@ -103,7 +106,7 @@
   }
   function tx(mode, fn) { return db().then(function (d) { return new Promise(function (ok, no) { var t = d.transaction('items', mode), res = fn(t.objectStore('items')); t.oncomplete = function () { ok(res && res.result !== undefined ? res.result : undefined); }; t.onerror = t.onabort = function () { no(t.error); }; }); }); }
   var OB = {};
-  OB.add = function (item) { item.uid = item.uid || uid; if (!item.uid) return Promise.reject(new Error('no user')); return tx('readwrite', function (s) { return s.put(item); }); };
+  OB.add = function (item) { item.uid = item.uid || uid; if (!item.uid) return Promise.reject(new Error('ระบบขัดข้อง กรุณาเข้าสู่ระบบอีกครั้ง')); return tx('readwrite', function (s) { return s.put(item); }); };
   OB.raw = function () { return tx('readonly', function (s) { return s.getAll(); }); };
   OB.purgeAll = function () { return OB.raw().then(function (a) { return Promise.all((a || []).map(function (i) { return OB.del(i.client_uuid); })); }); };
   OB.purgeOthers = function (id) { return OB.raw().then(function (a) { return Promise.all((a || []).filter(function (i) { return i.uid !== id; }).map(function (i) { return OB.del(i.client_uuid); })); }); };

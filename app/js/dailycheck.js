@@ -12,7 +12,7 @@
     { k: 'plant', h: 'ต้นข้าว', o: [{ v: 'normal', l: 'ปกติ' }, { v: 'abnormal', l: 'ผิดปกติ', t: 'text' }] },
     { k: 'pest', h: 'โรค แมลง วัชพืช', o: [{ v: 'none', l: 'ไม่พบปัญหา' }, { v: 'found', l: 'พบปัญหา', t: 'text' }] },
     { k: 'levee', h: 'คันนาและทางน้ำ', o: [{ v: 'normal', l: 'ปกติ' }, { v: 'leak', l: 'รั่วหรืออุดตัน', t: 'text' }] },
-    { k: 'weather', h: 'สภาพอากาศ', o: [{ v: 'rain', l: 'มีฝน' }, { v: 'norain', l: 'ไม่มีฝน' }, { v: 'other', l: 'อื่นๆ', t: 'text' }] }
+    { k: 'weather', h: 'สภาพอากาศ', o: [{ v: 'rain', l: 'มีฝน' }, { v: 'norain', l: 'ไม่มีฝน' }, { v: 'other', l: 'อื่น ๆ', t: 'text' }] }
   ];
 
   /* ---------- storage (own key only, every access guarded) ---------- */
@@ -35,14 +35,35 @@
   function answered(e) { return e ? GROUPS.filter(function (g) { return e[g.k] && e[g.k].c; }).length : 0; }
 
   /* ---------- home entry: first child of the sheet, above everything ---------- */
+  /* PingEris 23 Nov: inside "วันนี้ต้องทำ" (the .today block) as its full-bleed bottom band, and as its own card on top of #/missions.
+     Same states as the home card; no points. When the home has no .today block (no plot) the card below stays as it was. */
+  function stateHtml(e) {
+    return '<span class="dc-tst">' + RiceIco(e ? 'check' : 'clip') + '<span>' + (e ? '<b>บันทึกแล้ววันนี้</b><span>ตอบ ' + answered(e) + ' จาก ' + GROUPS.length + ' หัวข้อ</span>' : '<b>ยังไม่ได้ตรวจวันนี้</b><span>มี ' + GROUPS.length + ' หัวข้อ</span>') + '</span></span>';
+  }
+  function itemHtml(p, e, cls, id, tag) {
+    var FR = window.RiceFieldReview;
+    return '<' + tag + ' class="' + cls + (e ? ' done' : '') + '" id="' + id + '"' + (tag === 'section' ? ' aria-labelledby="' + id + 'h"' : '') + '>' +
+      '<span class="dc-tdh">' + RiceIco('sprout') + '<b id="' + id + 'h">ตรวจเช็คแปลงรายวัน</b><span class="dc-tdd">วันนี้ ' + thDay(today()) + '</span></span>' +
+      (p ? stateHtml(e) + (FR ? FR.line('daily', p, today(), e, tag === 'div' ? 'today' : 'card') : '') : '<span class="dc-tst">' + RiceIco('clip') + '<span><b>เพิ่มแปลงก่อน แล้วตรวจได้ทุกวัน</b></span></span>') +
+      '<a class="dc-tgo" id="' + id + 'go" href="#/dailycheck"><i>' + RiceIco('clip') + '</i>' + (e ? 'ดู / แก้ไข' : p ? 'เริ่มตรวจ' : 'เพิ่มแปลง') + '</a></' + tag + '>'; /* PingEris 23 Nov 16:20: same button form as ถ่ายรูปยืนยัน (icon first, no chevron) */
+  }
   function decorate(h) {
+    if (h === 'missions') {
+      var ms = A.app.querySelector('.sheet'); if (!ms || document.getElementById('dcmis')) return;
+      var mp = A.P(), mh = itemHtml(mp, mp ? getEntry(mp, today()) : null, 'card dc-mis', 'dcmis', 'section'), tr = ms.querySelector(':scope>.titlerow');
+      if (tr) tr.insertAdjacentHTML('afterend', mh); else ms.insertAdjacentHTML('afterbegin', mh);
+      var lb = ms.querySelector(':scope>.card>a.btn[href="#/lessons"]'); if (lb && !lb.querySelector('.ri')) lb.insertAdjacentHTML('afterbegin', RiceIco('book')); /* every task button: icon first */
+      return;
+    }
     if (h !== 'home') return;
-    var app = A.app, sh = app.querySelector('.sheet'); if (!sh || app.querySelector('.dc-home')) return;
-    var p = A.P(), e = p ? getEntry(p, today()) : null, n = answered(e);
-    var st = !p ? 'เพิ่มแปลงก่อน แล้วตรวจได้ทุกวัน' : e ? 'บันทึกแล้ววันนี้ · ตอบ ' + n + ' จาก ' + GROUPS.length + ' หัวข้อ' : 'ยังไม่ได้ตรวจวันนี้ · ' + GROUPS.length + ' หัวข้อ';
+    var app = A.app, sh = app.querySelector('.sheet'); if (!sh || app.querySelector('.dc-home,.dc-tday')) return;
+    var p = A.P(), e = p ? getEntry(p, today()) : null, n = answered(e), td = sh.querySelector('.today');
+    if (td && p) { var h3 = td.querySelector('h3'), nt = td.nextElementSibling, sb = td.querySelector('.shoot'); if (h3 && !h3.querySelector('.ri')) h3.insertAdjacentHTML('afterbegin', RiceIco('clip')); if (nt && sb && nt.matches('p.note')) td.insertBefore(nt, td.querySelector('.tk-pts') || sb); /* PingEris 23 Nov r2: icon + title, photo detail inside the item, as on the missions card */
+      td.insertAdjacentHTML('beforeend', itemHtml(p, e, 'dc-tday', 'dctoday', 'div')); return; } /* not twice on one screen */
+    var st = !p ? 'เพิ่มแปลงก่อน แล้วตรวจได้ทุกวัน' : e ? 'บันทึกแล้ววันนี้: ตอบ ' + n + ' จาก ' + GROUPS.length + ' หัวข้อ' : 'ยังไม่ได้ตรวจวันนี้: มี ' + GROUPS.length + ' หัวข้อ';
     sh.insertAdjacentHTML('afterbegin', '<a class="dc-home' + (e ? ' done' : '') + '" id="dchome" href="#/dailycheck">' +
       '<span class="dc-ico" aria-hidden="true">' + RiceIco(e ? 'check' : 'clip') + '</span>' +
-      '<span class="dc-txt"><b>ตรวจเช็คแปลงรายวัน</b><small class="dc-date">วันนี้ ' + thDay(today()) + (p && p.name ? ' · ' + esc(p.name) : '') + '</small><small class="dc-st">' + st + '</small></span>' +
+      '<span class="dc-txt"><b>ตรวจเช็คแปลงรายวัน</b><small class="dc-date">วันนี้ ' + thDay(today()) + (p && p.name ? ' แปลง: ' + esc(p.name) : '') + '</small><small class="dc-st">' + st + '</small></span>' +
       '<span class="dc-go">' + (e ? 'ดู / แก้ไข' : 'เริ่มตรวจ') + '<i aria-hidden="true">›</i></span></a>');
   }
 
@@ -50,7 +71,7 @@
   function optHtml(g, o, cur) {
     var c = cur && cur.c === o.v, id = 'dc-' + g.k + '-' + o.v, txt = c ? (cur.x || '') : '';
     var box = '';
-    if (o.t === 'num') box = '<span class="dc-numrow"><input class="dc-x dc-num" id="' + id + '-x" data-for="' + id + '" type="text" inputmode="text" autocomplete="off" maxlength="6" placeholder="เช่น 5" aria-label="ระดับน้ำเทียบผิวดิน หน่วยเซนติเมตร" value="' + esc(txt) + '"><span class="dc-unit">' + esc(o.unit) + '</span></span><small class="dc-numhint"><span>น้ำท่วมผิวดิน ใส่ตัวเลขปกติ เช่น <b class="dc-ex">5</b></span><span>น้ำพอดีผิวดิน ใส่ <b class="dc-ex">0</b></span><span>น้ำอยู่ใต้ผิวดิน ใส่ลบ เช่น <b class="dc-ex neg">-10</b></span></small>';
+    if (o.t === 'num') box = '<span class="dc-numrow"><input class="dc-x dc-num" id="' + id + '-x" data-for="' + id + '" type="text" inputmode="text" autocomplete="off" maxlength="6" placeholder="เช่น 5" aria-label="ระดับน้ำเทียบผิวดิน หน่วยเซนติเมตร" value="' + esc(txt) + '"><span class="dc-unit">' + esc(o.unit) + '</span></span><small class="dc-numhint"><span>น้ำท่วมผิวดิน ใส่ตัวเลขปกติ เช่น <b class="dc-ex">5</b></span><span>น้ำพอดีผิวดิน ใส่ <b class="dc-ex">0</b></span><span>น้ำอยู่ใต้ผิวดิน ใส่เครื่องหมายลบ เช่น <b class="dc-ex neg">-10</b></span></small>';
     else if (o.t) box = '<textarea class="dc-x" id="' + id + '-x" data-for="' + id + '" rows="2" autocomplete="off" maxlength="200" placeholder="อธิบาย เช่น จุดไหน มากน้อยแค่ไหน" aria-label="' + esc(o.l) + ' อธิบาย">' + esc(txt) + '</textarea>';
     return '<div class="dc-opt' + (c ? ' on' : '') + (o.t ? ' hasx' : '') + (o.t === 'num' ? ' isnum' : '') + '"><label class="dc-chk" for="' + id + '"><input type="checkbox" id="' + id + '" name="' + g.k + '" value="' + o.v + '"' + (c ? ' checked' : '') + '><span>' + esc(o.l) + (o.t === 'text' ? ' อธิบาย' : '') + '</span></label>' + box + '</div>';
   }
@@ -64,13 +85,13 @@
         if (!o) return '';
         var bad = /abnormal|found|leak/.test(o.v);
         return '<i class="' + (bad ? 'bad' : '') + '">' + esc(g.h) + ': ' + esc(o.l.replace(/:$/, '')) + (a.x ? ' ' + esc(a.x) + (o.unit ? ' ' + esc(o.unit) : '') : '') + '</i>';
-      }).join('') + '</span></li>';
+      }).join('') + '</span>' + (window.RiceFieldReview ? RiceFieldReview.line('daily', p, k, e, 'hist') : '') + '</li>';
     }).join('') + '</ul></section>';
   }
   function screen() {
     var S = A.S(), plots = S.plots || [], want = (/[?&]plot=([^&]+)/.exec(location.hash) || [])[1], day = today();
     var p = plots.filter(function (x) { return want && String(x.id) === decodeURIComponent(want); })[0] || A.P(); /* chosen plot lives in the URL: never written to riceos.v1 */
-    var head = A.header() + '<div class="sheet dc-sheet">' + A.titleRow('ตรวจเช็คแปลงรายวัน', 'วันนี้ ' + thDay(day) + (p ? ' · ' + esc(p.name || ('แปลง ' + (p.code || ''))) : ''));
+    var head = A.header() + '<div class="sheet dc-sheet">' + A.titleRow('ตรวจเช็คแปลงรายวัน', 'วันนี้ ' + thDay(day) + (p ? ' แปลง: ' + esc(p.name || p.code || '') : ''));
     if (!p) {
       A.app.innerHTML = head + '<div class="card dc-empty"><p class="big">ยังไม่มีแปลง เพิ่มแปลงก่อน แล้วกลับมาตรวจเช็คได้ทุกวัน</p><a class="btn" href="#/plotedit?new=1">เพิ่มแปลง</a></div></div>';
       return;
@@ -79,6 +100,7 @@
     var sw = plots.length > 1 ? '<div class="plotsw" role="tablist" aria-label="เลือกแปลง">' + plots.map(function (x) { return '<button type="button" data-pl="' + esc(x.id) + '" class="' + (x === p ? 'on' : '') + '"><b>' + esc(x.name || ('แปลง ' + x.code)) + '</b><small>' + A.fmt(x.rai) + ' ไร่</small></button>'; }).join('') + '</div>' : '';
     A.app.innerHTML = head + sw +
       '<div class="dc-saved" id="dcsaved" role="status" aria-live="polite"' + (e.at ? '' : ' hidden') + '>' + savedLine(e) + '</div>' +
+      '<div class="fr-wrap" id="dcreview" aria-live="polite">' + (window.RiceFieldReview ? RiceFieldReview.line('daily', p, day, e, 'form') : '') + '</div>' +
       '<form class="dc-form" id="dcform" novalidate><div class="dc-hrow"><h2 class="dc-h">รายการสิ่งที่ตรวจ</h2><span class="dc-prog" id="dcprog">' + progText(e) + '</span></div>' +
       GROUPS.map(function (g, i) { return '<fieldset class="card dc-g" data-g="' + g.k + '"><legend><span class="dc-n">' + (i + 1) + '</span>' + esc(g.h) + '<small class="dc-one">เลือก 1 ข้อ</small></legend>' + g.o.map(function (o) { return optHtml(g, o, e[g.k]); }).join('') + '</fieldset>'; }).join('') +
       '<p class="dc-err" id="dcerr" role="alert" hidden></p>' +
@@ -113,7 +135,7 @@
          the hidden variant is display:none, so it is left out of the button's description. The device note sits under the status, next to Save. */
       st.innerHTML = (k === 'need' ? '<span>เลือกอย่างน้อย</span> <span>1\u00a0หัวข้อ</span><span>ก่อนบันทึก</span>' : k === 'ok' ? '<span>บันทึกแล้ว</span> <span class="dc-tmv">เวลา ' + tm + '</span>' :
         '<i class="dc-ph">' + (last && last.at ? '<span>มีการแก้ไข</span> <span>ยังไม่ได้บันทึก</span>' : '<span>ยังไม่ได้บันทึก</span>') + '</i><i class="dc-pc">' + (last && last.at ? '<span>บันทึกล่าสุด</span> <span>เวลา ' + tm + '</span>' : '<span>ตอบแล้ว ' + n + ' จาก 5 หัวข้อ</span>') + '</i>') +
-        '<small class="dc-dev">บันทึกไว้ในเครื่องนี้</small>';
+        (window.RiceFieldReview && last && last.at ? RiceFieldReview.dev('daily', p, day, last) : '<small class="dc-dev">บันทึกไว้ในเครื่องนี้</small>');
       b.classList.toggle('idle', k !== 'stale');
     }
     bar(); fitBar(f);
@@ -148,7 +170,7 @@
           var v = x.value.trim().replace(/\s+/g, ' ');
           if (x.classList.contains('dc-num')) {
             v = v.replace(/[−–]/g, '-').replace(',', '.').replace(/[๐-๙]/g, function (d) { return String(d.charCodeAt(0) - 0x0E50); });
-            if (v && !(/^[+-]?\d{1,3}(\.\d)?$/.test(v) && Math.abs(+v) <= 200)) bad = bad || 'ระดับน้ำ: กรอกเป็นตัวเลขเซนติเมตร เช่น 5 หรือ -10 (น้ำอยู่ใต้ผิวดินใส่ลบ)';
+            if (v && !(/^[+-]?\d{1,3}(\.\d)?$/.test(v) && Math.abs(+v) <= 200)) bad = bad || 'ระดับน้ำ: กรอกเป็นตัวเลขเซนติเมตร เช่น 5 หรือ -10 (น้ำอยู่ใต้ผิวดินใส่เครื่องหมายลบ)';
             if (v) v = String(+v);
           }
           if (v) a.x = v.slice(0, 200);
@@ -161,6 +183,7 @@
       if (!putEntry(p, day, e)) return showErr('บันทึกไม่ได้: พื้นที่ในเครื่องเต็ม หรือเครื่องไม่อนุญาตให้บันทึก');
       saved.innerHTML = savedLine(e); saved.hidden = false; saved.classList.remove('stale'); last = e; dirty = false; bar();
       document.getElementById('dcsave').innerHTML = RiceIco('check') + ' บันทึกการแก้ไข';
+      if (window.RiceFieldReview) { document.getElementById('dcreview').innerHTML = RiceFieldReview.line('daily', p, day, e, 'form'); RiceFieldReview.submit(); } /* staff copy after the local save */
       A.toast('บันทึกแล้ว');
       saved.scrollIntoView({ block: 'center', behavior: 'smooth' });
     });
