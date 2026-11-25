@@ -1,0 +1,564 @@
+@font-face{font-family:Sarabun;src:url('../assets/fonts/Sarabun-Regular.ttf') format('truetype');font-display:swap}
+@font-face{font-family:Prompt;src:url('../assets/fonts/Prompt-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+:root{--green:#0c5139;--ink:#263b33;--muted:#58674f;--paper:#eee8d8;--white:#fafaf3;--line:#dce2d6;--gold:#c9b881;--shadow:0 5px 20px #263b3325;font:18px Sarabun,sans-serif;color:var(--ink);background:#a7bfcc;color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;touch-action:manipulation;min-width:48px;min-height:48px}
+button:active{transform:scale(.97)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #dfba70;outline-offset:3px}
+button:disabled{opacity:.55}
+a{color:inherit}
+h1,h2,h3,p{margin:0}
+h1,h2,h3,strong,.brand,.primary{font-family:Prompt,Sarabun,sans-serif;font-weight:600}
+h2{font-size:25px;line-height:1.45;margin-bottom:10px;padding-right:28px}
+h3{font-size:20px}
+p{font-size:18px;line-height:1.6}
+.tiny,.provenance,.sheet-source{font-size:16px;line-height:1.5;color:#5f5b4e}
+.eyebrow{font-size:16px;color:var(--muted)}
+.skip{position:fixed;top:-100px;left:12px;z-index:100;background:var(--white);padding:16px}
+.skip:focus{top:12px}
+.topbar{position:fixed;z-index:5;left:24px;right:24px;top:20px;height:64px;border:1px solid #ffffff45;border-radius:23px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;color:var(--white);background:#0c5139f5;box-shadow:var(--shadow)}
+.brand{min-height:48px;display:flex;align-items:center;gap:10px;text-decoration:none;font-size:24px;line-height:1.3}
+.brand img{width:42px;height:42px}
+.brand small{display:block;font:16px Sarabun;color:#e4e9e4}
+.header-right{display:flex;gap:8px;align-items:center}
+.byline{font:22px Prompt;margin-right:16px}
+.byline>span{color:#c9b881}
+.icon-button,.round-button{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#ffffff16;flex-shrink:0}
+.icon{width:32px;height:32px;flex-shrink:0;overflow:visible;stroke-linejoin:round;stroke-linecap:round}
+.round-button{color:var(--green);background:#e4e9e4}
+main,.farm-layout,.world-card,.scene{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;max-width:none}
+.world-card{overflow:hidden}
+.scene{background:#a7bfcc;isolation:isolate}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.page-heading,.below-world,.scene-caption{display:none}
+.source-pill{font-size:16px}
+.field-targets{position:absolute;inset:0}
+.field-target{position:absolute;width:17%;height:11%;padding:0;background:transparent;transform:translate(-50%,-50%);font-size:16px;display:flex;align-items:flex-end;justify-content:center;border-radius:30%}
+.field-target:active{transform:translate(-50%,-50%) scale(.98)}
+.field-target span{display:none;pointer-events:none}
+.scene-weather{position:absolute;top:104px;left:24px;display:flex;gap:8px;align-items:center;background:var(--white);border-radius:20px;padding:9px 14px;box-shadow:var(--shadow);pointer-events:none}
+.scene-weather strong{font-size:18px;display:block}
+.scene-weather small{font-size:16px;display:block}
+.scene-weather .icon{width:36px;height:36px}
+.scene-help{position:absolute;left:24px;top:190px;background:var(--white);border-radius:24px;padding:9px 16px;font-size:18px;color:var(--green);box-shadow:var(--shadow)}
+.scene-footer{position:absolute;left:auto;right:24px;bottom:18px;width:330px;background:var(--white);display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:24px;box-shadow:var(--shadow);z-index:2}
+.scene-footer strong{display:block;font-size:18px}
+.scene-footer .tiny{display:block}
+.scene-footer>div:first-child{display:none}
+.stage-copy{flex:1}
+.care-panel{position:absolute;z-index:3;right:24px;top:108px;width:330px;display:flex;flex-direction:column;gap:18px;pointer-events:none}
+.care-panel>*{pointer-events:auto}
+.village-card{border:1px solid #fafaf3;border-radius:26px;padding:20px;background:var(--white);box-shadow:var(--shadow)}
+.health-body{display:flex;align-items:center;gap:16px}
+.health-ring{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ring,#507153) calc(var(--value)*1%),#e5dfce 0);position:relative;flex-shrink:0}
+.health-ring:before{content:'';position:absolute;inset:8px;background:var(--white);border-radius:50%}
+.health-ring>div{position:relative;display:flex;flex-direction:column;align-items:center}
+.health-ring strong{font-size:34px;line-height:1.2}
+.health-ring small{font-size:16px}
+.health-word{font:20px Prompt;color:var(--ring)}
+.compact-source{display:none}
+.primary,.secondary{border-radius:26px;padding:13px 16px;min-height:56px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px}
+.primary{background:linear-gradient(140deg,#507153,#0c5139);color:var(--white);box-shadow:0 4px 8px #0c513925;width:100%}
+.primary .icon{width:34px;height:34px}
+.secondary{border:1px solid #a7bfcc;background:var(--white);color:var(--green)}
+.bottom-nav{position:fixed;z-index:6;bottom:18px;left:24px;width:min(650px,calc(100% - 48px));height:76px;display:flex;background:var(--white);border:1px solid #ffffff;border-radius:26px;padding:6px;box-shadow:var(--shadow)}
+.bottom-nav button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:0;background:transparent;border-radius:20px;color:#5f5b4e;font-size:16px}
+.bottom-nav button.active{background:var(--green);color:var(--white)}
+dialog{border:1px solid #fff;border-radius:30px;padding:30px;max-width:560px;width:calc(100% - 32px);max-height:88dvh;color:var(--ink);background:var(--white);box-shadow:0 14px 70px #263b3345;overflow:auto}
+dialog::backdrop{background:#19383255}
+.close{position:absolute;top:14px;right:14px;width:48px;height:48px;border-radius:50%;background:#e4e9e4;font-size:30px;z-index:1}
+.sheet-handle{display:none}
+#sheet-content>.eyebrow{display:block;margin-bottom:10px;padding-right:44px}
+.sheet-subtitle{color:#5f5b4e;margin-bottom:16px}
+.sheet-actions{display:flex;gap:10px;margin-top:18px}
+.sheet-actions>*{flex:1}
+.sheet-source{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
+.row-card{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:20px;padding:15px;margin:12px 0;background:#f0f2e8}
+.row-card>.icon{width:40px;height:40px}
+.row-card strong{font-size:18px}
+.row-card p{font-size:18px}
+.row-card button{margin-left:auto;background:var(--white);padding:8px 12px;border-radius:18px;color:var(--green);white-space:nowrap}
+.tube-art{height:240px;margin:14px 0 18px;background:linear-gradient(#a7bfcc 48%,#78715e 48%);border-radius:22px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tube-art .pipe{height:205px;width:65px;border:7px solid #eee8d8;border-top:10px solid #fafaf3;background:repeating-linear-gradient(0deg,#78715e 0 12px,#5f5b4e 12px 14px);border-radius:9px;position:relative}
+.tube-art .pipe:after{content:'';position:absolute;left:0;right:0;bottom:0;height:var(--water-height,33%);background:#849fa9;border-top:3px solid #fafaf3;animation:water-drop 2s ease-out}
+.tube-art .soil-line{position:absolute;top:47%;left:17px;font:18px Prompt}
+.tube-art .level-line{position:absolute;top:68%;right:20px;font:20px Prompt;color:#fafaf3}
+.tube-art .level-line:before{content:'← ';font-size:26px}
+@keyframes water-drop{from{height:90%}}
+.step-picture{height:235px;background:#a7bfcc;border-radius:22px;margin:12px 0;overflow:hidden}
+.step-picture canvas,.season-art canvas{width:100%;height:100%;display:block}
+.onboard-count{display:flex;gap:8px;margin:14px 0}
+.onboard-count i{height:5px;flex:1;background:#dce2d6;border-radius:10px}
+.onboard-count i.active{background:var(--green)}
+.intro-lead{font-size:26px}
+.stage-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.stage-item{padding:8px;border:1px solid var(--line);border-radius:18px;background:#f0f2e8;min-height:130px;font-size:18px}
+.stage-item canvas{display:block;width:100%;height:90px}
+.stage-item.active,.condition.active{outline:2px solid var(--green);background:#e5ebdd}
+.condition-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.condition{padding:10px;border-radius:16px;border:1px solid var(--line);background:#f0f2e8;font-size:18px}
+.weight-row{display:flex;align-items:center;gap:10px;margin:14px 0}
+.weight-row .bar{flex:1;height:10px;border-radius:10px;background:#eee8d8;overflow:hidden}
+.weight-row .bar i{display:block;height:100%;background:#7b963b}
+.weight-row span{min-width:80px}
+.weight-row small{font-size:16px}
+.field-label{font-size:18px;display:block;margin:16px 0 8px}
+input,select{width:100%;min-height:56px;border:1px solid #849fa9;border-radius:14px;padding:12px;background:var(--white);font-size:20px}
+.notice{padding:14px;border-radius:18px;background:#eee8d8;font-size:18px;line-height:1.6;margin-top:14px}
+.receipt-symbol{text-align:center;margin:8px}
+.large-number{font:48px Prompt;color:var(--green)}
+.season-art{position:relative;height:240px;margin:12px 0;overflow:hidden;background:#a7bfcc;border-radius:22px}
+.record-card{background:#f0f2e8;border:1px solid #c9b881;padding:16px;border-radius:20px;margin-top:14px}
+.record-card strong{font-size:24px;color:var(--green)}
+.neighbour-status{display:flex;gap:10px;margin-top:14px}
+.avatar{width:48px;height:48px;border-radius:50%;background:#e4e9e4;display:grid;place-items:center;flex-shrink:0}
+.village-card h2{font-size:22px}
+.village-card .primary{margin-top:14px}
+.journal{padding-left:20px;font-size:18px;line-height:1.7}
+#toast{position:fixed;bottom:104px;left:50%;transform:translate(-50%,20px);max-width:calc(100% - 32px);width:max-content;background:var(--green);color:var(--white);border-radius:20px;padding:13px 20px;opacity:0;pointer-events:none;transition:.2s;z-index:20;font-size:18px}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#celebration{position:fixed;inset:0;pointer-events:none;z-index:12}
+.grain{position:absolute;width:8px;height:19px;background:#c9b881;border:1px solid #fafaf3;border-radius:70% 30%;animation:grain-flight 1.8s ease-out both}
+@keyframes grain-flight{from{transform:translate(0,0) rotate(0);opacity:1}to{transform:translate(var(--x),var(--y)) rotate(300deg);opacity:0}}
+body.large{font-size:20px}
+body.large p,body.large button{font-size:20px}
+details{margin-top:15px}
+summary{cursor:pointer;min-height:48px;font-size:18px;padding:12px 0}
+details p{font-size:16px;white-space:pre-wrap}
+.previews-label{font-size:18px;margin-top:17px}
+#sheet[data-screen=G01]::backdrop{background:#1938320d}
+#sheet[data-screen=G01] .sheet-source{display:none}
+#sheet[data-screen=G12]::backdrop{background:#54462930}
+@media(max-width:700px){.topbar{left:12px;right:12px;top:12px;height:60px;border-radius:22px;padding:5px 8px}
+.brand{font-size:22px;gap:6px}
+.brand img{width:34px;height:34px}
+.brand small{display:none}
+.header-right{gap:2px}
+.byline{display:none}
+.scene-weather{left:auto;right:12px;top:88px;padding:9px 12px;gap:6px;max-width:194px}
+.scene-weather strong{font-size:18px}
+.scene-weather small{font-size:16px}
+.scene-weather .icon{width:30px;height:30px}
+.scene-help{left:auto;right:12px;top:167px;padding:8px 14px;font-size:16px}
+.care-panel{inset:0;width:auto;pointer-events:none;display:block}
+.health-body{display:block}
+.health-ring{width:86px;height:86px;margin:auto}
+.health-ring:before{inset:7px}
+.health-ring strong{font-size:30px}
+.health-ring small{font-size:16px}
+.scene-footer{left:12px;right:12px;bottom:calc(235px + env(safe-area-inset-bottom));width:auto;padding:9px 13px;border-radius:23px;gap:8px;max-width:336px}
+.scene-footer strong{font-size:18px}
+.scene-footer .tiny{font-size:16px}
+.scene-footer .round-button{width:48px;height:48px}
+.bottom-nav{left:12px;right:12px;width:auto;bottom:calc(12px + env(safe-area-inset-bottom));height:74px;padding:5px;border-radius:25px}
+.bottom-nav button{flex-direction:column;gap:1px;font-size:16px;line-height:1.2;border-radius:20px}
+.bottom-nav .icon{width:28px;height:28px}
+.field-target{width:26%;height:9%;font-size:16px}
+dialog{position:fixed;margin:0;left:0;right:0;bottom:0;top:auto;border-radius:30px 30px 0 0;width:100%;max-width:100%;max-height:92dvh;padding:28px 22px 26px}
+.sheet-handle{display:block;position:absolute;top:10px;left:calc(50% - 19px);height:4px;width:38px;border-radius:6px;background:#a7bfcc}
+h2{font-size:24px;padding-right:30px}
+.sheet-actions .secondary,.sheet-actions .primary{padding:10px;font-size:18px}
+.row-card{gap:10px;padding:13px}
+.row-card>.icon{width:32px;height:32px}
+.sheet-source{font-size:16px}
+.village-card{position:absolute;left:12px;right:12px;bottom:98px;padding:14px 16px}
+.village-card .eyebrow{display:block}
+.village-card h2{margin:2px 0 8px;font-size:20px;padding:0}
+.village-card>.provenance{font-size:16px}
+.village-card .primary{margin-top:10px}
+.village-card p{font-size:18px}
+.season-art{height:195px}
+.record-card{padding:14px}
+#sheet[data-screen=G01]{bottom:98px;left:12px;right:12px;width:auto;border-radius:28px;padding:24px 20px 20px;max-height:calc(100dvh - 120px)}
+#sheet[data-screen=G01] .intro-lead{font-size:23px;padding-right:30px}
+#sheet[data-screen=G01] .eyebrow{margin-bottom:8px}
+#sheet[data-screen=G01] p{font-size:20px}
+#sheet[data-screen=G12]{max-height:calc(100dvh - 86px);bottom:86px;border-radius:28px 28px 0 0}
+#sheet[data-screen=G12] .sheet-source{margin-top:12px}
+.intro-lead{font-size:24px}
+.level-line{font-size:18px}
+.step-picture{height:215px}
+}
+@media(max-height:650px) and (max-width:700px){.scene-footer{bottom:210px}
+.scene-weather{top:80px}
+.scene-help{top:155px}
+.step-picture{height:150px}
+#sheet[data-screen=G01]{bottom:90px;padding:22px 18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}
+.grain{display:none}
+}
+body.still *,body.still *:before{animation:none!important}
+#season-grains{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.scene-weather,.scene-help,.scene-footer{display:none}
+.byline{font:16px Sarabun;margin-right:10px}
+.measure-entry{display:flex;gap:10px}
+.measure-entry input{width:110px;flex-shrink:0}
+.measure-entry .primary{font-size:18px;padding:10px}
+.measure-form .field-label{margin:6px 0 8px}
+#sheet[data-screen=G06] .tube-art{height:160px;margin:10px 0}
+#sheet[data-screen=G06] .pipe{height:140px;width:56px}
+#sheet[data-screen=G06] .sheet-source{margin-top:8px}
+#sheet[data-screen=G06]>.close{top:10px}
+#sheet[data-screen=G06] #sheet-content>.eyebrow{display:none}
+#sheet[data-screen=G06] .sheet-subtitle{margin-bottom:8px}
+#sheet[data-screen=G12]{max-width:780px;padding:22px}
+#sheet[data-screen=G12] .season-art{height:clamp(250px,46dvh,420px);margin:12px 0}
+#sheet[data-screen=G12] .season-art canvas{object-fit:fill}
+#sheet[data-screen=V01] .sheet-subtitle,#sheet[data-screen=V01] #sheet-content>p,#sheet[data-screen=V01] .sheet-source,#sheet[data-screen=V01] #sheet-content>.eyebrow{display:none}
+@media(max-width:700px){.village-card{padding:12px 16px;max-height:30dvh;bottom:98px}
+.village-card h2{font-size:20px;margin:0}
+.village-card p{font-size:18px;line-height:1.5}
+.village-card .primary{margin-top:8px;min-height:52px}
+#sheet[data-screen=V01]{bottom:86px;max-height:30dvh;padding:14px 18px;border-radius:24px 24px 0 0}
+#sheet[data-screen=V01] h2{font-size:20px;line-height:1.3;margin:0;padding-right:40px}
+#sheet[data-screen=V01] .row-card{margin:6px 0;padding:4px 8px;border:0;background:transparent}
+#sheet[data-screen=V01] .row-card p{display:none}
+#sheet[data-screen=V01] .sheet-actions{margin-top:8px}
+.sheet-actions{gap:8px}
+body:has(#sheet[open][data-screen=V01]) .village-card{display:none}
+#sheet[data-screen=G12]{bottom:86px;max-height:calc(100dvh - 98px);padding:20px 16px;border-radius:28px 28px 0 0}
+#sheet[data-screen=G12] .season-art{height:43dvh;min-height:270px;margin:12px -16px;border-radius:0}
+#sheet[data-screen=G12] h2{font-size:24px;margin-bottom:4px}
+#sheet[data-screen=G12] .record-card{padding:10px 14px}
+.record-card strong{font-size:21px}
+#sheet[data-screen=G06]{max-height:70dvh;padding:22px 18px 18px}
+#sheet[data-screen=G06] h2{font-size:23px;margin-bottom:4px}
+#sheet[data-screen=G06] .sheet-subtitle{font-size:18px;line-height:1.4}
+#sheet[data-screen=G06] .tube-art{height:140px}
+.measure-entry .primary .icon{width:26px;height:26px}
+#sheet[data-screen=G01]{max-height:calc(100dvh - 190px)}
+#toast{bottom:175px;font-size:18px}
+
+}
+.season-heading{position:absolute;z-index:1;left:16px;top:18px;max-width:calc(100% - 82px);padding:8px 12px;border-radius:16px;background:#fafaf3e8}
+.season-heading .eyebrow{display:none}
+.season-heading h2{margin:0;padding:0;font-size:23px}
+@media(max-width:700px){#sheet[data-screen=G12] .season-art{height:48dvh;margin:-20px -16px 14px}
+#sheet[data-screen=G12] .season-heading h2{font-size:21px}
+}
+.field-target{min-width:48px;min-height:48px}
+.tube-art .level-line{font:30px Prompt;right:20px;top:58%}
+.tube-art .level-line:before{font-size:24px}
+.receipt-reading{display:flex;gap:12px;align-items:center;margin:10px 0}
+.receipt-reading strong{font-size:23px}
+#sheet[data-screen=G10]::backdrop{background:transparent}
+#sheet[data-screen=G10] .primary{margin-top:12px}
+#sheet[data-screen=G10] #sheet-content>.eyebrow{display:none}
+@media(max-width:700px){#sheet[data-screen=G10]{bottom:86px;max-height:35dvh;padding:18px 20px;border-radius:26px 26px 0 0}
+#sheet[data-screen=G10] h2{font-size:22px;margin:0}
+#sheet[data-screen=G10] .provenance{font-size:16px;line-height:1.35}
+#sheet[data-screen=G06] .tube-art{height:170px}
+#sheet[data-screen=G06] .pipe{height:155px}
+.tube-art .soil-line{left:12px;font-size:16px}
+.tube-art .level-line{right:10px;font-size:29px}
+
+}
+@media(max-width:700px){
+}
+
+
+/* One definition per redesigned component, with one phone adaptation below. */
+#sheet[data-screen=G04] .health-body{display:flex;align-items:center;gap:18px}
+.health-card{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:20px;border:1px solid #ffffff;border-radius:26px;background:#fafaf3;box-shadow:var(--shadow);position:relative}
+.health-card .health-body{grid-row:1 / 3;display:block}
+.health-card .health-body>div:last-child{display:none}
+.health-card .health-ring{width:78px;height:78px;margin:0}
+.health-card .health-ring strong{font-size:30px}
+.health-card .health-ring small{font-size:16px}
+.health-card>.provenance{grid-column:1 / -1;margin:0;border-top:1px solid #dce2d6;padding-top:10px}
+.health-card .compact-source{display:none}
+.status-crop{display:flex;flex-direction:column;gap:4px;min-width:0;grid-column:2;line-height:1.35}
+.status-crop strong{font-size:21px;line-height:1.35}
+.status-crop>span{font-size:18px;line-height:1.4}
+.status-health{color:#5f5b4e}
+.status-weather{display:flex;align-items:center;gap:8px;grid-column:1 / -1;font-size:18px;white-space:nowrap;word-break:keep-all;color:#43544b;padding:8px 12px;border-radius:16px;background:#eaf0e8}
+.status-weather .icon{width:30px;height:30px}
+.mission-card{padding:20px;border:1px solid #ffffff;border-radius:26px;background:#fafaf3;box-shadow:var(--shadow)}
+.mission-card .eyebrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.mission-card h2{font-size:22px;margin-bottom:8px;padding:0}
+.mission-card p{font-size:18px;margin-bottom:14px}
+.mission-card .primary{height:60px;font-size:22px;padding:10px 8px;gap:7px;white-space:nowrap}
+.mission-card .primary .icon{width:32px;height:32px}
+.mission-card .provenance{margin-top:12px}
+.mission-card .compact-source,.mission-card .desktop-break{display:none}
+.friend-target{position:absolute;left:73%;top:63%;width:16%;height:12%;min-height:48px;min-width:48px;background:transparent;border-radius:50%}
+.field-target.selected span{display:block;font-size:18px;padding:3px 12px;transform:translateY(10px);background:#fafaf3;border:1px solid #dfba70;border-radius:20px;box-shadow:0 3px 10px #263b3325;color:#0c5139;white-space:nowrap}
+@media(min-width:701px){.care-panel{width:360px}.byline,.brand small,.bottom-nav button,.health-card .provenance,.mission-card .provenance,.status-health{font-size:18px}.health-card .provenance,.mission-card .provenance{color:#435348}}
+@media(max-width:700px){
+ .health-card{position:absolute;top:84px;left:12px;right:12px;width:auto;height:100px;grid-template-columns:60px 1fr;gap:10px;padding:7px 12px;border-radius:24px;text-align:left;align-items:center}
+ .health-card .health-body{grid-row:1 / 2;align-self:center}
+ .health-card .health-ring{width:60px;height:60px}
+ .health-card .health-ring:before{inset:5px}
+ .health-card .health-ring strong{font-size:26px}
+ .health-card .health-ring small{display:none}
+ .health-card>.provenance{display:none}
+ .status-crop{gap:1px;align-self:start}
+ .status-crop strong{font-size:21px;white-space:nowrap}
+ .status-crop>span{font-size:18px;white-space:nowrap}
+ .status-crop .status-health{font-size:16px;line-height:1.6}
+ .status-weather{position:absolute;right:12px;bottom:7px;gap:5px;padding:0;background:transparent;font-size:18px;line-height:1.3}
+ .status-weather .icon{width:24px;height:24px}
+ .mission-card{position:absolute;left:12px;right:12px;bottom:calc(98px + env(safe-area-inset-bottom));padding:0;background:transparent;border:0;box-shadow:none}
+ .mission-card .eyebrow,.mission-card h2,.mission-card p,.mission-card>.provenance{display:none}
+ .mission-card .primary{box-shadow:0 5px 18px #263b3340}
+ .friend-target{left:72%;top:63%;width:19%;height:11%}
+}
+/* pass 7: let the painted field lead; quieter provenance, tighter cards (text sizes unchanged) */
+.provenance,.sheet-source,.source-pill{color:#6f6a5a}
+.health-card>.provenance,.mission-card .provenance{border-top-color:#e6e9df}
+.village-card{padding:16px}
+.scene-footer{padding:10px 14px}
+.row-card{padding:12px}
+
+/* pass 8: lighter phone HUD so the painted field leads; harvest sheet = scene, then summary, then one source line */
+.field-targets::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 75% 60% at 50% 46%,#0000 55%,#3a2c1424 100%)}
+.field-target.selected::before{content:'';position:absolute;left:-28%;right:-28%;top:-60%;bottom:-40%;pointer-events:none;border-radius:50%;background:none}
+@media(max-width:700px){
+ .health-card{top:80px;right:auto;width:300px;max-width:calc(100% - 24px);height:auto;grid-template-columns:54px 1fr;gap:10px;padding:8px 14px 9px 9px;border-radius:22px;background:linear-gradient(180deg,#fdf8eaf5,#f8efd8f2);-webkit-backdrop-filter:blur(8px) saturate(1.08);backdrop-filter:blur(8px) saturate(1.08);border:1px solid #fffaefd9;box-shadow:0 3px 14px #3a2c1433,0 1px 2px #3a2c1426}
+ .health-card .health-ring{width:54px;height:54px}
+ .health-card .health-ring:before{inset:4px}
+ .health-card .health-ring strong{font-size:22px}
+ .status-crop{gap:0}
+ .status-crop strong{font-size:19px;font-weight:500;line-height:1.3}
+ .status-crop>span{font-size:16px;line-height:1.35;color:#3d3a30}
+ .status-crop .status-health{line-height:1.35;color:#3d3a30}
+ .status-weather{bottom:8px;font-size:16px;color:#36422f}
+ .status-weather .icon{width:20px;height:20px}
+ .mission-card{left:50%;right:auto;transform:translateX(-50%);width:min(320px,calc(100% - 48px))}
+ .mission-card .primary{height:52px;min-height:52px;font-size:20px;font-weight:500;background:linear-gradient(140deg,#4a8655,#1d5a3d);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #ffffff38;box-shadow:0 3px 12px #1d3a2a4d,inset 0 1px 0 #ffffff2e}
+ .mission-card .primary .icon{width:26px;height:26px}
+}
+.season-summary{background:#fbf7ea;border:0;padding:4px 2px 2px;margin-top:4px}
+.season-summary>strong{display:block;font-size:22px;margin-bottom:10px}
+.season-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.season-stats>div{display:flex;flex-direction:column;gap:2px;padding:10px 10px 9px;border-radius:16px;background:#f1ecd8;min-width:0}
+.season-stats b{font:500 21px/1.45 Prompt,Sarabun,sans-serif;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.season-stats span{font-size:16px;line-height:1.3;color:#5f5b4e}
+#sheet[data-screen=G12] .sheet-actions{margin-top:14px}
+#sheet[data-screen=G12] .season-source{margin-top:12px;padding-top:8px;font-size:16px;line-height:1.45;color:#6f6a5a}
+#sheet[data-screen=G12] .season-art{background:#fafaf3}
+@media(max-width:700px){#sheet[data-screen=G12] .season-summary{padding:0}#sheet[data-screen=G12] .season-stats>div{padding:8px 8px 7px}.season-stats b{font-size:19px}}
+#sheet #toast{top:16px;bottom:auto}
+/* pass 12: phone card = health first, one task sentence above the action, quieter stage/weather/source (sizes unchanged) */
+.task-line{display:none}
+.status-word{font-weight:inherit;color:inherit}
+@media(max-width:700px){
+ .status-crop strong .status-word{color:var(--ring);font-weight:600}
+ .status-crop>span{color:#5a564a}
+ .status-crop .status-health{color:#77705e;margin-top:2px;padding-top:2px;border-top:1px solid #e3dccb}
+ .status-weather{color:#5a564a}
+ .mission-card .task-line{display:block;margin:0 auto 8px;width:fit-content;max-width:100%;padding:5px 14px 6px;font-size:18px;line-height:1.45;font-weight:500;text-align:center;color:#2f3a2c;border-radius:16px;background:linear-gradient(180deg,#fdf8eaf2,#f8efd8eb);border:1px solid #fffaefd9;box-shadow:0 2px 10px #3a2c1429;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+}
+/* pass 13: painted icon set + quieter header discs (visual 40px, hit 44px) */
+.topbar,.primary,.bottom-nav button.active{--ic-line:#f6ecd0}
+.header-right .icon-button{position:relative;width:44px;height:44px;background:none}
+.header-right .icon-button::before{content:'';position:absolute;inset:2px;border-radius:50%;background:#ffffff14;border:1px solid #ffffff2e;pointer-events:none}
+.header-right .icon-button .icon{position:relative;width:26px;height:26px}
+.header-right .icon-button:focus-visible{outline-offset:0}
+/* pass 14: harvest sheet reads as one state; stat labels stronger; provenance one quiet line */
+.season-summary>strong{margin-bottom:2px}
+.season-note{margin:0 0 10px;font-size:18px;line-height:1.4;color:#3f4a3c}
+.season-summary.is-pending .season-stats>div:last-child{background:#fff3cf;box-shadow:inset 0 0 0 1.5px #d9b64a}
+.season-summary.is-pending .season-stats>div:last-child b{color:#8a5a00}
+.season-stats span{font:600 16px/1.3 Prompt,Sarabun,sans-serif;color:#3d4436}
+#sheet[data-screen=G12] details.season-source{padding-top:2px}
+#sheet[data-screen=G12] .season-source summary{min-height:44px;padding:10px 0 4px;font-size:16px;line-height:1.45;color:#6f6a5a}
+#sheet[data-screen=G12] .season-source p{margin:4px 0 0;font-size:16px;line-height:1.45;color:#5f5b4e}
+/* pass 15: harvest hero ~20% shorter (summary + action rise); smaller close disc, 48px hit; desktop task card leads, health card quieter */
+.close{background:none;font-size:24px;line-height:1;color:#3d4436;isolation:isolate}
+.close::before{content:'';position:absolute;inset:7px;border-radius:50%;background:#e4e9e4e6;border:1px solid #fffaef;box-shadow:0 1px 4px #3a2c1426;z-index:-1;pointer-events:none}
+.close:focus-visible{outline:0}
+.close:focus-visible::before{box-shadow:0 0 0 3px #d9b64a}
+#sheet[data-screen=G12]>.close{top:12px;right:10px}
+@media(max-width:700px){#sheet[data-screen=G12] .season-art{height:38dvh;min-height:250px;margin-bottom:12px}}
+@media(min-width:701px){
+ #sheet[data-screen=G12] .season-art{height:clamp(230px,37dvh,340px)}
+ .care-panel{gap:14px}
+ .health-card{padding:14px 16px;gap:8px 12px;background:#fafaf3e0;border-color:#ffffffb3;box-shadow:0 2px 10px #263b331f}
+ .health-card .health-ring{width:66px;height:66px}
+ .health-card .health-ring:before{inset:6px}
+ .health-card .health-ring strong{font-size:26px}
+ .status-weather{padding:2px 0;background:none;gap:6px;color:#5f5b4e}
+ .status-weather .icon{width:24px;height:24px}
+ .health-card>.provenance{padding-top:6px;line-height:1.4}
+ .health-card .provenance,.mission-card .provenance{color:#6b6658}
+ .mission-card{background:#fffdf6;border:1.5px solid #c9d8c2;box-shadow:0 14px 34px #1d3a2a38,0 2px 6px #1d3a2a1f}
+ .mission-card h2{color:#173f2c}
+ .mission-card p{color:#2f3a2c}
+ .mission-card .primary{box-shadow:0 6px 16px #1d5a3d47}
+ .mission-card>.provenance{margin-top:10px}
+}
+@media(max-width:700px){body:has(#sheet[open][data-screen=G12]) .health-card{display:none}}
+@media(min-width:701px){
+ .health-card .status-weather{grid-column:2;margin-top:-2px}
+ .health-card{background:#fafaf3cc;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 1px 6px #263b3314}
+ .mission-card{padding:22px 22px 18px;background:linear-gradient(180deg,#fffef9,#fbf6e6)}
+ .mission-card .eyebrow{color:#2f6b47}
+}
+/* pass 16: harvest hero ~23% shorter, wide crop keeps both farmers; one compact title row above the picture (no badge); summary + actions rise */
+#sheet[data-screen=G12] .season-art{display:flex;flex-direction:column;height:auto;min-height:0;overflow:visible;background:none;border-radius:0}
+#sheet[data-screen=G12] .season-art canvas{height:clamp(190px,29dvh,262px);min-height:0;border-radius:18px}
+#sheet[data-screen=G12] .season-heading{position:static;max-width:none;padding:0 58px 10px 2px;background:none;border-radius:0}
+#sheet[data-screen=G12] .season-heading h2{font-size:22px;line-height:1.4;color:#173f2c}
+#sheet[data-screen=G12] .season-summary>strong{font-size:19px;line-height:1.4;color:#2f6b47}
+#sheet[data-screen=G12] .season-note{margin-bottom:8px}
+#sheet[data-screen=G12] .sheet-actions{margin-top:12px}
+@media(max-width:700px){
+ #sheet[data-screen=G12] .season-art{height:auto;min-height:0;margin:-20px -16px 10px}
+ #sheet[data-screen=G12] .season-art canvas{height:29dvh;min-height:200px;border-radius:0}
+ #sheet[data-screen=G12] .season-heading{padding:16px 64px 10px 18px}
+ #sheet[data-screen=G12] .season-heading h2{font-size:21px}
+}
+
+/* pass 17: plot-facts chip (RiceOS plot link) -- cream pill like the health card */
+.plot-facts{position:absolute;z-index:3;left:24px;top:108px;max-width:340px;display:grid;grid-template-columns:auto auto;justify-content:space-between;column-gap:14px;row-gap:1px;padding:9px 16px 10px;border-radius:22px;background:linear-gradient(180deg,#fdf8eaf5,#f8efd8f2);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid #fffaefd9;box-shadow:0 3px 14px #3a2c1433,0 1px 2px #3a2c1426;color:#2f3a2a;pointer-events:none;line-height:1.35}
+.plot-facts[hidden]{display:none}
+.plot-facts .pf-label{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:600;color:var(--green,#0c5139);white-space:nowrap}
+.plot-facts .pf-label .icon{width:20px;height:20px}
+.plot-facts .pf-stage{font-size:16px;color:#3d3a30;white-space:nowrap;text-align:right;align-self:center}
+.plot-facts strong{grid-column:1 / -1;font-size:20px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+@media(max-width:700px){.plot-facts{left:12px;right:12px;top:80px;max-width:none;padding:6px 14px 7px;border-radius:20px}
+.plot-facts strong{font-size:19px}
+body.has-plot .health-card{top:calc(90px + var(--pf-h,62px))}}
+@media(min-width:701px){.plot-facts{max-width:380px;padding:10px 18px 11px}.plot-facts .pf-label,.plot-facts .pf-stage{font-size:17px}.plot-facts strong{font-size:21px}}
+.plot-facts strong{word-break:keep-all;overflow-wrap:break-word}
+
+/* pass 18: farm-sim layer (original art) -- orders strip, coin pill, tap-to-collect bubble, chunky buttons */
+.orders-strip{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-radius:24px;background:linear-gradient(180deg,#fff3cf,#f3d98f);border:3px solid #b9873a;box-shadow:0 4px 0 #8a5f1c,0 8px 18px #3a2c1440;position:relative;z-index:3}
+.orders-title{display:grid;line-height:1.1;color:#5a3a12}.orders-title strong{font-size:18px;font-weight:700}.orders-title span{font-size:16px}
+.orders-row{display:flex;gap:6px}
+.order-token{position:relative;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:#fffaf0;border:3px solid #7a9b3e;box-shadow:0 3px 0 #4d6a24;padding:0;transition:transform .12s}
+.order-token:active{transform:translateY(3px);box-shadow:0 0 0 #4d6a24}
+.order-token .icon{width:30px;height:30px;margin-top:-6px}
+.order-token b{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);min-width:38px;text-align:center;font-size:16px;line-height:1.1;font-weight:700;color:#5a3a12;background:#f6d57a;border:2px solid #b9873a;border-radius:12px;padding:0 5px}
+.order-token.done{background:#dcefcf;border-color:#4d8a3a}.order-token.done::after{content:'✓';position:absolute;top:-8px;right:-6px;width:24px;height:24px;border-radius:50%;background:#2f7a3e;color:#fff;font-size:16px;line-height:24px;text-align:center;border:2px solid #fff}
+.order-token.later{opacity:.55;filter:saturate(.5)}
+.coin-pill{display:flex;align-items:center;gap:6px;margin-left:auto;min-height:48px;padding:3px 12px 3px 6px;border-radius:24px;background:#5a3a12;color:#fff6d8;border:2px solid #f6d57a}
+.coin-pill .coin{width:34px;height:34px;flex:none}.coin-pill span{display:grid;line-height:1.05;text-align:left}.coin-pill b{font-size:20px}.coin-pill small{font-size:16px}
+@media(max-width:700px){.orders-strip{position:fixed;left:12px;right:12px;top:var(--os-top,178px);gap:6px}.orders-strip .orders-title{display:none}.orders-strip{padding:5px 8px;justify-content:space-between}body.village .orders-strip,body:has(#sheet[open]) .orders-strip{display:none}}
+@media(min-width:701px){.orders-strip{margin-top:12px;flex-wrap:wrap}}
+.row-card.order{border:3px solid #b9873a;background:linear-gradient(180deg,#fff7de,#f6e3ab);box-shadow:0 3px 0 #8a5f1c}
+.row-card.order .reward{display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:16px;font-weight:700;color:#5a3a12}.row-card.order .reward .coin{width:22px;height:22px}
+.row-card.order button{background:#2f7a3e;color:#fff;border-bottom:3px solid #1d5a3d;min-height:48px;font-weight:700}
+.row-card.order.done{opacity:.8}.row-card.order.done button{background:#dcefcf;color:#1d5a3d;border-bottom-color:#7a9b3e}
+.orders-board{margin:8px 0}
+.harvest-bubble{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;min-height:60px;padding:6px 16px 6px 10px;border-radius:32px;background:linear-gradient(180deg,#fff3cf,#f6d57a);border:3px solid #b9873a;box-shadow:0 4px 0 #8a5f1c,0 10px 22px #3a2c1450;color:#5a3a12;animation:hb-bob 1.6s ease-in-out infinite}
+.harvest-bubble[hidden]{display:none}
+.harvest-bubble svg{width:40px;height:40px;flex:none}.harvest-bubble span{display:grid;text-align:left;line-height:1.15;font-size:16px}.harvest-bubble b{font-size:20px}
+.harvest-bubble::before{content:'';position:absolute;inset:-9px;border-radius:40px;border:2px dashed #f6d57a;opacity:.8;animation:hb-glint 1.6s linear infinite;pointer-events:none}
+@keyframes hb-bob{50%{transform:translate(-50%,-56%)}}
+@keyframes hb-glint{to{transform:rotate(0);opacity:.2}}
+.collect-grain{position:fixed;width:10px;height:22px;margin:-11px 0 0 -5px;background:#e6b840;border:1px solid #fff6d8;border-radius:70% 30%;animation:collect-fly .75s cubic-bezier(.5,-.3,.7,1) both}
+@keyframes collect-fly{0%{transform:translate(0,0) rotate(0);opacity:1}30%{transform:translate(var(--r),-50px) rotate(120deg)}100%{transform:translate(var(--x),var(--y)) rotate(400deg) scale(.5);opacity:0}}
+.mission-card .primary,.primary{border-bottom:4px solid #14452e}
+@media(prefers-reduced-motion:reduce){.harvest-bubble,.harvest-bubble::before{animation:none!important}.collect-grain{display:none}}
+/* pass 18b: compact bubble, nowrap, visible orders label on phone, short-screen safety */
+.harvest-bubble{white-space:nowrap;min-height:52px;padding:4px 12px 4px 8px;gap:6px;top:50%}
+.harvest-bubble svg{width:32px;height:32px}.harvest-bubble b{font-size:18px}.harvest-bubble span{font-size:16px}
+@media(max-width:700px){.orders-strip .orders-title{display:grid}.orders-strip .orders-title span{display:none}.orders-strip .orders-title strong{font-size:16px;writing-mode:horizontal-tb}.harvest-bubble{top:52%}.orders-strip{padding:5px 8px 5px 10px}.order-token{width:52px;height:52px}.coin-pill{padding:3px 10px 3px 4px}}
+@media(max-height:700px) and (max-width:700px){.harvest-bubble{top:58%;min-height:48px}.harvest-bubble::before{display:none}.orders-strip{padding:3px 8px}.order-token{height:48px;width:48px}.order-token b{font-size:16px}}
+.harvest-bubble{z-index:2}
+@media(max-width:700px){.orders-strip .orders-title strong,.coin-pill small,.coin-pill b{white-space:nowrap}.order-token{width:48px;height:48px}.orders-row{gap:5px}.orders-strip{gap:5px}.coin-pill .coin{width:30px;height:30px}.coin-pill small{font-size:16px}}
+body.ripe-bubble .field-target.selected span{display:none}
+.harvest-bubble{top:46%}
+@media(max-width:700px){.coin-pill{padding-right:14px}.coin-pill small{font-size:16px;letter-spacing:0}.row-card.order p{text-wrap:balance}.order-token.later{opacity:.75;filter:none;border-style:dashed}.order-token.later b{background:#e8e2cf;color:#6b6658}}
+@media(max-width:380px){.coin-pill .coin{width:24px;height:24px}.coin-pill{padding:3px 12px 3px 6px;gap:4px}.orders-strip .orders-title strong{font-size:16px}.orders-strip{padding:5px 6px 5px 8px}}
+@media(max-width:380px){.coin-pill .coin{display:none}.coin-pill{padding:3px 10px;justify-content:center}.coin-pill span{text-align:center}}
+
+/* pass 21: back to RiceOS app (only when ?back=/next/... is given) */
+.game-back{display:inline-flex;align-items:center;gap:6px;min-width:44px;min-height:44px;padding:0 14px 0 10px;margin-right:8px;border-radius:22px;background:#fdf8ea;color:#0c5139;font-weight:700;font-size:17px;line-height:1;text-decoration:none;white-space:nowrap;box-shadow:0 2px 8px #0003;flex:none}
+.game-back span{font-size:28px;line-height:1;margin-top:-3px}
+.game-back:focus-visible{outline:3px solid #e6b840;outline-offset:2px}
+body.has-back .topbar{padding-left:max(8px,env(safe-area-inset-left))}
+body.has-back .topbar .brand{flex:1 1 auto;min-width:0}
+body.has-back .topbar .brand small{display:none}
+@media(max-width:700px){body.has-back .brand img{display:none}body.has-back .brand{font-size:20px}}
+
+/* pass 22 (PingEris 17 Nov): phone HUD smaller / moved so it never covers the plots; phone landscape is treated as phone. Desktop and TV rules above are untouched. */
+.field-target .smp{display:none}
+@media(max-width:700px){
+ .field-target .smp{display:block;font-size:16px;line-height:1.3;color:#6f6a5a}
+ .field-target.selected span{width:max-content;max-width:62vw;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+ .plot-facts{top:76px;display:flex;align-items:center;gap:8px;padding:3px 12px 4px;border-radius:18px}
+ .plot-facts .pf-label{display:none}
+ .plot-facts .pf-stage{order:2;font-size:16px}
+ .plot-facts strong{font-size:17px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .health-card{width:262px;grid-template-columns:42px 1fr;gap:8px;padding:5px 10px 5px 6px}
+ .health-card .health-ring{width:42px;height:42px}
+ .health-card .health-ring:before{inset:4px}
+ .health-card .health-ring strong{font-size:18px}
+ .status-crop .status-health,.status-weather{display:none}
+ body.has-plot .health-card{top:calc(82px + var(--pf-h,38px))}
+ .mission-card .task-line{display:none}
+ .orders-strip{top:auto;bottom:calc(160px + env(safe-area-inset-bottom))}
+ .harvest-bubble{top:60%}
+}
+@media(max-width:700px) and (max-height:700px){.harvest-bubble{display:none}}
+@media(max-height:500px) and (orientation:landscape){
+ .topbar{top:4px;left:8px;right:8px;height:52px;border-radius:18px;padding:2px 8px}
+ .brand{font-size:20px;gap:8px}.brand img{width:34px;height:34px}.brand small,.byline{display:none}
+ .game-back{min-height:40px}
+ .plot-facts{left:auto;right:8px;top:62px;width:260px;max-width:260px;display:flex;align-items:center;gap:8px;padding:3px 12px 4px;border-radius:16px}
+ .plot-facts .pf-label{display:none}
+ .plot-facts .pf-stage{order:2;font-size:16px}
+ .plot-facts strong{font-size:17px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .care-panel{right:8px;top:62px;width:260px;gap:6px}
+ body.has-plot .care-panel{top:calc(68px + var(--pf-h,0px))}
+ .health-card{grid-template-columns:42px 1fr;gap:8px;padding:5px 10px 5px 6px;border-radius:18px}
+ .health-card .health-ring{width:42px;height:42px}
+ .health-card .health-ring:before{inset:4px}
+ .health-card .health-ring strong{font-size:18px}
+ .health-card .health-ring small{display:none}
+ .health-card>.provenance,.status-crop .status-health,.status-weather{display:none}
+ .status-crop strong{font-size:17px}.status-crop>span{font-size:16px}
+ .mission-card{padding:0;background:transparent;border:0;box-shadow:none}
+ .mission-card .eyebrow,.mission-card h2,.mission-card p,.mission-card>.provenance{display:none}
+ .mission-card .primary{height:48px;min-height:48px;font-size:18px;box-shadow:0 3px 12px #1d3a2a4d}
+ .orders-strip{margin-top:0;flex-wrap:nowrap;gap:5px;padding:3px 8px 3px 8px;border-width:2px;border-radius:20px}
+ .orders-strip .orders-title{display:none}
+ .order-token{width:48px;height:48px}
+ .orders-row{gap:5px}
+ .coin-pill{padding:3px 10px}.coin-pill .coin{display:none}.coin-pill span{text-align:center}.coin-pill small,.coin-pill b{white-space:nowrap}
+ .bottom-nav{left:auto;right:8px;bottom:6px;width:260px;height:52px;padding:2px;border-radius:18px}
+ .bottom-nav button{min-height:46px}
+ .bottom-nav button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+ .bottom-nav .icon{width:28px;height:28px}
+ .harvest-bubble{display:none}
+ .field-target .smp{display:block;font-size:16px;line-height:1.3;color:#6f6a5a}
+ .field-target.selected span{width:max-content;max-width:40vw;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+}
+@media(max-height:340px) and (orientation:landscape){.health-card{display:none}}
+/* 24 Nov (PingEris): plot switcher in the plot chip -- one plot at a time, kratong count from the account */
+.plot-facts .pf-pick{grid-column:1 / -1;position:relative;display:block;margin:4px 0 2px}
+.plot-facts .pf-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.plot-facts select{-webkit-appearance:none;appearance:none;width:100%;min-height:44px;padding:6px 40px 6px 14px;border:1px solid #0c513955;border-radius:14px;background:#fffdf6;color:var(--green,#0c5139);font:600 19px/1.25 Sarabun,sans-serif;cursor:pointer;text-overflow:ellipsis;box-shadow:0 1px 0 #ffffff inset}
+.plot-facts select:focus-visible{outline:2px solid #e6b840;outline-offset:1px}
+.plot-facts .pf-chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--green,#0c5139);pointer-events:none}
+.plot-facts .pf-name{grid-column:1 / -1;font-size:20px;font-weight:600;line-height:1.3;color:var(--green,#0c5139);overflow-wrap:anywhere}
+.plot-facts .pf-meta{grid-column:1 / -1;font-size:16px;line-height:1.35;color:#3d3a30}
+.plot-facts{pointer-events:auto}
+@media(min-width:701px){.plot-facts select{font-size:20px}.plot-facts .pf-meta{font-size:17px}}
+@media(max-width:700px),(max-height:500px) and (orientation:landscape){
+ .plot-facts.pf-mine{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:3px;align-items:center;padding:6px 12px 7px 7px}
+ .plot-facts.pf-mine .pf-pick{grid-column:1 / -1;grid-row:1;margin:0}
+ .plot-facts.pf-mine .pf-name{grid-column:1;grid-row:1;font-size:18px;padding-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .plot-facts.pf-mine .pf-stage{grid-column:2;grid-row:2}
+ .plot-facts.pf-mine .pf-meta{grid-column:1;grid-row:2;padding-left:7px;font-size:16px;min-width:0}
+ .plot-facts.pf-mine:not(:has(.pf-pick)) .pf-stage{grid-row:1}
+ .plot-facts.pf-mine select{min-height:44px;font-size:18px;padding:4px 34px 4px 12px}
+ .plot-facts.pf-mine .pf-chev{right:12px}
+}
+@media(min-width:701px) and (min-height:501px){.plot-facts.pf-mine{max-width:440px;padding:12px 20px 13px;row-gap:4px}.plot-facts.pf-mine .pf-label,.plot-facts.pf-mine .pf-stage{font-size:18px}.plot-facts.pf-mine select{font-size:22px;min-height:50px}.plot-facts.pf-mine .pf-meta{font-size:19px}}
+.plot-facts .pf-meta .nw{white-space:nowrap}
+.plot-facts .pf-meta .nw+.nw::before{content:' · '}
+.plot-facts .pf-meta .pm-stg{display:none}
+@media(max-width:700px),(max-height:500px) and (orientation:landscape){
+ .plot-facts.pf-mine{row-gap:2px;padding:5px 10px 6px 6px}
+ .plot-facts.pf-mine .pf-stage,.plot-facts.pf-mine .pf-meta .pm-var{display:none}
+ .plot-facts.pf-mine .pf-meta{grid-column:1 / -1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .plot-facts.pf-mine .pf-meta .pm-stg{display:inline}
+ .plot-facts.pf-mine select{min-height:44px;font-size:18px}
+}

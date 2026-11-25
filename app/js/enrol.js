@@ -129,7 +129,7 @@
   function trainingPage() {
     var rows = trainingRows(), tot = rows.reduce(function (a, r) { return a + (r.e.min || 0); }, 0);
     page('ชั่วโมงอบรมของฉัน', 'นับจากบทเรียนที่ผ่านแบบทดสอบ', '<div class="card w8card"><div class="w8big">' + Math.floor(tot / 60) + ' ชม. ' + (tot % 60) + ' นาที</div><p class="w8line">รวมจาก ' + rows.length + ' บทเรียนที่ผ่าน</p></div>' +
-      '<div class="card w8card"><h3>บันทึกการเรียน</h3>' + (rows.length ? '<ul class="w8log">' + rows.map(function (r) { return '<li><b>' + esc(r.l.title) + '</b><small>' + thDate(r.e.at) + ' (' + (r.e.min || 0) + ' นาที)' + (r.l.srp ? ' หัวข้อข้าวยั่งยืน (SRP): ' + esc(r.l.srp) : '') + '</small></li>'; }).join('') + '</ul>' : '<p>ยังไม่มีบทเรียนที่ผ่าน ลองเรียนบทแรกได้ที่เมนู บทเรียน</p>') + '<a class="btn ghost" href="#/lessons" style="margin-top:8px">ไปที่บทเรียน</a></div>' +
+      '<div class="card w8card"><h3>บันทึกการเรียน</h3>' + (rows.length ? '<ul class="w8log">' + rows.map(function (r) { return '<li><b>' + esc(r.l.title) + '</b><small>' + thDate(r.e.at) + ' · ' + (r.e.min || 0) + ' นาที' + (r.l.srp ? ' หัวข้อข้าวยั่งยืน (SRP): ' + esc(r.l.srp) : '') + '</small></li>'; }).join('') + '</ul>' : '<p>ยังไม่มีบทเรียนที่ผ่าน ลองเรียนบทแรกได้ที่เมนู บทเรียน</p>') + '<a class="btn ghost" href="#/lessons" style="margin-top:8px">ไปที่บทเรียน</a></div>' +
       '<div class="card w8card"><p class="w8note">หัวข้อข้าวยั่งยืน (SRP) บอกว่าบทเรียนนี้เกี่ยวกับหัวข้อไหนของหลักสูตรข้าวยั่งยืน บทเรียนนี้ไม่ใช่หลักสูตรที่ได้รับรองจาก SRP และชั่วโมงที่นับเป็นเวลาเรียนโดยประมาณในแอป ไม่ใช่ใบรับรอง</p></div>');
   }
   function decorate(h) {

@@ -433,3 +433,11 @@ body a.dc-home.aw-menu .aw-mt .aw-m1{grid-column:1/-1;grid-row:2}
 body a.dc-home.aw-menu.done{border:1px solid var(--vc-line);box-shadow:0 1px 3px rgba(11,90,42,.08)}
 body a.dc-home.aw-menu:focus-visible{outline:3px solid var(--fr-focus);outline-offset:3px}
 body[data-screen="missions"] .sheet>.card>.dc-tst>.ri{color:var(--vc-g9)}
+
+/* PingEris 24 Nov 08:52 "รวม วันนี้ต้องทำ เป็นการ์ดใบเดียวไร้รอยต่อ": one background over both parts (rice-field photo under a single
+   top-to-bottom green gradient, white text stays >= 7:1 on it), no band and no divider line between ถ่ายรูปยืนยัน and ตรวจเช็คแปลงรายวัน:
+   spacing only. 28px of air between the camera button / points chip and the daily-check heading. */
+body .today{background:linear-gradient(180deg,rgba(11,90,42,.97) 0%,rgba(14,100,48,.93) 50%,rgba(8,72,34,.97) 100%),url(../img/mission-card.jpg) center/cover}
+body .today .dc-tday{background:none;border-top:0;margin:var(--tk-gap) 0 0;padding:0;box-shadow:none;border-radius:0}
+body .today .shoot+.plus{margin-bottom:4px}
+body .today .dc-tday{margin-top:20px}

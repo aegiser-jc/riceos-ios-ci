@@ -1,0 +1,15 @@
+{
+  "note": "Fictional booth accounts for the 26-27 Nov presentation. Display names only: no phone, ID, real name or GPS. Static seed: no public league aggregate endpoint exists (GET /api/me/points is per signed-in user, ledger is admin-only).",
+  "rewardGoal": 300,
+  "rewardLabel": "เป้ารางวัลแรก",
+  "plots": [
+    {"name": "ทุ่งรวงทอง", "stage": 5, "health": 0, "points": 285},
+    {"name": "กอข้าวยิ้ม", "stage": 4, "health": 0, "points": 240},
+    {"name": "คันนาแสงเช้า", "stage": 3, "health": 0, "points": 210},
+    {"name": "น้ำใสใจดี", "stage": 2, "health": 0, "points": 175},
+    {"name": "ลมโชยรวง", "stage": 4, "health": 1, "points": 150},
+    {"name": "ฟ้าหลังฝน", "stage": 1, "health": 0, "points": 120},
+    {"name": "นาข้างคลอง", "stage": 3, "health": 0, "points": 95},
+    {"name": "เมล็ดสุขใจ", "stage": 0, "health": 0, "points": 60}
+  ]
+}

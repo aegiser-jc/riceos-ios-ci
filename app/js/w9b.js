@@ -9,18 +9,21 @@
   var STATUS = { approved: 'ผ่านการตรวจ', complete: 'ส่งแล้ว รอเจ้าหน้าที่ตรวจ', pending_photo: 'รอส่งรูป', rejected: 'ไม่ผ่านการตรวจ' };
 
   /* ---------- game link (contract: game-dev2/PLOT-LINK.md). Keys that are not known or not valid are left out. ---------- */
-  /* store app (Capacitor, https://localhost origin) has no /game/ of its own: a relative link hung the game button (Play 1.5). Native -> absolute site URL. */
-  function gameBase() { var c = window.Capacitor; return (c && c.isNativePlatform && c.isNativePlatform()) ? 'https://riceos.donaus.com' : ''; }
+  /* store app (Capacitor, https://localhost origin) has no server /game/: Android 1.8+ bundles the game in www/game/ -> local /game/index.html
+     (an extensionless /game/ would get the app index); iOS 1.1 still opens the site URL. Web: plain /game/. */
+  function isAndroidApp() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform() && c.getPlatform && c.getPlatform() === 'android'); }
+  function gameBase() { var c = window.Capacitor; return (c && c.isNativePlatform && c.isNativePlatform() && !isAndroidApp()) ? 'https://riceos.donaus.com' : ''; }
+  function gamePath() { return isAndroidApp() ? '/game/index.html' : '/game/'; }
   function gameUrl(p) {
     var q = [], add = function (k, v) { q.push(k + '=' + encodeURIComponent(v)); };
-    if (!p) return gameBase() + '/game/';
+    if (!p) return gameBase() + gamePath();
     var v = String(p.variety || '').replace(/[^0-9A-Za-z฀-๿ .\-_]/g, '').trim().slice(0, 24); if (v) add('v', v);
     var a = Number(p.rai); if (isFinite(a) && a >= 0.1 && a <= 1000) add('a', Math.round(a * 100) / 100);
     var s = String(p.sowDate || '').slice(0, 10), d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Math.floor((Date.now() - Date.parse(s + 'T00:00:00+07:00')) / 864e5) : NaN;
     if (isFinite(d) && d >= 0 && d <= 400) { add('s', s); var g = 0; STAGE_DAYS.forEach(function (x) { if (d >= x) g++; }); add('g', g); }
     var id = String(p.pid || p.id || '').replace(/-/g, ''); if (/^[A-Za-z0-9_-]{1,32}$/.test(id)) add('p', id); /* server plot ids are 36-char UUIDs; the contract allows 32: hyphens dropped */
-    var h = String(location.hash || ''); add('back', /^#\/plot\/[A-Za-z0-9_%-]{1,60}$/.test(h) ? '/next/' + h : '/next/'); /* back button in the game; game accepts only paths starting with /next/ */
-    return gameBase() + '/game/' + (q.length ? '?' + q.join('&') : '');
+    var h = String(location.hash || ''); var home = /^\/next\//.test(location.pathname) ? '/next/' : '/'; add('back', /^#\/plot\/[A-Za-z0-9_%-]{1,60}$/.test(h) ? home + h : home); /* back button in the game: back to the app copy the user came from (/ main app since 24 Nov, /next/ older copy) */
+    return gameBase() + gamePath() + (q.length ? '?' + q.join('&') : '');
   }
   function gameBtn(p, id) {
     return '<a class="btn w9b-game" id="' + id + '" href="' + esc(gameUrl(p)) + '"><span class="w9b-gi" aria-hidden="true">' + RiceIco('sprout') + '</span><span>เล่นเกมนาข้าวของแปลงนี้</span></a>';

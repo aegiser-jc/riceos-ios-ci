@@ -1,19 +1,21 @@
-/* RiceOS service worker: the app opens offline. Page, CSS, JS and JSON are network-first (cache when offline or slow), so a deploy shows on the
+/* ROOT (/) service worker. 24 Nov (PingEris): the /next/ app (riceos-next-v49) became the main app at /; the old main (riceos-v7)
+   moved to /prev/ (own SW, cache riceos-prev-vN). /next/ keeps its own copy and SW (riceos-next-vN). Root cache is riceos-vN (v8+).
+   RiceOS service worker: the app opens offline. Page, CSS, JS and JSON are network-first (cache when offline or slow), so a deploy shows on the
    first open; images and fonts are cache-first. Bump VERSION on every release.
    18 Nov (v37, kept in v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48): CSS/JS are linked with ?v=<n> from index.html and precached under those exact URLs; when a new version replaces an older one,
    activate reloads every open /next/ window once, so a page that an older cache-first SW (v35 and before) answered from its cache shows the
    new CSS without the user clearing anything. Keep these ?v= in step with index.html. */
-const VERSION = 'riceos-next-v48';
+const VERSION = 'riceos-v10';
 const ASSETS = [
   './',
   './content/flags.json',
   './content/privacy.json',
-  './css/app.css?v=48',
-  './css/w8.css?v=48',
-  './css/w9.css?v=48',
-  './css/w9b.css?v=48',
-  './css/vc6.css?v=48',
-  './css/dailycheck.css?v=48',
+  './css/app.css?v=49',
+  './css/w8.css?v=49',
+  './css/w9.css?v=49',
+  './css/w9b.css?v=49',
+  './css/vc6.css?v=49',
+  './css/dailycheck.css?v=49',
   './data/knowledge.json',
   './data/lessons.json',
   './data/ruleset_v2.json',
@@ -60,36 +62,36 @@ const ASSETS = [
   './img/opt3.jpg',
   './img/trend-chart.jpg',
   './index.html',
-  './js/api.js?v=48',
-  './js/app.js?v=48',
-  './js/enrol.js?v=48',
-  './js/idreader.js?v=48',
-  './js/league.js?v=48',
-  './js/w9b.js?v=48',
-  './js/vc6.js?v=48',
-  './js/booth.js?v=48',
-  './js/fieldreview.js?v=48',
-  './js/dailycheck.js?v=48',
-  './js/plotplan.js?v=48',
-  './js/awd.js?v=48',
+  './js/api.js?v=49',
+  './js/app.js?v=50',
+  './js/enrol.js?v=49',
+  './js/idreader.js?v=49',
+  './js/league.js?v=49',
+  './js/w9b.js?v=51',
+  './js/vc6.js?v=49',
+  './js/booth.js?v=49',
+  './js/fieldreview.js?v=49',
+  './js/dailycheck.js?v=49',
+  './js/plotplan.js?v=49',
+  './js/awd.js?v=49',
   './content/rewards.json',
-  './js/lessons.js?v=48',
-  './js/native.js?v=48',
-  './js/plots2.js?v=48',
-  './js/points.js?v=48',
-  './js/points2.js?v=48',
-  './js/regpoint.js?v=48',
+  './js/lessons.js?v=49',
+  './js/native.js?v=49',
+  './js/plots2.js?v=49',
+  './js/points.js?v=49',
+  './js/points2.js?v=49',
+  './js/regpoint.js?v=49',
   './manifest.webmanifest',
-  './vendor/jsqr.js?v=48',
-  './vendor/qrcode.js?v=48'
+  './vendor/jsqr.js?v=49',
+  './vendor/qrcode.js?v=49'
 ];
 const OWN = new Set(ASSETS.map(a => new URL(a, self.registration.scope).pathname));
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS.map(a => new Request(a, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
-/* Delete only our own old caches (riceos-next-vN) and legacy /next/ names riceos-v2x/v3x. Root SW owns riceos-vN (v7);
-   game, nalamun etc. caches are never touched. */
-const STALE = k => k !== VERSION && (/^riceos-next-v\d+$/.test(k) || /^riceos-v(2\d|3\d)$/.test(k));
+/* Delete only old root caches riceos-vN (the old main app riceos-v7, legacy riceos-v2x/v3x). riceos-next-vN (/next/), riceos-prev-vN (/prev/),
+   game, nalamun etc. caches are never touched. Deleting riceos-v7 makes activate reload open windows once, so returning users get the new app. */
+const STALE = k => k !== VERSION && /^riceos-v\d+$/.test(k);
 self.addEventListener('activate', e => {
   const cleaned = caches.keys().then(ks => { const old = ks.filter(STALE); return Promise.all(old.map(k => caches.delete(k))).then(() => old.length); });
   e.waitUntil(cleaned.then(() => self.clients.claim()));
@@ -104,10 +106,10 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   const path = new URL(e.request.url).pathname;
   if (path.startsWith('/api/')) return; /* the API is never cached and never answered with the app shell */
-  if (path.startsWith('/next/game-')) return; /* games (/next/game-np, game-cx ...) have their own SW; never answer or cache them here */
+  if (/^\/(next|prev|game|cornstraw|straw)(\/|$)/.test(path)) return; /* other apps under their own scope/SW; never answer or cache them here */
   const net = () => fetch(e.request).then(res => {
-    /* cache only the app's own files: the ASSETS list, or a non-HTML file under /next/; never an HTML fallback for an unknown path */
-    const own = OWN.has(path) || (path.startsWith('/next/') && !(res.headers.get('content-type') || '').includes('text/html'));
+    /* cache only the app's own files: the ASSETS list, or a non-HTML file of the root app; never an HTML fallback for an unknown path */
+    const own = OWN.has(path) || !(res.headers.get('content-type') || '').includes('text/html');
     if (res.ok && own) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); }
     return res;
   });

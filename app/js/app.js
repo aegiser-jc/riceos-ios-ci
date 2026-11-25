@@ -126,7 +126,7 @@
   function profileCard(rows, thumb) {
     var pr = S.profile || {};
     return '<div class="card pcard"><img class="av" alt="" src="' + esc(pr.avatar || 'icons/icon-192.png') + '"><div><b style="font-size:20px">' + esc(pr.name || '') + '</b>' +
-      '<div style="font-size:13.5px"><span class="green">' + RiceIco('pin') + '</span>' + esc(pr.district || '') + '</div></div>' +
+      '<div style="font-size:13.5px"><span class="green">📍</span>' + esc(pr.district || '') + '</div></div>' +
       '<div class="info">' + rows.map(function (r) { return '<div>' + r + '</div>'; }).join('') + '</div>' + (thumb ? '<img class="th" alt="" src="' + thumb + '">' : '') + '</div>';
   }
   function stdRows() { var p = P() || {}; return ['' + RiceIco('sprout') + ' แปลง ' + fmt(p.rai || 0) + ' ไร่', '' + RiceIco('leaf') + ' พันธุ์ ' + esc(p.variety || '-'), '' + RiceIco('cal') + ' อายุข้าว ' + (age(p) == null ? '-' : age(p)) + ' วัน']; }
@@ -847,9 +847,9 @@
       var k = p.kratongs.filter(function (x) { return x.seq === Number(mm[2]); })[0];
       if (!k) { $('qrok').textContent = 'ไม่พบกระทงนี้ในแปลง'; return false; }
       st.code = v; st.kratong = k; if (mm[3]) st.state = mm[3];
-      $('qrok').innerHTML = RiceIco('check') + ' ' + esc(k.label) + (st.state ? ' (' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') + ')' : '') + ' แล้วกดถ่ายรูป';
+      $('qrok').innerHTML = '✅ ' + esc(k.label) + (st.state ? ' · ' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') : '') + ' แล้วกดถ่ายรูป';
       if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); clearInterval(st.timer); st.stream = null; }
-      var vo = $('vok'), vb = $('vbox'); if (vb && vb.style.display !== 'none') { $('cv').style.display = 'none'; vo.hidden = false; vo.style.display = 'flex'; vb.classList.add('done'); vo.dataset.s = st.state || ''; vo.textContent = k.label + (st.state ? ' (' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') + ')' : ''); }
+      var vo = $('vok'), vb = $('vbox'); if (vb && vb.style.display !== 'none') { $('cv').style.display = 'none'; vo.hidden = false; vo.style.display = 'flex'; vb.classList.add('done'); vo.dataset.s = st.state || ''; vo.textContent = '✅ ' + k.label + (st.state ? ' · ' + (st.state === 'DRY' ? 'แห้ง' : 'มีน้ำ') : ''); }
       return true;
     }
     if (IN_LINE && needQr) { $('vbox').style.display = 'none'; $('camhint').hidden = false; } /* no blank viewfinder in LINE (no getUserMedia there) */
@@ -879,7 +879,7 @@
     }
     var gps = null, gpsStatus = 'unavailable';
     var phl = $('phl'), gpsSettled = false;
-    function gpsDone() { if (gpsSettled) return; gpsSettled = true; phl.style.pointerEvents = ''; phl.style.opacity = ''; phl.textContent = '' + RiceIco('camera') + ' ถ่ายรูปยืนยัน'; startCam(); }
+    function gpsDone() { if (gpsSettled) return; gpsSettled = true; phl.style.pointerEvents = ''; phl.style.opacity = ''; phl.innerHTML = RiceIco('camera') + ' ถ่ายรูปยืนยัน'; startCam(); }
     if (!IN_LINE) { phl.style.pointerEvents = 'none'; phl.style.opacity = '.55'; phl.textContent = 'กำลังหาพิกัด...'; } setTimeout(function () { if (!st.closed) gpsDone(); }, 20000);
     phl.addEventListener('click', function (ev) {
       if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; clearInterval(st.timer); var cv = $('cv'); if (cv) { cv.pause(); cv.srcObject = null; } } /* free the camera for the system camera app */
@@ -889,7 +889,7 @@
       $('gps').textContent = 'กำลังหาพิกัด...'; $('gpsretry').style.display = 'none';
       readGps().then(function (r) {
         if (st.closed) return; gpsDone(); gpsStatus = r.status; gps = r.gps || null;
-        if (gps) { $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' เมตร)' + (inArea(gps) ? '' : ' ' + OUTSIDE_NOTE); return; }
+        if (gps) { $('gps').textContent = 'พิกัด ' + gps.lat.toFixed(5) + ', ' + gps.lon.toFixed(5) + ' (±' + Math.round(gps.acc) + ' เมตร)' + (inArea(gps) ? '' : ' · ' + OUTSIDE_NOTE); return; }
         $('gps').innerHTML = esc((r.status === 'denied' ? 'ยังไม่ได้อนุญาตให้แอปใช้ตำแหน่ง (GPS) (เปิดได้ที่ ตั้งค่า > แอป > RiceOS > สิทธิ์) ' : 'ไม่ได้รับพิกัด GPS ') + 'รูปยังบันทึกและส่งได้ แต่เจ้าหน้าที่อาจขอให้ถ่ายใหม่') + '<br>' + esc(GPS_HELP);
         $('gpsretry').style.display = '';
       });
@@ -920,7 +920,7 @@
         var meta = { client_uuid: uuid, plot_id: p.pid || null, mission_type: missionType, client_time: now, gps_status: gps ? 'ok' : gpsStatus };
         if (st.kratong) meta.kratong_seq = st.kratong.seq; if (st.code) meta.scanned_code = st.code;
         if (gps) { meta.lat = gps.lat; meta.lon = gps.lon; meta.acc_m = Math.round(gps.acc); }
-        var msg = pts > 0 ? 'บันทึกแล้ว +' + fmt(pts) + ' แต้ม (รอตรวจ)' : 'บันทึกหลักฐานแล้ว (รอตรวจ)' + (outside ? ' ' + OUTSIDE_NOTE : '');
+        var msg = pts > 0 ? 'บันทึกแล้ว +' + fmt(pts) + ' แต้ม (รอตรวจ)' : 'บันทึกหลักฐานแล้ว (รอตรวจ)' + (outside ? ' · ' + OUTSIDE_NOTE : '');
         if (!API) { toast(msg + ' แต่ส่งรูปจากเครื่องนี้ไม่ได้'); route(); return; }
         confirmSent('saving', pts, null, outside);   /* big status card at once: farmers never wonder whether the photo went */
         API.outbox.add({ client_uuid: uuid, plot_local: p.id, meta: meta, blob: blob, saved_at: now }).then(function () { return flushOutbox(); }).then(function (r) {
@@ -937,13 +937,13 @@
     var d = document.getElementById('sentcard');
     if (!d) { d = document.createElement('div'); d.id = 'sentcard'; d.className = 'modal sentm'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-live', 'assertive'); document.body.appendChild(d); }
     var T = {
-      saving: [RiceIco('upload'), 'กำลังส่งรูป...', 'บันทึกรูปในเครื่องแล้ว กรุณารอสักครู่', 'wait'],
-      sent: [RiceIco('check'), 'ส่งรูปแล้ว', 'รอเจ้าหน้าที่ตรวจ' + (pts > 0 ? ' แต้ม +' + fmt(pts) + ' จะนับเมื่อตรวจผ่าน' : ''), 'good'],
-      queued: [RiceIco('upload'), 'บันทึกรูปแล้ว รอส่ง', (reason === 'unreachable' ? 'ยังติดต่อระบบไม่ได้' : 'ตอนนี้ไม่มีสัญญาณอินเทอร์เน็ต') + ' แอปจะส่งให้เองเมื่อมีสัญญาณ ไม่ต้องถ่ายซ้ำ', 'wait'],
-      rejected: [RiceIco('warn'), 'ส่งรูปไม่ผ่าน', 'ระบบไม่รับรูปนี้ รูปยังอยู่ในเครื่อง แตะ "ส่งไม่ผ่าน" บนหน้าแรกเพื่อดูวิธีแก้', 'bad'],
-      full: [RiceIco('warn'), 'เก็บรูปไม่ได้', 'พื้นที่ในเครื่องเต็ม ลบรูปหรือแอปที่ไม่ใช้แล้วถ่ายใหม่', 'bad']
+      saving: ['⏳', 'กำลังส่งรูป...', 'บันทึกรูปในเครื่องแล้ว กรุณารอสักครู่', 'wait'],
+      sent: ['✅', 'ส่งรูปแล้ว', 'รอเจ้าหน้าที่ตรวจ' + (pts > 0 ? ' แต้ม +' + fmt(pts) + ' จะนับเมื่อตรวจผ่าน' : ''), 'good'],
+      queued: ['📤', 'บันทึกรูปแล้ว รอส่ง', (reason === 'unreachable' ? 'ยังติดต่อระบบไม่ได้' : 'ตอนนี้ไม่มีสัญญาณอินเทอร์เน็ต') + ' แอปจะส่งให้เองเมื่อมีสัญญาณ ไม่ต้องถ่ายซ้ำ', 'wait'],
+      rejected: ['⚠️', 'ส่งรูปไม่ผ่าน', 'ระบบไม่รับรูปนี้ รูปยังอยู่ในเครื่อง แตะ "ส่งไม่ผ่าน" บนหน้าแรกเพื่อดูวิธีแก้', 'bad'],
+      full: ['⚠️', 'เก็บรูปไม่ได้', 'พื้นที่ในเครื่องเต็ม ลบรูปหรือแอปที่ไม่ใช้แล้วถ่ายใหม่', 'bad']
     }[state];
-    d.innerHTML = '<div class="sentcard ' + T[3] + '"><div class="sc-ic" aria-hidden="true">' + T[0] + '</div><h2>' + T[1] + '</h2><p>' + esc(T[2]) + '</p>' + (outside && state !== 'full' ? '<p class="note" role="note">' + RiceIco('warn') + ' ' + esc(OUTSIDE_NOTE) + '</p>' : '') + (state === 'saving' ? '' : '<button class="btn" id="scok">ตกลง</button>') + '</div>';
+    d.innerHTML = '<div class="sentcard ' + T[3] + '"><div class="sc-ic" aria-hidden="true">' + T[0] + '</div><h2>' + T[1] + '</h2><p>' + esc(T[2]) + '</p>' + (outside && state !== 'full' ? '<p class="note" role="note">⚠️ ' + esc(OUTSIDE_NOTE) + '</p>' : '') + (state === 'saving' ? '' : '<button class="btn" id="scok">ตกลง</button>') + '</div>';
     clearTimeout(confirmSent.t); if (state === 'sent') confirmSent.t = setTimeout(function () { d.remove(); }, 4500); /* good news fades; queued / full stay until OK */
     var ok = d.querySelector('#scok'); if (ok) { ok.onclick = function () { d.remove(); }; try { ok.focus(); } catch (e) {} }
   }
@@ -1014,7 +1014,7 @@
       '<div class="msg ai"><img alt="" src="img/mascot-head.png" style="width:52px"><div class="b"><div style="display:flex;gap:8px"><div style="flex:1">' +
       '<div style="font:800 22px Prompt">' + RiceIco('rain') + ' ยังไม่ควรใส่ปุ๋ย</div><div>' + RiceIco('rain') + ' พรุ่งนี้มีโอกาสฝนตก 60%</div><div>' + RiceIco('cal') + ' แนะนำรอ 3 วัน</div><div>' + RiceIco('leaf') + ' เพื่อลดการสูญเสียปุ๋ย<br>และประหยัดค่าใช้จ่าย</div>' +
       '<div>ประมาณ <b class="pill" style="background:#f8ee45;padding:0 8px;font-size:20px">350 บาท/ไร่</b></div></div><img alt="" src="img/chat-rice.jpg" style="width:88px;height:108px;border-radius:14px;object-fit:cover"></div>' +
-      '<div style="font-size:17px">' + RiceIco('clip') + ' ' + esc(F('ai_advice_figures', 'ref')) + '</div><span class="advice">' + (STORE ? 'คำแนะนำทั่วไป (ตัวอย่างเพื่อวางแผน)' : 'คำแนะนำประกอบ') + '</span><div class="tm">09:29</div></div></div>' +
+      '<div style="font-size:17px">📄 ' + esc(F('ai_advice_figures', 'ref')) + '</div><span class="advice">' + (STORE ? 'คำแนะนำทั่วไป (ตัวอย่างเพื่อวางแผน)' : 'คำแนะนำประกอบ') + '</span><div class="tm">09:29</div></div></div>' +
       '<div class="msg me"><div class="b">แล้วควรทำอะไรต่อครับ<div class="tm">09:30 <em>✓✓</em></div></div></div>' +
       '<div class="msg ai"><img alt="" src="img/mascot-head.png" style="width:52px"><div class="b"><b style="font-size:19px">' + RiceIco('check') + ' ลำดับงานแนะนำ (ใน 3 วันนี้)</b>' +
       '<ol style="margin:4px 0;padding-left:24px;font-size:17px"><li>ตรวจระดับน้ำ และคงไว้ที่ 5–10 ซม.</li><li>สำรวจโรคใบ (โดยเฉพาะไหม้คอรวง)</li><li>บันทึกสภาพแปลง เพื่อรับแต้ม <b class="pill" style="background:#fbefa0;padding:0 6px">' + RiceIco('star') + ' +20</b></li></ol><span class="advice">คำแนะนำประกอบ</span><div class="tm">09:31</div></div></div>';
@@ -1033,12 +1033,12 @@
     S.chat = S.chat || [];
     var intro = F('ai_advice_figures', 'use_his_chat') && S.seeded ? hisChat() : answer('awd');
     app.innerHTML = header() + '<div class="sheet">' + titleRow('พี่เลี้ยงนาข้าว', 'ถามเรื่องทำนา ตอบจากคำแนะนำที่เตรียมไว้', '<span style="margin-left:auto;font-size:22px;color:#074810">⋮</span>', '<img alt="" src="img/mascot-title.png" style="width:55px">') +
-      '<div class="card farm"><img class="av" alt="" src="' + esc((S.profile || {}).avatar || 'icons/icon-192.png') + '"><div style="flex:1"><b style="font-size:19px">แปลง ' + esc((S.profile || {}).name || '') + '</b><div style="font-size:14px">' + RiceIco('pin') + ' ' + esc((S.profile || {}).district || '') + '</div></div>' +
-      '<div style="border-left:1px solid #c3c9c5;padding-left:8px;font-size:14px;line-height:1.4">' + RiceIco('leaf') + ' ' + fmt(p.rai || 0) + ' ไร่<br>' + RiceIco('sprout') + ' ' + esc(p.variety || '-') + '<br>' + RiceIco('sprout') + ' อายุข้าว ' + (age(p) == null ? '-' : age(p)) + ' วัน</div>' + (p.map ? '<img alt="" src="img/map-thumb.jpg" style="width:72px;border-radius:10px">' : '') + '</div>' +
+      '<div class="card farm"><img class="av" alt="" src="' + esc((S.profile || {}).avatar || 'icons/icon-192.png') + '"><div style="flex:1"><b style="font-size:19px">แปลง ' + esc((S.profile || {}).name || '') + '</b><div style="font-size:14px">📍 ' + esc((S.profile || {}).district || '') + '</div></div>' +
+      '<div style="border-left:1px solid #c3c9c5;padding-left:8px;font-size:14px;line-height:1.4">🌾 ' + fmt(p.rai || 0) + ' ไร่<br>' + RiceIco('sprout') + ' ' + esc(p.variety || '-') + '<br>' + RiceIco('sprout') + ' อายุข้าว ' + (age(p) == null ? '-' : age(p)) + ' วัน</div>' + (p.map ? '<img alt="" src="img/map-thumb.jpg" style="width:72px;border-radius:10px">' : '') + '</div>' +
       '<div id="thread">' + intro + S.chat.join('') + '</div>' +
       '<div style="font:700 20px Prompt;color:#0b4a12;margin:8px 2px 4px">ถามเรื่องอื่นได้เลย</div>' +
       '<div class="qchips"><button data-q="ใบเหลือง ทำอย่างไร">' + RiceIco('leaf') + ' ใบเหลือง<br>ทำอย่างไร?</button><button data-q="ราคาข้าว วันนี้">' + RiceIco('chart') + ' ราคาข้าว<br>วันนี้</button><button data-q="น้ำ เปียกสลับแห้ง ท่อวัดน้ำ">' + RiceIco('drop') + ' ดูระดับน้ำ<br>ในท่อ</button><button data-q="สูตรปุ๋ย กข85">' + RiceIco('sprout') + ' สูตรปุ๋ย<br>สำหรับ กข85</button></div>' +
-      '<form class="inputbar" id="ask"><span style="color:#5b5a5f">' + RiceIco('camera') + '</span><input id="q" placeholder="' + (noMic ? 'พิมพ์คำถาม...' : 'พิมพ์คำถาม หรือกดพูด...') + '" autocomplete="off">' + (noMic ? '' : '<button type="button" class="mic" id="mic" aria-label="พูด">' + RiceIco('mic') + '</button>') + '<button aria-label="ส่ง" style="color:#3e8e4e;font-size:22px">➤</button></form></div>';
+      '<form class="inputbar" id="ask"><span style="color:#5b5a5f">📷</span><input id="q" placeholder="' + (noMic ? 'พิมพ์คำถาม...' : 'พิมพ์คำถาม หรือกดพูด...') + '" autocomplete="off">' + (noMic ? '' : '<button type="button" class="mic" id="mic" aria-label="พูด">🎤</button>') + '<button aria-label="ส่ง" style="color:#3e8e4e;font-size:22px">➤</button></form></div>';
     function ask(q) {
       if (!q) return;
       var me = '<div class="msg me"><div class="b">' + esc(q) + '<div class="tm">' + new Date().toTimeString().slice(0, 5) + '</div></div></div>';
@@ -1061,9 +1061,9 @@
     var rows = [
       ['ค่ากรดด่างของดิน (pH)', dot(Y) + '5.2<br><small>' + esc(F('ph_label_inconsistency', 'table_label')) + '</small>', 'ปรับสภาพดิน', 'ใส่โดโลไมต์<br>100 กก./ไร่', '+15–20%<br><small>ผลผลิต</small>'],
       ['' + RiceIco('leaf') + ' อินทรียวัตถุ<br>(OM)', dot(RD) + '1.1%<br><small>ต่ำ</small>', 'เพิ่มอินทรียวัตถุ', 'ไถกลบฟาง<br>หรือเพิ่มปุ๋ยหมัก', '+10–15%<br><small>ความอุดมสมบูรณ์</small>'],
-      ['' + RiceIco('sack') + ' N-P-K', dot(RD) + 'ไนโตรเจน (N) ต่ำ<br>' + dot(Y) + 'ฟอสฟอรัส (P) กลาง<br>' + dot(G) + 'โพแทสเซียม (K) สูง', 'ปรับสมดุลธาตุ', 'ปุ๋ยสั่งตัด<br>46-0-0 และ<br>18-46-0', 'ประหยัด<br>350 บาท/ไร่'],
+      ['🧺 N-P-K', dot(RD) + 'ไนโตรเจน (N) ต่ำ<br>' + dot(Y) + 'ฟอสฟอรัส (P) กลาง<br>' + dot(G) + 'โพแทสเซียม (K) สูง', 'ปรับสมดุลธาตุ', 'ปุ๋ยสั่งตัด<br>46-0-0 และ<br>18-46-0', 'ประหยัด<br>350 บาท/ไร่'],
       ['' + RiceIco('sprout') + ' พันธุ์', dot(G) + 'กข85<br><small>เหมาะสม</small>', 'ให้คงใช้ต่อ', 'ใช้พันธุ์ กข85<br>(เหมาะกับพื้นที่)', 'ผลผลิตดี<br>สม่ำเสมอ'],
-      ['' + RiceIco('drop') + ' น้ำ', dot(G) + 'เปียกสลับแห้ง<br><small>เหมาะสม</small>', 'จัดการน้ำตาม<br>ช่วงอายุ', 'จัดการน้ำแบบ<br>เปียกสลับแห้ง', 'ลดค่าสูบ<br>30%'],
+      ['💧 น้ำ', dot(G) + 'เปียกสลับแห้ง<br><small>เหมาะสม</small>', 'จัดการน้ำตาม<br>ช่วงอายุ', 'จัดการน้ำแบบ<br>เปียกสลับแห้ง', 'ลดค่าสูบ<br>30%'],
       ['' + RiceIco('bug') + ' โรค', dot(Y) + '<span style="color:#d32f2f">ไหม้คอรวง</span><br><small>(เสี่ยงสูง)</small>', 'เฝ้าระวังและ<br>ป้องกันทันที', 'ใช้สารที่ขึ้นทะเบียน<br>ตามฉลาก', 'ลดความเสี่ยง<br>ผลผลิต'],
       ['' + RiceIco('wallet') + ' ต้นทุน', '4,200 บาท/ไร่', 'ลดต้นทุนได้', '' + RiceIco('wallet') + ' ปรับเหลือ<br>3,500 บาท/ไร่', 'ลดลง<br>700 บาท/ไร่'],
       ['ตลาด', 'โรงสี A<br>' + esc(F('prices_98_95_110', 'p98')) + ' บาท/กก.', 'ตลาดรองรับดี', '' + RiceIco('clip') + ' ทำสัญญาขาย<br>ล่วงหน้า', 'รายได้มั่นคง']];
@@ -1086,7 +1086,7 @@
     var y7 = F('yield_750_600', 'y750'), y6 = F('yield_750_600', 'y600');
     var opt = function (best, img, nm, d, sell, col, bg, prof, risk, rc, seg, foot, fc) {
       return '<div class="card opt' + (best ? ' best' : '') + '">' + (best ? '<span class="tag">' + RiceIco('star') + ' แนะนำสูงสุด</span>' : '') + '<span class="radio' + (best ? ' on' : '') + '"></span>' +
-        '<img class="ph" alt="" src="img/' + img + '.jpg"><div><div class="nm">' + nm + '</div><div style="font-size:14px">' + RiceIco('cal') + ' ' + d + '</div><div style="font-size:14px">' + RiceIco('sack') + ' ' + sell + '</div></div>' +
+        '<img class="ph" alt="" src="img/' + img + '.jpg"><div><div class="nm">' + nm + '</div><div style="font-size:14px">📅 ' + d + '</div><div style="font-size:14px">🏭 ' + sell + '</div></div>' +
         '<div><div class="pb" style="background:' + bg + '">กำไรคาด<br><b style="color:' + col + '">' + prof + '</b> <b style="color:' + col + ';font-size:16px">บาท/ไร่</b></div><div style="font-size:13px">ความเสี่ยง: <b style="color:' + rc + ';font:600 13px Prompt">' + risk + '</b></div><div class="risk">' + seg + '</div></div>' +
         '<div class="foot"><span class="dot" style="background:' + fc + '">✓</span> ' + foot + '</div></div>';
     };
@@ -1109,20 +1109,20 @@
   R.market = function () {
     var note = F('prices_98_95_110', 'note');
     var buyer = function (best, img, nm, list, price, col, pill, pillbg) {
-      return '<div class="card buyer' + (best ? ' best' : '') + '">' + (best ? '<span class="tag">' + esc(F('typos_as_shown', 'offer_tag')) + '</span><span class="dot" style="position:absolute;right:10px;top:8px;background:#2ea52e;width:20px;height:20px">✓</span>' : '<span class="radio" style="top:10px"></span>') +
+      return '<div class="card buyer' + (best ? ' best' : '') + '">' + (best ? '<span class="tag">👑 ' + esc(F('typos_as_shown', 'offer_tag')) + '</span><span class="dot" style="position:absolute;right:10px;top:8px;background:#2ea52e;width:20px;height:20px">✓</span>' : '<span class="radio" style="top:10px"></span>') +
         '<img class="ph" alt="" src="img/' + img + '.jpg"><div><div class="nm">' + nm + '</div><ul>' + list.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul></div>' +
         '<div class="pr">เสนอราคา<br><b style="color:' + col + '">' + price + ' <small>บาท/กก.</small></b><span class="lk" style="background:' + pillbg + '">' + pill + '</span></div></div>';
     };
-    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตลาดขายข้าว: ผู้ซื้อเสนอราคาล่วงหน้า', 'เชื่อมตรงกับผู้ซื้อ ตกลงราคาไว้ล่วงหน้าได้ ลดความเสี่ยง', '<span style="margin-left:auto;color:#0d3d10;font-size:20px">' + RiceIco('link') + '</span>') + storeNote('ราคาและผู้ซื้อในหน้านี้เป็นตัวอย่างเพื่อวางแผน ไม่ใช่ราคาจริง ไม่ใช่ข้อมูลจากหน่วยงานรัฐ ราคาจริงดูที่แหล่งข้อมูล') +
+    app.innerHTML = header({ pl: true }) + '<div class="sheet" style="background:#fff">' + titleRow('ตลาดขายข้าว: ผู้ซื้อเสนอราคาล่วงหน้า', 'เชื่อมตรงกับผู้ซื้อ ตกลงราคาไว้ล่วงหน้าได้ ลดความเสี่ยง', '<span style="margin-left:auto;color:#0d3d10;font-size:20px">🔗</span>') + storeNote('ราคาและผู้ซื้อในหน้านี้เป็นตัวอย่างเพื่อวางแผน ไม่ใช่ราคาจริง ไม่ใช่ข้อมูลจากหน่วยงานรัฐ ราคาจริงดูที่แหล่งข้อมูล') +
       profileCard(stdRows(), 'img/ears-thumb.jpg') +
       '<div class="banner"><span style="font-size:32px">' + RiceIco('cert') + '</span><div><b style="font:700 19px Prompt;color:#0b3d0b">จับคู่ผู้ซื้อสำหรับ “กข85”</b><div style="font-size:13px">ผลผลิตคาด 15,000 กก. (15 ตัน) เริ่มรับซื้อ ก.ย. – ต.ค.</div></div></div>' +
-      buyer(true, 'buyer1', 'โรงสี A', ['ต้องการ: กข85', 'ความชื้น: ไม่เกิน 15%', 'รับซื้อ: ก.ย. – ต.ค.'], F('prices_98_95_110', 'p98'), '#13641a', esc(F('locked_15_ton', 'locked')).replace(/ (\d+) ตัน/, ' $1\u00a0ตัน'), '#dff2d4') +
+      buyer(true, 'buyer1', 'โรงสี A', ['ต้องการ: กข85', 'ความชื้น: ไม่เกิน 15%', 'รับซื้อ: ก.ย. – ต.ค.'], F('prices_98_95_110', 'p98'), '#13641a', '🤝 ' + esc(F('locked_15_ton', 'locked')).replace(/ (\d+) ตัน/, ' $1\u00a0ตัน'), '#dff2d4') +
       buyer(false, 'buyer2', 'สหกรณ์ B', ['ต้องการ: กข85', 'ความชื้น: ไม่เกิน 15%', 'รับซื้อ: ก.ย. – ต.ค.'], F('prices_98_95_110', 'p95'), '#7a4a05', 'รอการยืนยัน', '#fdf0c8') +
       buyer(false, 'buyer3', 'ผู้ส่งออก C', ['ต้องการ: กข85 (มีรหัส QR)', 'มาตรฐาน: การปฏิบัติทางการเกษตรที่ดี (GAP) และคาร์บอนต่ำ', 'ความชื้น: ไม่เกิน 14%', 'รับซื้อ: ต.ค. – พ.ย.'], F('prices_98_95_110', 'p92'), '#a50f0f', 'ต้องมีรหัส QR ล็อตข้าว', '#fdf0c8') +
       (note ? '<p class="note">' + esc(note) + '</p>' : '') +
       '<div class="card feat"><img class="mascot" alt="" src="img/mascot-mkt.jpg" style="right:2px;top:-22px;width:70px"><b style="font:700 17px Prompt;color:#0d2a10">จุดเด่นการขายล่วงหน้าผ่าน RiceOS</b><div class="c4">' +
       '<div><span style="font-size:24px">' + RiceIco('badge') + '</span><br>ราคามั่นคง<small>ลดความเสี่ยง</small></div><div><span style="font-size:24px">' + RiceIco('wallet') + '</span><br>มีผู้ซื้อจริง<small>ตรวจสอบได้</small></div><div><span style="font-size:24px">' + RiceIco('leaf') + '</span><br>เพิ่มมูลค่า<small>คาร์บอนต่ำ</small></div><div><span style="font-size:24px">' + RiceIco('sack') + '</span><br>มีรหัส QR ล็อตข้าว<small>ดูที่มาของข้าวได้</small></div></div></div>' +
-      '<button class="btn" id="deal" style="margin-top:8px">' + esc(F('locked_15_ton', 'cta')) + ' →</button>' +
+      '<button class="btn" id="deal" style="margin-top:8px">🤝 ' + esc(F('locked_15_ton', 'cta')) + ' →</button>' +
       '<p class="note">แอปยังไม่ทำสัญญาซื้อขายแทนท่าน การตกลงจริงต้องทำกับผู้ซื้อและเจ้าหน้าที่โครงการ ราคาขึ้นกับพันธุ์และความชื้น</p></div>';
     document.getElementById('deal').onclick = function () { toast('บันทึกความสนใจแล้ว เจ้าหน้าที่จะติดต่อกลับ (ยังไม่ใช่สัญญา)'); };
   };
@@ -1132,8 +1132,8 @@
     var names = { 'R1-awd-photo': 'ถ่ายรูปท่อวัดน้ำ (เปียกสลับแห้ง)', 'R2-no-burn': 'ไม่เผาฟาง', 'R3-lesson': 'ผ่านบทเรียน', OPENING: 'ยอดยกมา' };
     app.innerHTML = header() + '<div class="sheet">' + titleRow('เงินและแต้ม') +
       '<div class="duo"><div class="wallet" style="margin:0;display:block"><div style="font:600 15px Prompt">ยอดเงิน</div><b>' + esc(pr.wallet || '-') + ' บาท</b></div><div class="ptspill" style="flex-direction:column;padding:6px">' + RiceIco('star') + ' <b>' + fmt(t.confirmed + t.pending) + '</b>แต้ม</div></div>' +
-      '<p class="note">ยืนยันแล้ว ' + fmt(t.confirmed) + '<br>รอส่งเมื่อระบบกลางพร้อม ' + fmt(t.pending) + '<br>แต้มที่นับในอันดับคะแนนสัปดาห์นี้ ' + fmt(t.week) + '</p>' +
-      '<div class="card" style="padding:12px;margin-top:8px"><h3 style="margin:0;font:700 19px Prompt">' + RiceIco('star') + ' อันดับคะแนน</h3><p style="font-size:16px">อันดับในตำบล/อำเภอ/จังหวัด จะแสดงเมื่อเชื่อมระบบกลางของโครงการ' + (S.consent && S.consent.public_rank ? ' (ท่านยินยอมแล้ว: “ให้เกษตรกรในพื้นที่เดียวกันเห็นชื่อและคะแนนของฉันในอันดับคะแนน”)' : ' (ท่านเลือกไม่แสดงชื่อในอันดับ)') + '</p></div>' +
+      '<p class="note">ยืนยันแล้ว ' + fmt(t.confirmed) + '<br>รอส่งเมื่อระบบกลางพร้อม ' + fmt(t.pending) + ' · แต้มที่นับในอันดับคะแนนสัปดาห์นี้ ' + fmt(t.week) + '</p>' +
+      '<div class="card" style="padding:12px;margin-top:8px"><h3 style="margin:0;font:700 19px Prompt">🏆 อันดับคะแนน</h3><p style="font-size:16px">อันดับในตำบล/อำเภอ/จังหวัด จะแสดงเมื่อเชื่อมระบบกลางของโครงการ' + (S.consent && S.consent.public_rank ? ' (ท่านยินยอมแล้ว: “ให้เกษตรกรในพื้นที่เดียวกันเห็นชื่อและคะแนนของฉันในอันดับคะแนน”)' : ' (ท่านเลือกไม่แสดงชื่อในอันดับ)') + '</p></div>' +
       '<div class="card" style="padding:12px;margin-top:8px"><h3 style="margin:0;font:700 19px Prompt">' + RiceIco('gift') + ' รางวัล</h3><p style="font-size:16px">รายการรางวัลรอคณะกรรมการโครงการอนุมัติ</p></div>' +
       '<div class="card" style="padding:12px;margin-top:8px"><h3 style="margin:0 0 4px;font:700 19px Prompt">กติกาแต้ม ' + (rs ? 'ฉบับที่ ' + esc(String(rs.version).replace(/^[a-z]+(?=\d+$)/i, '')) + ' (มีผล ' + thDate(rs.effective_from.slice(0, 10)) + ')' : '') + '</h3>' +
       (rs ? rs.rules.map(function (r) { return '<div style="font-size:16px;padding:4px 0;border-top:1px solid #eee">' + esc(names[r.id] || r.id) + ': ' + r.formula.base + (r.formula.per_rai ? ' แต้มต่อไร่' : ' แต้ม') + ' สูงสุด ' + r.formula.cap_per_week + ' ต่อสัปดาห์</div>'; }).join('') : '') + '</div>' +
@@ -1157,7 +1157,7 @@
     if (!L) {
       app.innerHTML = header() + '<div class="sheet">' + titleRow('บทเรียน') + LESSONS.lessons.map(function (l) {
         var sc = (S.lessons || {})[l.id];
-        return '<a class="card lesson" href="#/lessons?id=' + l.id + '" style="display:block;color:inherit;text-decoration:none"><h3>' + RiceIco('book') + ' ' + esc(l.title) + '</h3><div style="font-size:16px">' + (sc == null ? 'ยังไม่ได้ทำแบบทดสอบ' : 'คะแนน ' + sc + '%' + (sc >= LESSONS.pass_score ? ' ' + RiceIco('check') + ' ผ่าน' : '')) + '</div></a>';
+        return '<a class="card lesson" href="#/lessons?id=' + l.id + '" style="display:block;color:inherit;text-decoration:none"><h3>📖 ' + esc(l.title) + '</h3><div style="font-size:16px">' + (sc == null ? 'ยังไม่ได้ทำแบบทดสอบ' : 'คะแนน ' + sc + '%' + (sc >= LESSONS.pass_score ? ' ' + RiceIco('check') + ' ผ่าน' : '')) + '</div></a>';
       }).join('') + '</div>';
       return;
     }
@@ -1385,7 +1385,7 @@
   function riskPill(level) { return '<span class="risk-label ' + level + '"><i>' + RISK[level][0] + '</i>' + RISK[level][1] + '</span>'; }
   function provinceMap() {
     return '<svg class="province-svg" viewBox="0 0 490 570" role="img" aria-label="แผนที่ความเสี่ยง 9 อำเภอ จังหวัดพิษณุโลก"><defs><filter id="province-shadow" x="-15%" y="-15%" width="130%" height="135%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#153c28" flood-opacity=".14"/></filter></defs><g class="map-districts" filter="url(#province-shadow)">' + DISTRICTS.map(function (d, i) {
-      return '<g class="district ' + d.level + '"><title>' + d.name + ' (' + RISK[d.level][1] + ')</title><path d="' + districtPath(d.borders) + '"/><circle cx="' + d.x + '" cy="' + d.y + '" r="19"/><text x="' + d.x + '" y="' + (d.y + 6) + '" text-anchor="middle">' + (i + 1) + '</text></g>';
+      return '<g class="district ' + d.level + '"><title>' + d.name + ' · ' + RISK[d.level][1] + '</title><path d="' + districtPath(d.borders) + '"/><circle cx="' + d.x + '" cy="' + d.y + '" r="19"/><text x="' + d.x + '" y="' + (d.y + 6) + '" text-anchor="middle">' + (i + 1) + '</text></g>';
     }).join('') + '</g><g class="map-compass"><path d="M25 64V31m-6 9l6-9 6 9"/><text x="25" y="22" text-anchor="middle">N</text></g></svg>';
   }
   var ALERTS = [['บางระกำ', 'high'], ['พรหมพิราม', 'watch'], ['วัดโบสถ์', 'watch']];

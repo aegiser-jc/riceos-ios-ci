@@ -1,0 +1,36 @@
+Nalamun artwork and original Canvas characters: RiceOS field art pass, 2026.
+Reference palette: Thai paddy field visit, 7 November 2026.
+Rice plant cut-outs and mud, water, grass and road tiles generated with
+FLUX.2-klein-4B (Apache-2.0), then selected, recoloured and reduced locally.
+Dry cracked mud and loose straw texture generation:
+Qwen-Image-Edit-2511 (Apache-2.0), recoloured and reduced locally.
+Both model licences: Apache License, Version 2.0.
+Source candidates and model provenance retained in the development art records.
+Prompt SemiBold and Sarabun Regular: SIL Open Font License 1.1;
+licence texts accompany the fonts in assets/fonts/.
+Original sound cues: synthesized locally for this game.
+
+Pass 5 backdrops (tall and wide), buffalo views, egret, sala, sugar palm,
+banana, bush, hat post, tied sheaves and original seed friend in three poses:
+FLUX.2-klein-4B (Apache-2.0), generated for Nalamun with the same painted
+style reference as the rice. Backdrops use the source WebP colours to retain
+smooth cloud and reflection shading. Sprites use the pass 5 palette; the
+friend body uses jade greens from that palette. Local lossless WebP packing.
+Additional pass 5 painted bank, two heading clumps, three ripe drooping
+clumps and three neighbour farmers: FLUX.2-klein-4B (Apache-2.0), created
+with the same style reference, keyed and locked to the pass 5 palette.
+Heading foliage recoloured to the field greens; one broad-leaf plant rejected.
+
+rice-fields.webp (pass 6): whole-plot rice tiles, original work. Geometry: own Blender 4.2.3 blockout script (Blender GPL-3.0, tool only; output is ours) game-dev2/blender/plot_tile.py.
+Painted with Stable Diffusion XL base 1.0 (CreativeML Open RAIL++-M), sdxl-vae-fp16-fix by madebyollin (MIT), xinsir controlnet-union-sdxl-1.0 promax (Apache-2.0), h94 IP-Adapter ip-adapter-plus_sdxl_vit-h (Apache-2.0) with ComfyUI_IPAdapter_plus (GPL-3.0, tool only); style reference = our own backdrop-tall.webp. No third-party game art used.
+- 2026-11-08 p8: buffalo-*, mascot-*, neighbour-*, bank, banana, bush, palm, sala, hat-post, egret-fly repainted (img2img of the original sprites) with SDXL base 1.0 + ControlNet Union promax (canny+tile) + IP-Adapter plus (style from our own painted field) via ComfyUI; script game-dev2/blender/paint_sprites.py. Original art, no third-party images.
+harvest-scene.webp (pass 9): G12 harvest illustration, original work. Geometry: own Blender 4.2.3 blockout game-dev2/blender/harvest_scene.py (rounded metaball farmers, one cutting with a sickle and one carrying sheaves on a shoulder pole, stubble, clustered tree canopies, sugar palms, hut); painted by game-dev2/blender/paint_harvest.py with SDXL 1.0 base + sdxl-vae-fp16-fix + xinsir controlnet-union promax (depth+canny) + h94 IP-Adapter plus (style ref = our own style_ref.png), plus a low-denoise refine pass. Seed 101. No third-party game art used.
+rice-fields.webp (pass 9 canopy): mature plot cells rebuilt from individually painted rice clumps, original work. Geometry: own Blender 4.2.3 single-clump blockouts game-dev2/blender/clump_scene.py; painted by game-dev2/blender/paint_clumps.py with SDXL base 1.0 + sdxl-vae-fp16-fix + xinsir controlnet-union promax (canny+depth) + h94 IP-Adapter plus (style ref = our own style_ref.png); composed by compose_clumps.py. No third-party game art used.
+Pass 10 (2026-11-08): rice-fields.webp, rice-clumps.webp, bank.webp and harvest-scene.webp repainted; village figure scale and harvest crop adjusted in art.js/animation.js.
+Pass 10 art is original, made locally with Blender + SDXL; no third-party assets.
+Pass 11 (2026-11-09): rice-fields.webp recomposed from the pass 10 painted clumps (fewer larger hills, water channels, bare mud and lodged stems in sick plots); harvest-scene.webp repainted (smaller bound sheaves, shoulder pad); bank.webp regraded; sala and neighbour sprites outline-softened. Own scripts (compose_clumps.py, harvest_scene.py, bank-regrade-p11.py, outline-soften-p11.py) with Blender 4.2.3 + SDXL base 1.0 as in earlier passes; original work, no third-party assets.
+Pass 12 (2026-11-09): rice-fields.webp recomposed (noise-varied hill spacing/height/lean, open water between hills, larger sick gaps); harvest-scene.webp repainted with sheaves painted separately (paint_sheaf.py, comp.py); bank.webp regraded (bank-regrade-p12.py); village cottage variants and mascot grade made in canvas. Own scripts with Blender 4.2.3 + SDXL base 1.0 as in earlier passes; original work, no third-party assets.
+Pass 13 (2026-11-09): house-b.webp and house-c.webp are original cottages (PIL iso blockout -> local SDXL img2img with sala.webp as style, colour-matched to sala); mascot/buffalo outline bands repainted from their own interior colour; bank.webp lip reworked with drawn grass clusters, roots and wet earth. No third-party assets.
+Pass 14-15 (2026-11-09): mascot-*.webp and neighbour-*.webp regraded (game-dev2/backup-p14/p15-grade.py); shared lighting, contact shadows and per-plot water layouts drawn in canvas code. Original work, no third-party assets.
+Pass 16 (2026-11-09): rice-fields.webp recomposed (fewer, larger separate clumps, connected open water, flattened sick straw) with own compose_clumps.py from the pass 9+ painted clumps; neighbour-*.webp shirts flattened to colour blocks (game-dev2/backup-p15/p16/p16-blocks.py); mascot underside shading, contact shadows and shared light direction drawn in canvas code. Original work, no third-party assets.
+Pass 19 (2026-11-13): ?tv=1 booth TV mode (js/tv.js, css/tv.css, assets/booth-seed.json fictional accounts). js/qr.js is qrcode-generator 1.4.4 by Kazuhiko Arase, MIT licence, vendored unmodified apart from comments.

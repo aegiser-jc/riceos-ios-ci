@@ -28,7 +28,7 @@
   var origPoints, more = null;
   function histRow(r) {
     var d = Number(r.delta) || 0, nm = NAMES[r.reason] || r.reason;
-    return '<li><span>' + A.esc(nm) + '<small>' + W.date(r.event_at || r.created_at) + (r.note ? ' (' + A.esc(r.note) + ')' : '') + '</small></span><b class="' + (d < 0 ? 'neg' : '') + '">' + (d > 0 ? '+' : '') + A.fmt(d) + '</b></li>';
+    return '<li><span>' + A.esc(nm) + '<small>' + W.date(r.event_at || r.created_at) + (r.note ? ' · ' + A.esc(r.note) : '') + '</small></span><b class="' + (d < 0 ? 'neg' : '') + '">' + (d > 0 ? '+' : '') + A.fmt(d) + '</b></li>';
   }
   function evRow(ev, approvedIds) {
     var done = approvedIds[ev.id], t = ev.mission_type || ev.type || '', nm = /burn/.test(t) ? 'หลักฐานไม่เผาฟาง' : /awd|water|tube/.test(t) ? 'ถ่ายรูปท่อวัดน้ำ (เปียกสลับแห้ง)' : 'หลักฐานจากแปลง';
