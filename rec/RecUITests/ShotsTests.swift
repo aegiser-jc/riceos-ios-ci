@@ -1,6 +1,6 @@
 import XCTest
 
-// RiceOS iOS 1.10 (15) screen check on a simulator: launch -> notice -> consent -> register (throwaway test phone,
+// RiceOS iOS 1.11 (16) screen check on a simulator: launch -> notice -> consent -> register (throwaway test phone,
 // per-run PIN) -> plot -> voice -> home -> missions -> lessons -> wallet -> points -> game entry -> settings ->
 // delete account -> register page -> login page. Saves a PNG + an accessibility-label dump per screen to SHOTS_DIR.
 // Steps after registration never stop the run: a screen that cannot be reached is logged as "NOT_REACHED <name> <why>".
@@ -283,8 +283,8 @@ final class ShotsTests: XCTestCase {
         _ = must(["สร้างบัญชีและตั้งรหัส PIN"], 20, "register")
         pause(0.5); toTop(); shot("04-register-step1")
         let nm = field(["ชื่อที่ใช้แสดง", "เช่น ลุงสมชาย"], secure: false)
-        typeInto(nm, "บัญชีตัวอย่าง", "name")
-        if !((nm.value as? String) ?? "").contains("บัญชี") {
+        typeInto(nm, "สมพร ใจดี", "name")
+        if !((nm.value as? String) ?? "").contains("สมพร") {
             out("DIAG thai name not typed, using ASCII")
             typeInto(nm, "Somchai R", "name", clear: true)
         }
@@ -333,7 +333,8 @@ final class ShotsTests: XCTestCase {
         // home
         _ = must(["ตั้งค่า / ลบบัญชี"], 30, "home")
         pause(2.5); toTop(); shot("10-home")
-        scrollPage(up: true); scrollPage(up: true); shot("11-home-scrolled"); toTop()
+        scrollPage(up: true); scrollPage(up: true); shot("11-home-scrolled")
+        scrollPage(up: true); scrollPage(up: true); shot("11b-home-scrolled-more"); toTop()
 
         // missions (header bell -> #/missions, else the tile)
         var ok = false
@@ -368,15 +369,23 @@ final class ShotsTests: XCTestCase {
             }
         }
 
-        // game entry (home button under the greeting; iOS opens https://riceos.donaus.com/game/)
+        // game entry (home button under the greeting). 1.11: the bundled game opens INSIDE the app (/game/index.html),
+        // back link "กลับหน้าแอป" -> app home. Safari check kept: if the game is not in the app, it is logged, not hidden.
         if tryTap(NSPredicate(format: "label CONTAINS 'เล่นเกมนาข้าว'"), "game button", scrolls: 3) {
             pause(8.0)
-            let front: XCUIApplication = safari.state == .runningForeground ? safari : app
-            out("DIAG game opened in \(front == safari ? "Safari" : "RiceOS")")
-            shot("17-game-entry", front)
-            pause(6.0); shot("18-game-loaded", front)
-            if front == safari { app.activate(); pause(2.0) }
-            else { goHome() }
+            let backQ = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'กลับหน้าแอป'"))
+            let inApp = backQ.firstMatch.waitForExistence(timeout: 10)
+            out("DIAG game opened in \(inApp ? "RiceOS" : "not RiceOS") app.state=\(app.state.rawValue) safari.state=\(safari.state.rawValue)")
+            shot("17-game-entry")
+            pause(6.0); shot("18-game-loaded")
+            if inApp {
+                if let b = firstHittable(backQ) { b.tap() } else { backQ.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
+                if waitAnyText(["ตั้งค่า / ลบบัญชี"], 20) != nil { pause(2.0); shot("19-back-from-game") }
+                else { notReached("19-back-from-game", "home not shown 20 s after tapping กลับหน้าแอป") }
+            } else {
+                notReached("19-back-from-game", "game not inside RiceOS (no กลับหน้าแอป in the app tree)")
+                app.activate(); pause(2.0)
+            }
         } else { notReached("17-game-entry", "game button not on home") }
         goHome()
 

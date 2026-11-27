@@ -1,4 +1,4 @@
-# RiceOS iOS screen check on an iOS Simulator: app/ + ios/ of this branch (= ios 1.10 (15) main 16e89c0), Release, unsigned.
+# RiceOS iOS screen check on an iOS Simulator: app/ + ios/ of this branch (= ios 1.11 (16), rice-farmer ios-111-27nov 89888ab), Release, unsigned.
 # No Apple account, no signing, no TestFlight/App Store Connect calls, no secrets.
 # Hits the live backend (https://riceos.donaus.com) only to register one throwaway test phone and delete it again in the UI;
 # an always() step deletes it via the API if the UI run stopped early. PIN is generated per run and masked; never in the repo or logs.

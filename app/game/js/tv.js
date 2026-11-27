@@ -63,7 +63,7 @@
   function paint(i,s,h){const c=root.querySelectorAll('.tv-tile canvas')[i];if(!c||!scene(c,s,h,false))return false;c.parentNode.dataset.art='1';return true;}
   function render(){
     root.querySelectorAll('.tv-tile').forEach((t,i)=>{const s=seed.plots[i].stage,h=seed.plots[i].health,key=s+'/'+h;
-      t.querySelector('.tv-stage-txt').textContent=`ระยะ ${s+1} · ${STAGES[s]}`;t.querySelector('.tv-dots').innerHTML=STAGES.map((_,j)=>`<i${j<=s?' class="on"':''}></i>`).join('');t.dataset.s=s;
+      t.querySelector('.tv-stage-txt').textContent=`ระยะ ${s+1} ${STAGES[s]}`;t.querySelector('.tv-dots').innerHTML=STAGES.map((_,j)=>`<i${j<=s?' class="on"':''}></i>`).join('');t.dataset.s=s;
       if(shown[i]!==key&&paint(i,s,h))shown[i]=key;});
   }
   let focalKey='';

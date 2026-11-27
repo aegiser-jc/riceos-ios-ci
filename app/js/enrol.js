@@ -114,7 +114,7 @@
       '<div class="card w8card"><h3>เตรียมให้ครบ</h3><ul class="w8chk">' + BAAC.map(function (r) { return '<li><label class="chk"><input type="checkbox" data-bk="' + r[0] + '"' + (done[r[0]] ? ' checked' : '') + '><span><b>' + r[1] + '</b><small>' + r[2] + '</small></span></label></li>'; }).join('') + '</ul>' +
       '<div class="w8prog" id="bprog"></div></div>' +
       '<div class="card w8card"><h3>ข้อมูลแปลงของท่านในแอป</h3><div class="w8scroll"><table class="t w8t"><tr><th>แปลง</th><th>พื้นที่</th><th>พันธุ์</th><th>รหัสแปลง</th><th>พิกัด GPS</th></tr>' + rows + '</table></div></div>' +
-      '<button class="btn ghost" onclick="window.print()" style="margin-top:6px">พิมพ์รายการนี้</button>');
+      (window.RiceNative && RiceNative.native ? '' : '<button class="btn ghost" onclick="window.print()" style="margin-top:6px">พิมพ์รายการนี้</button>')); /* fix1 27nov: hidden in the store apps */
     var upd = function () { var n = Object.keys(done).filter(function (k) { return done[k]; }).length; document.getElementById('bprog').textContent = 'เตรียมแล้ว ' + n + ' จาก ' + BAAC.length + ' รายการ'; };
     A.app.querySelectorAll('[data-bk]').forEach(function (c) { c.onchange = function () { done[c.dataset.bk] = c.checked; A.save(); upd(); }; }); upd();
   }

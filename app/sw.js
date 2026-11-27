@@ -5,12 +5,12 @@
    18 Nov (v37, kept in v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48): CSS/JS are linked with ?v=<n> from index.html and precached under those exact URLs; when a new version replaces an older one,
    activate reloads every open /next/ window once, so a page that an older cache-first SW (v35 and before) answered from its cache shows the
    new CSS without the user clearing anything. Keep these ?v= in step with index.html. */
-const VERSION = 'riceos-v13';
+const VERSION = 'riceos-v19';
 const ASSETS = [
   './',
   './content/flags.json',
   './content/privacy.json',
-  './css/app.css?v=49',
+  './css/app.css?v=54',
   './css/w8.css?v=49',
   './css/w9.css?v=49',
   './css/w9b.css?v=50',
@@ -63,11 +63,11 @@ const ASSETS = [
   './img/trend-chart.jpg',
   './index.html',
   './js/api.js?v=49',
-  './js/app.js?v=50',
-  './js/enrol.js?v=49',
+  './js/app.js?v=56',
+  './js/enrol.js?v=53',
   './js/idreader.js?v=49',
   './js/league.js?v=49',
-  './js/w9b.js?v=52',
+  './js/w9b.js?v=55',
   './js/vc6.js?v=49',
   './js/booth.js?v=49',
   './js/fieldreview.js?v=49',
@@ -76,10 +76,10 @@ const ASSETS = [
   './js/awd.js?v=49',
   './content/rewards.json',
   './js/lessons.js?v=49',
-  './js/native.js?v=49',
+  './js/native.js?v=53',
   './js/plots2.js?v=49',
   './js/points.js?v=49',
-  './js/points2.js?v=49',
+  './js/points2.js?v=55',
   './js/regpoint.js?v=49',
   './manifest.webmanifest',
   './vendor/jsqr.js?v=49',

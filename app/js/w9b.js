@@ -9,11 +9,12 @@
   var STATUS = { approved: 'ผ่านการตรวจ', complete: 'ส่งแล้ว รอเจ้าหน้าที่ตรวจ', pending_photo: 'รอส่งรูป', rejected: 'ไม่ผ่านการตรวจ' };
 
   /* ---------- game link (contract: game-dev2/PLOT-LINK.md). Keys that are not known or not valid are left out. ---------- */
-  /* store app (Capacitor, https://localhost origin) has no server /game/: Android 1.8+ bundles the game in www/game/ -> local /game/index.html
-     (an extensionless /game/ would get the app index); iOS 1.1 still opens the site URL. Web: plain /game/. */
-  function isAndroidApp() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform() && c.getPlatform && c.getPlatform() === 'android'); }
-  function gameBase() { var c = window.Capacitor; return (c && c.isNativePlatform && c.isNativePlatform() && !isAndroidApp()) ? 'https://riceos.donaus.com' : ''; }
-  function gamePath() { return isAndroidApp() ? '/game/index.html' : '/game/'; }
+  /* store app (Capacitor) has no server /game/: the game is bundled in www/game/ (Android 1.8+, iOS 1.2+) -> local /game/index.html
+     (an extensionless /game/ would get the app index). fix2 27nov: iOS opened the site URL in Safari (only needed before iOS 1.2 bundled the game);
+     now both platforms open the bundled copy inside the app, back link -> app '/'. Web: plain /game/. */
+  function native() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform()); }
+  function gameBase() { return ''; }
+  function gamePath() { return native() ? '/game/index.html' : '/game/'; }
   function gameUrl(p) {
     var q = [], add = function (k, v) { q.push(k + '=' + encodeURIComponent(v)); };
     if (!p) return gameBase() + gamePath();
@@ -23,10 +24,13 @@
     if (isFinite(d) && d >= 0 && d <= 400) { add('s', s); var g = 0; STAGE_DAYS.forEach(function (x) { if (d >= x) g++; }); add('g', g); }
     var id = String(p.pid || p.id || '').replace(/-/g, ''); if (/^[A-Za-z0-9_-]{1,32}$/.test(id)) add('p', id); /* server plot ids are 36-char UUIDs; the contract allows 32: hyphens dropped */
     var h = String(location.hash || ''); var home = /^\/next\//.test(location.pathname) ? '/next/' : '/'; add('back', /^#\/plot\/[A-Za-z0-9_%-]{1,60}$/.test(h) ? home + h : home); /* back button in the game: back to the app copy the user came from (/ main app since 24 Nov, /next/ older copy) */
-    return gameBase() + gamePath() + (q.length ? '?' + q.join('&') : '');
+    /* fix2 27nov: plot name + kratong count in the hash (not sent to the server) so the game shows this plot even when its /api/me call fails */
+    var hq = [], nm = String(p.name || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 40), kc = (p.kratongs || []).length;
+    if (nm) hq.push('n=' + encodeURIComponent(nm)); if (kc >= 1 && kc <= 30) hq.push('k=' + kc);
+    return gameBase() + gamePath() + (q.length ? '?' + q.join('&') : '') + (hq.length ? '#' + hq.join('&') : '');
   }
   function gameBtn(p, id) {
-    return '<a class="btn w9b-game" id="' + id + '" href="' + esc(gameUrl(p)) + '"><span class="w9b-gi" aria-hidden="true">' + RiceIco('sprout') + '</span><span>เล่นเกมนาข้าวของแปลงนี้</span></a>';
+    return '<a class="btn w9b-game" id="' + id + '" href="' + esc(gameUrl(p)) + '"><span class="w9b-gi" aria-hidden="true">' + RiceIco('sprout') + '</span><span><span class="nw">เล่นเกมนาข้าว</span><wbr><span class="nw">ของแปลงนี้</span></span></a>';
   }
 
   /* ---------- decorate home + plot screens ---------- */
@@ -74,8 +78,8 @@
       '<p class="w9note"><b>โปรดทราบ</b> ยังไม่มีการรับรองว่าแปลงของท่านจะได้คาร์บอนเครดิตหรือได้เงินเท่าใด ขึ้นอยู่กับเงื่อนไขโครงการ การตรวจสอบ และราคาในตลาดขณะนั้น</p>' +
       '<a class="btn w9btn" href="#/kratong">ดูท่อวัดน้ำและ QR ของแปลง</a></div>' +
       '<div class="card w9card" id="inc-ideas"><h3>แนวทางหารายได้อื่นจากนาและครัวเรือน</h3><ul class="w9list w9b-ideas">' + IDEAS.map(li).join('') + '</ul></div>' +
-      '<div class="card w9card" id="inc-prices"><h3>ราคาอ้างอิง</h3><span class="w9b-tag">ตัวอย่างเพื่อวางแผน</span>' +
-      '<p class="w9note">ตัวเลข x,xxx ด้านล่างเป็นที่ว่างสำหรับจดราคา ตัวอย่างเพื่อวางแผน ยังไม่ใช่ราคาจริง กรุณาสอบถามราคาปัจจุบันก่อนตัดสินใจ</p><ul class="w9list">' +
+      '<div class="card w9card" id="inc-prices"><h3>ราคาอ้างอิง</h3><span class="w9b-tag">ช่องจดราคา</span>' +
+      '<p class="w9note">ตัวเลข x,xxx ด้านล่างเป็นที่ว่างสำหรับจดราคาเอง ยังไม่ใช่ราคาจริง กรุณาสอบถามราคาปัจจุบันก่อนตัดสินใจ</p><ul class="w9list">' +
       PRICES.map(function (r) { return '<li><span>' + r[0] + '<small>' + r[1] + '</small></span><b class="w9b-ph">x,xxx</b></li>'; }).join('') + '</ul></div>' +
       '<div class="card w9card"><h3>ขั้นต่อไป</h3><a class="btn w9btn" href="#/lessons">เรียนบทเรียนการจัดการน้ำ</a><a class="btn ghost w9btn" href="#/mentor">ถามพี่เลี้ยงนาข้าว</a></div>' +
       '<footer class="w9b-src" id="inc-src"><h3>แหล่งที่มา</h3><ul>' + SOURCES.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>' +
@@ -98,7 +102,7 @@
         return '<li><b>' + esc(MISSIONS[e.mission_type] || 'หลักฐานภารกิจ') + (e.kratong_seq ? ' กระทง ' + esc(e.kratong_seq) : '') + '</b><span>' + esc(thTime(e.client_time || e.server_time)) + '</span><em>' + esc(STATUS[e.status] || 'ส่งแล้ว') + '</em></li>';
       }).join('') + '</ol>' + (evs.length > 40 ? '<p class="w9note">แสดง 40 รายการล่าสุด จากทั้งหมด ' + A.fmt(evs.length) + ' รายการ</p>' : '') : '<p class="w9p">ยังไม่มีหลักฐานของแปลงนี้</p>';
       A.app.innerHTML = A.header() + '<div class="sheet w9 w9b w9b-sum">' + A.titleRow('สรุปแปลง', esc(p.name || 'แปลงของฉัน')) +
-        '<div class="w9b-actions"><button class="btn w9btn" id="w9bprint" type="button">พิมพ์ / บันทึก PDF</button><a class="btn ghost w9btn" href="#/plot">กลับไปหน้าแปลง</a></div>' +
+        '<div class="w9b-actions">' + (native() ? '' : '<button class="btn w9btn" id="w9bprint" type="button">พิมพ์ / บันทึก PDF</button>') + '<a class="btn ghost w9btn" href="#/plot">กลับไปหน้าแปลง</a></div>' +
         '<div class="w9b-sheet"><h2 class="w9b-ptitle">สรุปแปลงนา ' + esc(p.name || '') + '</h2>' +
         '<div class="card w9card w9b-id"><div class="w9b-qr" id="w9bqr" role="img" aria-label="QR รหัสแปลง"></div><div><span class="w9b-lbl">รหัสแปลง</span><b class="w9b-code" id="w9bcode">' + (code ? esc(code) : 'ยังไม่มีรหัส') + '</b>' +
         (code ? '' : '<small>รหัสจะขึ้นหลังส่งข้อมูลแปลงสำเร็จ</small>') + '</div></div>' +
@@ -111,7 +115,7 @@
       var q = document.getElementById('w9bqr');
       if (code && q && window.qrcode) { try { var z = qrcode(0, 'M'); z.addData(code); z.make(); q.innerHTML = z.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { q.textContent = code; } }
       else if (q) q.textContent = 'ไม่มีรหัส QR';
-      document.getElementById('w9bprint').onclick = function () { window.print(); };
+      var pb = document.getElementById('w9bprint'); if (pb) pb.onclick = function () { window.print(); }; /* fix1 27nov: no print button in the store apps (window.print does nothing in their WebView) */
     };
     draw(local, null, 0, '');
     if (!A.api || !A.api.req || !p.pid) return;
