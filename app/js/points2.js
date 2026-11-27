@@ -69,8 +69,10 @@
 
   function decorate(h) {
     var S = A.S();
-    if (h === 'home' && S.registered && !S.seeded) {
-      W.load('points', '/api/me/points?limit=20').then(function (r) { if (!W.alive('home')) return; var b = A.app.querySelector('.ptspill b'); if (b) b.textContent = A.fmt(r.data.balance); }, function () {});
+    /* fix2 27nov: home and เงินของฉัน show the same figure as แต้มของฉัน: the server balance. A cached (offline) or missing answer leaves "–", never a local or old number shown as current. */
+    var sel = { home: '.ptspill b', wallet: '.points-link b' }[h];
+    if (sel && S.registered && !S.seeded) {
+      W.load('points', '/api/me/points?limit=20').then(function (r) { if (!W.alive(h)) return; var b = A.app.querySelector(sel); if (b) b.textContent = r.stale ? '–' : A.fmt(r.data.balance); }, function () {});
     }
     if (h === 'home') { /* PingEris 23 Nov r2: home points = the same star state line as on the missions card, above the button */
       var pl = A.app.querySelector('.today .plus'), sh = pl && A.app.querySelector('.today .shoot');

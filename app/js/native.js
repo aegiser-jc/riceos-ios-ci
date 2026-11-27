@@ -20,6 +20,14 @@
       if (no) no({ code: denied ? 1 : 2, message: msg });
     });
   }
+  /* fix1 27nov: is location already allowed? Never opens the permission prompt (for background retries). Unknown -> false. */
+  function geoGranted() {
+    try {
+      if (Geo && typeof Geo.checkPermissions === 'function') return Geo.checkPermissions().then(function (s) { return !!s && (s.location === 'granted' || s.coarseLocation === 'granted'); }, function () { return false; });
+      if (navigator.permissions && navigator.permissions.query) return navigator.permissions.query({ name: 'geolocation' }).then(function (s) { return !!s && s.state === 'granted'; }, function () { return false; });
+    } catch (e) {}
+    return Promise.resolve(false);
+  }
   /* Native camera: resolves a JPEG Blob, null when the farmer cancelled; rejects {denied:true} when camera access is off */
   function takePhoto() {
     return Cam.getPhoto({ source: 'CAMERA', resultType: 'uri', quality: 85, width: 2048, correctOrientation: true, saveToGallery: false, allowEditing: false })
@@ -28,5 +36,5 @@
   }
   /* Capacitor App 'resume' (app back to foreground): callers use it to retry the photo outbox */
   function onResume(fn) { var A = native && cap.Plugins && cap.Plugins.App; if (A && A.addListener) { try { A.addListener('resume', fn); } catch (e) {} } }
-  window.RiceNative = { native: native, camera: !!Cam, geo: !!Geo, geoAvailable: geoAvailable, getPosition: getPosition, takePhoto: Cam ? takePhoto : null, onResume: onResume };
+  window.RiceNative = { native: native, camera: !!Cam, geo: !!Geo, geoAvailable: geoAvailable, geoGranted: geoGranted, getPosition: getPosition, takePhoto: Cam ? takePhoto : null, onResume: onResume };
 })();

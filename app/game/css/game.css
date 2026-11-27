@@ -551,12 +551,13 @@ body.has-back .topbar .brand small{display:none}
 }
 @media(min-width:701px) and (min-height:501px){.plot-facts.pf-mine{max-width:440px;padding:12px 20px 13px;row-gap:4px}.plot-facts.pf-mine .pf-label,.plot-facts.pf-mine .pf-stage{font-size:18px}.plot-facts.pf-mine select{font-size:22px;min-height:50px}.plot-facts.pf-mine .pf-meta{font-size:19px}}
 .plot-facts .pf-meta .nw{white-space:nowrap}
-.plot-facts .pf-meta .nw+.nw::before{content:' · '}
+.plot-facts .pf-meta .nw+.nw{margin-left:.6em}
 .plot-facts .pf-meta .pm-stg{display:none}
 @media(max-width:700px),(max-height:500px) and (orientation:landscape){
  .plot-facts.pf-mine{row-gap:2px;padding:5px 10px 6px 6px}
- .plot-facts.pf-mine .pf-stage,.plot-facts.pf-mine .pf-meta .pm-var{display:none}
- .plot-facts.pf-mine .pf-meta{grid-column:1 / -1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .plot-facts.pf-mine .pf-stage{display:none}
+ /* fix2 27nov: variety and rice age stay visible on phones; items wrap between each other instead of being cut with an ellipsis */
+ .plot-facts.pf-mine .pf-meta{grid-column:1 / -1;white-space:normal;line-height:1.35}
  .plot-facts.pf-mine .pf-meta .pm-stg{display:inline}
  .plot-facts.pf-mine select{min-height:44px;font-size:18px}
 }
@@ -574,3 +575,19 @@ body.has-back .topbar .brand small{display:none}
 .plot-facts .pf-chip[aria-pressed=true] .pc-k{color:#f7e3a6}
 .plot-facts .pf-chip:focus-visible{outline:2px solid #e6b840;outline-offset:2px}
 @media(min-width:701px) and (min-height:501px){.plot-facts .pf-chip{min-height:54px}.plot-facts .pf-chip .pc-n{font-size:19px}.plot-facts .pf-chip .pc-k{font-size:15px}}
+/* fix1 27nov: header never pushes the sound/info buttons off screen (large font, small phone) */
+body.has-back .topbar .game-back,body.has-back .topbar .header-right{flex-shrink:0}
+body.has-back .topbar .brand>span{display:block;min-width:0;white-space:nowrap;overflow:hidden}
+.topbar.brand-off .brand>span{visibility:hidden}
+/* fix1 27nov r2: large font -- selected plot bubble keeps its own width (was squeezed to the 26% tap target), bottom-menu labels stay on one line and are scaled to fit by fitNav() */
+.field-target.selected span{flex:none}
+.bottom-nav button{position:relative;overflow:visible}
+.bottom-nav button span{white-space:nowrap;transform-origin:50% 50%}
+.coin-pill>span{transform-origin:50% 50%}
+/* fix2 27nov (Assist): no real plot -> prompt to add one, no game board */
+body.no-plot .bottom-nav,body.no-plot #sound{display:none}
+.no-plot-gate{min-height:calc(100dvh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px 20px;text-align:center}
+.no-plot-gate>.icon{width:72px;height:72px}
+.no-plot-gate h1{margin:0;font-size:26px;line-height:1.45;color:var(--green,#0c5139)}
+.no-plot-gate .primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;min-width:220px;padding:0 28px;border-radius:999px;background:var(--green,#0c5139);color:#fff;font-size:20px;font-weight:600;text-decoration:none}
+.no-plot-gate .primary .icon{width:24px;height:24px;--ic-line:#fff}

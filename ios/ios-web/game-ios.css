@@ -1,0 +1,7 @@
+/* iOS build only (ios/sync-www.sh adds this to www/game/index.html; app/ stays equal to the web files).
+   contentInset "never" (1.11) lays the web view under the status bar; the game's fixed bars use top:4-20px and
+   would sit under the clock. Body becomes the containing block for the fixed layers and starts below the status bar.
+   On devices without a top inset env() is 0 and nothing moves. */
+html:root{background:#0c5139}
+body{position:fixed;left:0;right:0;bottom:0;top:env(safe-area-inset-top,0px);transform:translateZ(0);background:#a7bfcc}
+body .skip:not(:focus){top:-300px}
