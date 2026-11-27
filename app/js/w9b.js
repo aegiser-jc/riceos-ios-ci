@@ -34,7 +34,10 @@
     var p = A.P(), app = A.app;
     if (h === 'home' && !app.querySelector('.w9b-home')) {
       var g = app.querySelector('.grid4'); if (!g) return;
-      g.insertAdjacentHTML('afterend', '<div class="w9b-home">' + (p ? gameBtn(p, 'w9bgamehome') : '') +
+      /* 25 Nov: the game button sits right under the greeting (first screen on phones), not after the tile grid */
+      var pf = app.querySelector('.profile');
+      if (p) { if (pf) pf.insertAdjacentHTML('afterend', gameBtn(p, 'w9bgamehome').replace('class="btn w9b-game"', 'class="btn w9b-game w9b-gtop"')); else g.insertAdjacentHTML('beforebegin', gameBtn(p, 'w9bgamehome')); }
+      g.insertAdjacentHTML('afterend', '<div class="w9b-home">' +
         '<a class="w9b-inc" href="#/income"><b>นาข้าวหนึ่งแปลง หลายรายได้</b><small>รู้จักรายได้เสริมจากนาข้าว</small><span aria-hidden="true">&rsaquo;</span></a></div>');
     }
     if (h === 'plot' && p && !app.querySelector('.w9b-plot')) {

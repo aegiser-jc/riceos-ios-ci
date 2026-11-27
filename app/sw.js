@@ -5,7 +5,7 @@
    18 Nov (v37, kept in v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48): CSS/JS are linked with ?v=<n> from index.html and precached under those exact URLs; when a new version replaces an older one,
    activate reloads every open /next/ window once, so a page that an older cache-first SW (v35 and before) answered from its cache shows the
    new CSS without the user clearing anything. Keep these ?v= in step with index.html. */
-const VERSION = 'riceos-v10';
+const VERSION = 'riceos-v13';
 const ASSETS = [
   './',
   './content/flags.json',
@@ -13,8 +13,8 @@ const ASSETS = [
   './css/app.css?v=49',
   './css/w8.css?v=49',
   './css/w9.css?v=49',
-  './css/w9b.css?v=49',
-  './css/vc6.css?v=49',
+  './css/w9b.css?v=50',
+  './css/vc6.css?v=50',
   './css/dailycheck.css?v=49',
   './data/knowledge.json',
   './data/lessons.json',
@@ -67,7 +67,7 @@ const ASSETS = [
   './js/enrol.js?v=49',
   './js/idreader.js?v=49',
   './js/league.js?v=49',
-  './js/w9b.js?v=51',
+  './js/w9b.js?v=52',
   './js/vc6.js?v=49',
   './js/booth.js?v=49',
   './js/fieldreview.js?v=49',

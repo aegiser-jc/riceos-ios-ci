@@ -202,12 +202,11 @@ body.still *,body.still *:before{animation:none!important}
 #sheet[data-screen=G06] .pipe{height:140px;width:56px}
 #sheet[data-screen=G06] .sheet-source{margin-top:8px}
 #sheet[data-screen=G06]>.close{top:10px}
-#sheet[data-screen=G06] #sheet-content>.eyebrow{display:none}
 #sheet[data-screen=G06] .sheet-subtitle{margin-bottom:8px}
 #sheet[data-screen=G12]{max-width:780px;padding:22px}
 #sheet[data-screen=G12] .season-art{height:clamp(250px,46dvh,420px);margin:12px 0}
 #sheet[data-screen=G12] .season-art canvas{object-fit:fill}
-#sheet[data-screen=V01] .sheet-subtitle,#sheet[data-screen=V01] #sheet-content>p,#sheet[data-screen=V01] .sheet-source,#sheet[data-screen=V01] #sheet-content>.eyebrow{display:none}
+#sheet[data-screen=V01] .sheet-subtitle,#sheet[data-screen=V01] #sheet-content>p,#sheet[data-screen=V01] .sheet-source{display:none}
 @media(max-width:700px){.village-card{padding:12px 16px;max-height:30dvh;bottom:98px}
 .village-card h2{font-size:20px;margin:0}
 .village-card p{font-size:18px;line-height:1.5}
@@ -234,7 +233,7 @@ body:has(#sheet[open][data-screen=V01]) .village-card{display:none}
 
 }
 .season-heading{position:absolute;z-index:1;left:16px;top:18px;max-width:calc(100% - 82px);padding:8px 12px;border-radius:16px;background:#fafaf3e8}
-.season-heading .eyebrow{display:none}
+.season-heading .eyebrow{display:flex;margin-bottom:4px}
 .season-heading h2{margin:0;padding:0;font-size:23px}
 @media(max-width:700px){#sheet[data-screen=G12] .season-art{height:48dvh;margin:-20px -16px 14px}
 #sheet[data-screen=G12] .season-heading h2{font-size:21px}
@@ -246,7 +245,6 @@ body:has(#sheet[open][data-screen=V01]) .village-card{display:none}
 .receipt-reading strong{font-size:23px}
 #sheet[data-screen=G10]::backdrop{background:transparent}
 #sheet[data-screen=G10] .primary{margin-top:12px}
-#sheet[data-screen=G10] #sheet-content>.eyebrow{display:none}
 @media(max-width:700px){#sheet[data-screen=G10]{bottom:86px;max-height:35dvh;padding:18px 20px;border-radius:26px 26px 0 0}
 #sheet[data-screen=G10] h2{font-size:22px;margin:0}
 #sheet[data-screen=G10] .provenance{font-size:16px;line-height:1.35}
@@ -562,3 +560,17 @@ body.has-back .topbar .brand small{display:none}
  .plot-facts.pf-mine .pf-meta .pm-stg{display:inline}
  .plot-facts.pf-mine select{min-height:44px;font-size:18px}
 }
+
+/* 25 Nov: one header system -- every sheet opens with its bottom-menu section (icon + name, menu green) */
+#sheet-content .sheet-section,.season-heading .sheet-section{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:600;color:var(--green,#0c5139);letter-spacing:.01em}
+.sheet-section .icon{width:20px;height:20px;flex:none}
+/* 25 Nov (PingEris): plot chips replace the native select -- one chip per plot with its kratong count from /api/me, tap >= 44 px */
+.plot-facts .pf-chips{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 2px 4px;margin:4px 0 2px}
+.plot-facts .pf-chips::-webkit-scrollbar{display:none}
+.plot-facts .pf-chip{flex:none;scroll-snap-align:start;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;min-height:48px;min-width:96px;max-width:200px;padding:4px 14px;border:1.5px solid #0c513940;border-radius:14px;background:#fffdf6;color:var(--green,#0c5139);font:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 0 #0c513918}
+.plot-facts .pf-chip .pc-n{font:600 17px/1.25 Sarabun,sans-serif;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plot-facts .pf-chip .pc-k{font-size:14px;line-height:1.2;color:#5d5a4c}
+.plot-facts .pf-chip[aria-pressed=true]{background:var(--green,#0c5139);border-color:var(--green,#0c5139);color:#fff}
+.plot-facts .pf-chip[aria-pressed=true] .pc-k{color:#f7e3a6}
+.plot-facts .pf-chip:focus-visible{outline:2px solid #e6b840;outline-offset:2px}
+@media(min-width:701px) and (min-height:501px){.plot-facts .pf-chip{min-height:54px}.plot-facts .pf-chip .pc-n{font-size:19px}.plot-facts .pf-chip .pc-k{font-size:15px}}

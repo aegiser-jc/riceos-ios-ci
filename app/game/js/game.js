@@ -71,7 +71,7 @@
     $('#page-title').textContent=village?'หมู่บ้านเล็ก ๆ ที่ดูแลกัน':'แวะมาดูนา วันนี้เป็นอย่างไร';$('#eyebrow').textContent=village?'บ้านปลายคลอง · เติบโตไปด้วยกัน':(plot&&(plot.variety||plot.area)?['ข้าว '+(plot.variety||''),plot.area?plot.area+' ไร่':''].filter(Boolean).join(' · ').replace('ข้าว ','ข้าว'+' '):'บ้านปลายคลอง · ฤดูข้าวของเรา');
     {const pf=$('#plot-facts');if(pf){const mine=!!(user&&board&&board.mine),has=(mine||!!(plot&&(plot.variety||plot.area||plot.sow||plot.stage!==undefined)))&&!village;pf.hidden=!has;document.body.classList.toggle('has-plot',has);document.body.classList.toggle('has-switch',has&&mine&&user.plots.length>1);pf.classList.toggle('pf-mine',has&&mine);if(has){const f=[plot&&plot.variety?'ข้าว '+esc(plot.variety):'',plot&&plot.area?esc(plot.area)+' ไร่':''].filter(Boolean).join(' · ');
       if(mine){const cur=user.plots[board.cur],kr=board.n+' กระทง'+(board.n>board.shown?' (ภาพแสดง '+board.shown+')':''),line=[kr,f].filter(Boolean).join(' · '),lineHtml=[['kr',esc(kr)],['var',plot&&plot.variety?'ข้าว '+esc(plot.variety):''],['area',plot&&plot.area?esc(plot.area)+' ไร่':''],['stg',shortStages[state.stage]]].filter(x=>x[1]).map(x=>'<span class="nw pm-'+x[0]+'">'+x[1]+'</span>').join('');
-        const pick=user.plots.length>1?'<label class="pf-pick"><span class="pf-sr">เลือกแปลง ('+user.plots.length+' แปลง)</span><select id="plot-switch" aria-label="เลือกแปลง มี '+user.plots.length+' แปลง">'+user.plots.map((p,i)=>'<option value="'+i+'"'+(i===board.cur?' selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select><span class="pf-chev" aria-hidden="true">▾</span></label>':'<strong class="pf-name">'+esc(cur.name)+'</strong>';
+        const pick=user.plots.length>1?'<div class="pf-pick pf-chips" role="group" aria-label="เลือกแปลง มี '+user.plots.length+' แปลง">'+user.plots.map((p,i)=>'<button type="button" class="pf-chip" data-plot="'+i+'" aria-pressed="'+(i===board.cur)+'"><span class="pc-n">'+esc(p.name)+'</span><span class="pc-k">'+p.kr+' กระทง</span></button>').join('')+'</div>':'<strong class="pf-name">'+esc(cur.name)+'</strong>';
         pf.innerHTML='<span class="pf-label">'+icon('farm')+(user.plots.length>1?'แปลงของคุณ '+(board.cur+1)+'/'+user.plots.length:'แปลงของคุณ')+'</span><span class="pf-stage">ระยะ: '+shortStages[state.stage]+'</span>'+pick+'<span class="pf-meta">'+lineHtml+'</span>';
         pf.setAttribute('aria-label','แปลง '+cur.name+' '+line+' ระยะ: '+shortStages[state.stage]);}
       else{pf.innerHTML='<span class="pf-label">'+icon('farm')+'แปลงของคุณ</span><span class="pf-stage">ระยะ: '+shortStages[state.stage]+'</span><strong>'+(f||'ข้าวในแปลง')+'</strong>';pf.setAttribute('aria-label','แปลงของคุณ '+(f||'')+' ระยะ: '+shortStages[state.stage]);}
@@ -96,7 +96,9 @@
   function showSheet(content,code){lastFocus=document.activeElement;const d=$('#sheet');$('#sheet-content').innerHTML=content;if(!d.open)d.showModal();if(code)d.dataset.screen=code;$('#sheet-content').scrollTop=0;d.scrollTop=0;}
   function close(){const d=$('#sheet');d.close();if(lastFocus?.isConnected)lastFocus.focus();if(state.screen!=='V01')state.screen='G02';updateHUD();M.set(state);}
   function footer(source='ภาพจัดวางในเครื่อง',at=STAMP){return `<div class="sheet-source">ที่มา: ${esc(source)} · เวลา ${time(at)}<br>บันทึกในอุปกรณ์นี้ · ยังไม่เชื่อมระบบตรวจหลักฐาน</div>`;}
-  function title(code,label,subtitle=''){return `<span class="eyebrow">เรื่องเล่าข้างคันนา</span><h2 id="sheet-title">${label}</h2>${subtitle?`<p class="sheet-subtitle">${subtitle}</p>`:''}`;}
+  // sheet eyebrow = the bottom-menu section the sheet belongs to (same name + icon as the menu), so every page reads as one app
+  const SECTION={G08:['mission','ภารกิจ'],G09:['mission','ภารกิจ'],G10:['mission','ภารกิจ'],V01:['village','หมู่บ้าน'],G12:['harvest','บันทึกฤดู'],RiceOS:['info','ที่มาข้อมูล']};
+  function title(code,label,subtitle=''){const sec=SECTION[code]||['farm','นาของเรา'];return `<span class="eyebrow sheet-section">${icon(sec[0])}${sec[1]}</span><h2 id="sheet-title">${label}</h2>${subtitle?`<p class="sheet-subtitle">${subtitle}</p>`:''}`;}
   function tube(level=-15){return `<div class="tube-art" role="img" aria-label="ท่อวัดน้ำ ระดับ ${Math.abs(level)} เซนติเมตรใต้ผิวดิน"><span class="soil-line">ผิวดิน</span><div class="pipe" style="--water-height:${level===-5?68:33}%"></div><span class="level-line" style="top:${level===-5?53:58}%" id="tube-value">−${Math.abs(level)} ซม.</span></div>`;}
   function animateTube(){
     if(typeof requestAnimationFrame!=='function'||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -206,7 +208,8 @@
     if(i<0){let sv=null;try{sv=localStorage.getItem(selKey());}catch{}i=Math.max(0,u.plots.findIndex(p=>p.id.replace(/-/g,'')===sv));}
     setPlot(i,true);
   }
-  document.addEventListener('change',e=>{if(e.target&&e.target.id==='plot-switch'&&user){const i=Number(e.target.value);if(Number.isInteger(i)&&i>=0&&i<user.plots.length&&(!board||i!==board.cur)){sound();setPlot(i,false);}}});
+  // plot chips (no native select; 25 Nov): tap a chip -> that plot, board = its kratong_count from /api/me
+  document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('[data-plot]');if(!c||!user)return;const i=Number(c.dataset.plot);if(Number.isInteger(i)&&i>=0&&i<user.plots.length&&(!board||i!==board.cur)){sound();setPlot(i,false);const n=document.querySelector('.pf-chip[data-plot="'+i+'"]');if(n){if(e.detail===0)n.focus({preventScroll:true});n.scrollIntoView({block:'nearest',inline:'nearest'});}}});
   async function boot(){applyUser(await loadUser());updateHUD();await M.mount(state);artReady=true;if(pendingArt)open(pendingArt);else if(route)open(route);}
   boot();if(!NATIVE&&'serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
