@@ -381,7 +381,7 @@ final class ShotsTests: XCTestCase {
             if inApp {
                 if let b = firstHittable(backQ) { b.tap() } else { backQ.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
                 if waitAnyText(["ตั้งค่า / ลบบัญชี"], 20) != nil { pause(2.0); shot("19-back-from-game") }
-                else { notReached("19-back-from-game", "home not shown 20 s after tapping กลับหน้าแอป") }
+                else { out("DIAG after back: game=\(backQ.firstMatch.exists) market=\(anyContains("ตลาดขายข้าว").firstMatch.exists)"); notReached("19-back-from-game", "home not shown 20 s after tapping กลับหน้าแอป") }
             } else {
                 notReached("19-back-from-game", "game not inside RiceOS (no กลับหน้าแอป in the app tree)")
                 app.activate(); pause(2.0)
