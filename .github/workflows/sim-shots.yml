@@ -1,0 +1,75 @@
+# RiceOS iOS screen check on an iOS Simulator: app/ + ios/ of this branch (= ios 1.10 (15) main 16e89c0), Release, unsigned.
+# No Apple account, no signing, no TestFlight/App Store Connect calls, no secrets.
+# Hits the live backend (https://riceos.donaus.com) only to register one throwaway test phone and delete it again in the UI;
+# an always() step deletes it via the API if the UI run stopped early. PIN is generated per run and masked; never in the repo or logs.
+name: sim-shots
+on:
+  push:
+    branches: [sim-shots]
+permissions:
+  contents: read
+concurrency:
+  group: ios
+  cancel-in-progress: false
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 50
+    env:
+      REC_PHONES: '0899123409,0899123410,0899123407,0899123401'
+    steps:
+      - name: Run-time PIN (masked)
+        run: |
+          PIN=$(python3 - <<'PY'
+          import secrets
+          while True:
+              p = ''.join(secrets.choice('0123456789') for _ in range(6))
+              d = [int(c) for c in p]; steps = {d[i+1]-d[i] for i in range(5)}
+              if len(set(p)) >= 5 and steps not in ({1}, {-1}, {0}) and p not in ('000000','123456','654321','121212','112233'): print(p); break
+          PY
+          )
+          echo "::add-mask::$PIN"
+          echo "REC_PIN=$PIN" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode (same as ios.yml)
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1); [ -n "$X" ] && sudo xcode-select -s "$X"; xcodebuild -version
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Copy app/ into the iOS bundle
+        run: |
+          cd ios && ./sync-www.sh
+          echo "app files: $(find www -type f | wc -l)"; grep -o "riceos-next-v[0-9]*" www/sw.js | head -1 || true
+      - name: Capacitor sync (npm ci + pod install)
+        run: |
+          cd ios && npm ci --no-audit --no-fund
+          npx cap sync ios
+      - name: Pick simulator (newest iOS, iPhone 17/16 class)
+        run: |
+          python3 rec/pick_sim.py | tee -a "$GITHUB_ENV"
+      - name: Build RiceOS for the simulator (Release, no signing)
+        run: |
+          set -o pipefail
+          cd ios/ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphonesimulator -destination "id=$SIM_UDID" -derivedDataPath "$GITHUB_WORKSPACE/app-dd" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO build | tail -15
+          A="$GITHUB_WORKSPACE/app-dd/Build/Products/Release-iphonesimulator/App.app"; test -d "$A"; echo "APP_PATH=$A" >> "$GITHUB_ENV"
+          /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' -c 'Print CFBundleShortVersionString' -c 'Print CFBundleVersion' "$A/Info.plist"
+      - name: Build UI driver (XcodeGen + build-for-testing)
+        run: |
+          set -o pipefail
+          brew install xcodegen >/dev/null
+          cd rec && xcodegen generate
+          xcodebuild build-for-testing -project RecUI.xcodeproj -scheme RecUITests -destination "id=$SIM_UDID" -derivedDataPath "$GITHUB_WORKSPACE/rec-dd" | tail -15
+      - name: Walk the main screens + screenshots
+        run: bash rec/shots.sh
+      - name: Ensure the test account is deleted (API)
+        if: always()
+        run: python3 rec/cleanup.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: riceos-ios-shots
+          path: |
+            out/shots/
+            out/marks.txt
+          if-no-files-found: warn
